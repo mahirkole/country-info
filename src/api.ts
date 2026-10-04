@@ -1,0 +1,153 @@
+import Fastify, { type FastifyInstance } from 'fastify';
+import fastifyStatic from '@fastify/static';
+import { randomBytes } from 'node:crypto';
+import { mkdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import type pg from 'pg';
+import { config } from './config.js';
+
+const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data, updated_seq';
+const MAX_LIMIT = 1000;
+
+function page(q: { limit?: string; after?: string }) {
+  const limit = Math.min(Math.max(parseInt(q.limit ?? '100', 10) || 100, 1), MAX_LIMIT);
+  return { limit, after: q.after ?? '' };
+}
+
+export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; exportDir?: string } = {}): Promise<FastifyInstance> {
+  const adminToken = opts.adminToken ?? config.adminToken;
+  const app = Fastify({ logger: false });
+
+  const requireAdmin = async (req: { headers: Record<string, unknown> }, reply: { code: (n: number) => { send: (b: unknown) => unknown } }) => {
+    if (!adminToken || req.headers['authorization'] !== `Bearer ${adminToken}`) return reply.code(401).send({ error: 'unauthorized' });
+  };
+
+  app.get('/healthz', async () => ({ ok: true }));
+
+  // ---- countries -------------------------------------------------------
+  app.get<{ Querystring: { limit?: string; after?: string; un_status?: string; continent?: string } }>('/v1/countries', async (req) => {
+    const { limit, after } = page(req.query);
+    const { un_status, continent } = req.query;
+    const rows = (
+      await pool.query(
+        `SELECT ${COLS} FROM entities WHERE kind = 'country' AND code > $1
+           AND ($2::text IS NULL OR data->>'un_status' = $2) AND ($3::text IS NULL OR data->>'continent' = $3)
+         ORDER BY code LIMIT $4`,
+        [after, un_status ?? null, continent ?? null, limit + 1],
+      )
+    ).rows;
+    return paged(rows, limit, 'code');
+  });
+
+  app.get<{ Params: { code: string } }>('/v1/countries/:code', async (req, reply) => {
+    const r = await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'country' AND code = $1`, [req.params.code.toUpperCase()]);
+    return r.rows[0] ?? reply.code(404).send({ error: 'not_found' });
+  });
+
+  app.get<{ Params: { code: string }; Querystring: { level?: string; limit?: string; after?: string } }>(
+    '/v1/countries/:code/regions',
+    async (req, reply) => {
+      const cc = req.params.code.toUpperCase();
+      const kind = req.query.level === '2' ? 'admin2' : req.query.level === '1' || !req.query.level ? 'admin1' : null;
+      if (!kind) return reply.code(400).send({ error: 'level must be 1 or 2' });
+      const { limit, after } = page(req.query);
+      const rows = (
+        await pool.query(`SELECT ${COLS} FROM entities WHERE country_code = $1 AND kind = $2 AND id > $3 ORDER BY id LIMIT $4`, [cc, kind, after, limit + 1])
+      ).rows;
+      return paged(rows, limit, 'id');
+    },
+  );
+
+  // ---- regions ---------------------------------------------------------
+  app.get<{ Params: { id: string } }>('/v1/regions/:id', async (req, reply) => {
+    const r = await pool.query(`SELECT ${COLS} FROM entities WHERE id = $1`, [req.params.id]);
+    return r.rows[0] ?? reply.code(404).send({ error: 'not_found' });
+  });
+
+  app.get<{ Params: { id: string }; Querystring: { limit?: string; after?: string } }>('/v1/regions/:id/children', async (req) => {
+    const { limit, after } = page(req.query);
+    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE parent_id = $1 AND id > $2 ORDER BY id LIMIT $3`, [req.params.id, after, limit + 1])).rows;
+    return paged(rows, limit, 'id');
+  });
+
+  app.get<{ Querystring: { q?: string; country?: string; kind?: string; limit?: string } }>('/v1/search', async (req, reply) => {
+    const q = (req.query.q ?? '').trim();
+    if (q.length < 2) return reply.code(400).send({ error: 'q must be at least 2 characters' });
+    const { limit } = page(req.query);
+    const esc = q.toLowerCase().replace(/[\\%_]/g, '\\$&');
+    const rows = (
+      await pool.query(
+        `SELECT ${COLS} FROM entities WHERE lower(name) LIKE $1 || '%' AND ($2::text IS NULL OR country_code = $2) AND ($3::text IS NULL OR kind = $3)
+         ORDER BY kind, name LIMIT $4`,
+        [esc, req.query.country?.toUpperCase() ?? null, req.query.kind ?? null, limit],
+      )
+    ).rows;
+    return { data: rows };
+  });
+
+  // ---- snapshots & deltas ---------------------------------------------
+  app.get('/v1/snapshots', async () => ({
+    data: (await pool.query('SELECT id, source, started_at, finished_at, from_seq, to_seq, inserted, updated, deleted, unchanged FROM snapshots ORDER BY id DESC LIMIT 100')).rows,
+  }));
+
+  /**
+   * Cursor-based delta feed: everything after `since` (a seq from a previous
+   * response's `next_seq`; 0 = from the start), oldest first.
+   */
+  app.get<{ Querystring: { since?: string; until?: string; country?: string; kind?: string; limit?: string } }>('/v1/changes', async (req) => {
+    const since = Number(req.query.since ?? 0) || 0;
+    const until = req.query.until ? Number(req.query.until) : null;
+    const countries = req.query.country ? req.query.country.toUpperCase().split(',') : null;
+    const { limit } = page(req.query);
+    const rows = (
+      await pool.query(
+        `SELECT seq, snapshot_id, entity_id, kind, country_code::text AS country_code, op, changed_fields, before, after FROM changes
+         WHERE seq > $1 AND ($2::bigint IS NULL OR seq <= $2) AND ($3::text[] IS NULL OR country_code = ANY($3)) AND ($4::text IS NULL OR kind = $4)
+         ORDER BY seq LIMIT $5`,
+        [since, until, countries, req.query.kind ?? null, limit + 1],
+      )
+    ).rows;
+    const more = rows.length > limit;
+    const data = more ? rows.slice(0, limit) : rows;
+    const last = data[data.length - 1];
+    const head = Number((await pool.query('SELECT COALESCE(max(seq),0) AS s FROM changes')).rows[0].s);
+    return { data, has_more: more, next_seq: last ? Number(last.seq) : since, head_seq: head };
+  });
+
+  // ---- webhooks (admin) -----------------------------------------------
+  app.post<{ Body: { url?: string; countries?: string[] } }>('/v1/webhooks', { preHandler: requireAdmin }, async (req, reply) => {
+    const url = req.body?.url ?? '';
+    try {
+      const u = new URL(url);
+      if (u.protocol !== 'https:' && u.protocol !== 'http:') throw new Error();
+    } catch {
+      return reply.code(400).send({ error: 'url must be a valid http(s) URL' });
+    }
+    const countries = req.body.countries?.map((c) => c.toUpperCase()) ?? null;
+    const secret = randomBytes(24).toString('hex');
+    const r = await pool.query('INSERT INTO webhook_subscriptions (url, secret, countries) VALUES ($1, $2, $3) RETURNING id, url, countries, active', [url, secret, countries]);
+    return reply.code(201).send({ ...r.rows[0], secret }); // secret is shown only here
+  });
+
+  app.get('/v1/webhooks', { preHandler: requireAdmin }, async () => ({
+    data: (await pool.query('SELECT id, url, countries, active, created_at FROM webhook_subscriptions ORDER BY id')).rows,
+  }));
+
+  app.delete<{ Params: { id: string } }>('/v1/webhooks/:id', { preHandler: requireAdmin }, async (req, reply) => {
+    const r = await pool.query('DELETE FROM webhook_subscriptions WHERE id = $1', [req.params.id]);
+    return r.rowCount ? reply.code(204).send() : reply.code(404).send({ error: 'not_found' });
+  });
+
+  // ---- exported files --------------------------------------------------
+  const dir = resolve(opts.exportDir ?? config.exportDir);
+  await mkdir(dir, { recursive: true });
+  await app.register(fastifyStatic, { root: dir, prefix: '/files/' });
+
+  return app;
+}
+
+function paged(rows: Record<string, unknown>[], limit: number, key: string) {
+  const more = rows.length > limit;
+  const data = more ? rows.slice(0, limit) : rows;
+  return { data, has_more: more, next_after: more ? data[data.length - 1]![key] : null };
+}

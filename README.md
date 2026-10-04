@@ -1,1 +1,53 @@
 # country-info
+
+Ülkeler ve idari bölgeler (eyalet, il, ilçe …) için sürümlü bir veri servisi. Veriyi **REST API** ve **indirilebilir dosyalar** olarak sunar; güncellemeleri izler ve değişiklikleri **delta** (API + dosya) ve **webhook** ile bildirir.
+
+## Durum (MVP)
+
+| Kapsam | Durum |
+|---|---|
+| Ülkeler / bölgeler (ISO 3166-1, 252 kayıt; `un_status`: member 193, observer 2, other 57) | ✅ |
+| Alt bölgeler: admin1 (~3.9k) ve admin2 (~47k) – GeoNames | ✅ |
+| Ülke nitelikleri: para birimi, diller, telefon kodu, posta kodu biçimi, komşular, TLD | ✅ |
+| Snapshot + değişiklik günlüğü (delta), cursor tabanlı API | ✅ |
+| Webhook (HMAC imzalı, yeniden deneme, ülke filtresi) | ✅ |
+| Dosya dışa aktarım (JSON/CSV/NDJSON + manifest + sha256) | ✅ |
+| Şehir, mahalle, sokak (OpenStreetMap), tatiller, özel günler, posta kodları | ⏳ bkz. `docs/DESIGN.md` |
+
+## Hızlı başlangıç
+
+```bash
+cp .env.example .env            # DATABASE_URL vb.
+npm install
+npm run ingest                  # migrate + GeoNames'ten içe aktar (idempotent)
+npm run export                  # out/ altına dosyaları yaz
+npm run serve                   # API :3000 (+ webhook işçisi)
+npm test                        # TEST_DATABASE_URL ile DB testleri de çalışır
+```
+
+## API
+
+```
+GET  /v1/countries?un_status=member&continent=EU&limit=&after=
+GET  /v1/countries/:iso2
+GET  /v1/countries/:iso2/regions?level=1|2
+GET  /v1/regions/:id            GET /v1/regions/:id/children
+GET  /v1/search?q=ist&country=TR&kind=admin1
+GET  /v1/snapshots
+GET  /v1/changes?since=<seq>&until=&country=TR,DE&kind=&limit=   # delta akışı
+POST /v1/webhooks   {url, countries?}   (Authorization: Bearer $ADMIN_TOKEN; secret yalnızca yanıtta görünür)
+GET/DELETE /v1/webhooks[/:id]
+GET  /files/manifest.json, /files/latest/*, /files/snapshots/<id>/*
+```
+
+### Delta nasıl tüketilir
+`/v1/changes?since=0` ile başlayın; yanıttaki `next_seq` değerini saklayıp bir sonrakinde `since` olarak verin. Her kayıt `op` (`insert|update|delete`), `changed_fields` (ör. `name`, `data.population`), `before` ve `after` içerir.
+
+### Webhook
+Her ingest sonrası değişiklik varsa abonelere `snapshot.completed` bildirimi gider (küçük gövde; veri `changes_url` ile çekilir). Başlıklar: `x-countryinfo-signature: sha256=HMAC(secret, "<timestamp>.<body>")`, `x-countryinfo-timestamp`, `x-countryinfo-delivery`. 2xx dışı yanıtta 30s·2ⁿ ile 8 denemeye kadar tekrar denenir.
+
+### Dosyalar
+`snapshots/<id>/` altında `countries.json`, `countries.csv`, `regions.ndjson`, `delta.ndjson`; `latest/` en son kopya; `manifest.json` boyut ve sha256 içerir.
+
+## Lisans ve atıf
+GeoNames verisi CC-BY 4.0'dır; dağıtılan veride atıf gerekir. İleride eklenecek OpenStreetMap verisi ODbL'dir (atıf + share-alike). Ayrıntı: `docs/DESIGN.md`.
