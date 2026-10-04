@@ -99,8 +99,24 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   // ---- regions ---------------------------------------------------------
   app.get<{ Params: { id: string } }>('/v1/regions/:id', async (req, reply) => {
     const r = await pool.query(`SELECT ${COLS} FROM entities WHERE id = $1`, [req.params.id]);
-    return r.rows[0] ?? reply.code(404).send({ error: 'not_found' });
+    if (!r.rows[0]) return reply.code(404).send({ error: 'not_found' });
+    const links = (
+      await pool.query(
+        `SELECT CASE WHEN a_id = $1 THEN b_id ELSE a_id END AS id, relation, confidence, method FROM entity_links WHERE a_id = $1 OR b_id = $1 ORDER BY 1`,
+        [req.params.id],
+      )
+    ).rows;
+    return { ...r.rows[0], links };
   });
+
+  app.get<{ Querystring: { status?: string; limit?: string } }>('/v1/review-items', { preHandler: requireAdmin }, async (req) => ({
+    data: (
+      await pool.query('SELECT id, entity_id, field, a_source, a_value, b_source, b_value, status, created_at FROM review_items WHERE status = $1 ORDER BY id LIMIT $2', [
+        req.query.status ?? 'open',
+        page(req.query).limit,
+      ])
+    ).rows,
+  }));
 
   app.get<{ Params: { id: string }; Querystring: { limit?: string; after?: string } }>('/v1/regions/:id/children', async (req) => {
     const { limit, after } = page(req.query);

@@ -57,7 +57,16 @@ export interface IngestScope {
   kinds: string[];
   /** Limit deletion to these countries; omit when the input covers every country the source owns. */
   countries?: string[];
+  /**
+   * Abort (roll back) if more than this share of the source's existing records would be deleted.
+   * Guards against a truncated or broken download wiping the dataset. Default 0.05; only applies
+   * when at least MIN_FOR_DELETE_GUARD records exist. Pass 1 to allow any deletion.
+   */
+  maxDeleteRatio?: number;
 }
+
+export const MIN_FOR_DELETE_GUARD = 100;
+export class DeleteGuardError extends Error {}
 
 /**
  * Reconcile the database with `input`. Only entities owned by `source`, of the
@@ -66,7 +75,7 @@ export interface IngestScope {
  * happens in one transaction and produces one snapshot plus an ordered change log.
  */
 export async function ingest(pool: pg.Pool, source: SourceMeta, input: EntityInput[], scope: IngestScope): Promise<IngestResult> {
-  const { kinds, countries } = scope;
+  const { kinds, countries, maxDeleteRatio = 0.05 } = scope;
   const ids = new Set<string>();
   for (const e of input) {
     if (ids.has(e.id)) throw new Error(`duplicate entity id in source: ${e.id}`);
@@ -100,6 +109,11 @@ export async function ingest(pool: pg.Pool, source: SourceMeta, input: EntityInp
     const updates = input.filter((e) => existing.has(e.id) && existing.get(e.id)!.hash !== hashes.get(e.id)).sort((a, b) => a.id.localeCompare(b.id));
     const deleteIds = [...existing.keys()].filter((id) => !ids.has(id)).sort();
     const unchanged = input.length - inserts.length - updates.length;
+    if (existing.size >= MIN_FOR_DELETE_GUARD && deleteIds.length / existing.size > maxDeleteRatio) {
+      throw new DeleteGuardError(
+        `source ${source.id}: refusing to delete ${deleteIds.length} of ${existing.size} records (> ${maxDeleteRatio * 100}%); source data looks incomplete. Re-run with maxDeleteRatio if intended.`,
+      );
+    }
 
     // Ids not owned by this source in scope but already present belong to someone else: refuse to take them over.
     for (const part of chunks(inserts.map((e) => e.id))) {

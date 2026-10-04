@@ -4,7 +4,8 @@ import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { migrate } from '../src/db.js';
-import { ingest } from '../src/ingest.js';
+import { ingest, DeleteGuardError } from '../src/ingest.js';
+import { linkRegions } from '../src/linking.js';
 import { buildApp } from '../src/api.js';
 import { processDeliveries, sign } from '../src/webhooks.js';
 import { exportSnapshot } from '../src/export.js';
@@ -117,6 +118,34 @@ d('database', () => {
     const d = (await pool.query('SELECT payload FROM webhook_deliveries')).rows;
     expect(d).toHaveLength(1);
     expect(d[0].payload.changes_url).toContain('kind=holiday');
+  });
+
+  it('refuses to delete too much of a source and leaves the data untouched', async () => {
+    const many = [E('country:TR', 'country', 'TR', 'Turkey', null), ...Array.from({ length: 200 }, (_, i) => E(`gn:${i + 10}`, 'admin1', 'TR', `R${i}`, 'country:TR'))];
+    await ingest(pool, SRC, many, { kinds: KINDS });
+    const before = (await pool.query('SELECT max(seq) s FROM changes')).rows[0].s;
+    await expect(ingest(pool, SRC, many.slice(0, 20), { kinds: KINDS })).rejects.toThrow(DeleteGuardError);
+    expect((await pool.query('SELECT count(*)::int n FROM entities')).rows[0].n).toBe(201);
+    expect((await pool.query('SELECT max(seq) s FROM changes')).rows[0].s).toBe(before);
+    expect((await pool.query('SELECT count(*)::int n FROM snapshots')).rows[0].n).toBe(1);
+    // Small, normal churn (<5%) and an explicit override both pass.
+    expect((await ingest(pool, SRC, many.slice(0, 195), { kinds: KINDS })).deleted).toBe(6);
+    expect((await ingest(pool, SRC, many.slice(0, 20), { kinds: KINDS, maxDeleteRatio: 1 })).deleted).toBe(175);
+  });
+
+  it('links GeoNames admin1 to NUTS, exposes links via the API, and is idempotent', async () => {
+    await ingest(pool, { id: 'geonames', authority: 'GeoNames' }, [E('country:DE', 'country', 'DE', 'Germany', null), E('gn:1', 'admin1', 'DE', 'Bavaria', 'country:DE'), E('gn:2', 'admin1', 'DE', 'Hamburg', 'country:DE')], { kinds: KINDS });
+    const nuts = { id: 'gisco-nuts', authority: 'x' };
+    const n = [E('nuts:DE2', 'nuts1', 'DE', 'Bayern', 'country:DE', { name_latin: 'Bayern' }), E('nuts:DE6', 'nuts1', 'DE', 'Hamburg', 'country:DE', { name_latin: 'Hamburg' })];
+    await ingest(pool, nuts, n, { kinds: ['nuts1'] });
+    const p1 = await linkRegions(pool);
+    expect(p1.links.map((l) => `${l.a}>${l.b}`)).toEqual(['gn:2>nuts:DE6']); // "Bavaria" != "Bayern": unmatched, not guessed
+    await linkRegions(pool);
+    expect((await pool.query('SELECT count(*)::int n FROM entity_links')).rows[0].n).toBe(1);
+    const app = await buildApp(pool, { adminToken: 'tok', exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    expect((await app.inject('/v1/regions/nuts:DE6')).json().links).toMatchObject([{ id: 'gn:2', method: 'name_exact' }]);
+    expect((await app.inject('/v1/review-items')).statusCode).toBe(401);
+    await app.close();
   });
 
   it('is atomic: a bad source leaves nothing behind', async () => {

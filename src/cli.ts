@@ -5,6 +5,7 @@ import { ingest } from './ingest.js';
 import { GEONAMES } from './sources/geonames.js';
 import { GISCO_NUTS, GISCO_LAU, loadNuts, loadLau } from './sources/gisco.js';
 import { EU27 } from './sources/eu.js';
+import { linkRegions } from './linking.js';
 import { loadHolidayFiles, HOLIDAYS_SOURCE } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { exportSnapshot } from './export.js';
@@ -12,6 +13,8 @@ import { processDeliveries } from './webhooks.js';
 import { buildApp } from './api.js';
 
 const cmd = process.argv[2];
+/** `ALLOW_BULK_DELETE=1` disables the ingest delete guard for an intentional large removal. */
+const deleteRatio = () => (process.env.ALLOW_BULK_DELETE === '1' ? 1 : undefined);
 const pool = createPool();
 
 async function main() {
@@ -23,16 +26,16 @@ async function main() {
       await migrate(pool);
       const input = await loadGeoNames(config.cacheDir, config.ingestAdmin2);
       const kinds = config.ingestAdmin2 ? ['country', 'admin1', 'admin2'] : ['country', 'admin1'];
-      console.log(await ingest(pool, GEONAMES, input, { kinds }));
+      console.log(await ingest(pool, GEONAMES, input, { kinds, maxDeleteRatio: deleteRatio() }));
       break;
     }
     case 'ingest-gisco': {
       // NUTS (EU27 + Türkiye İBBS) and LAU (EU27). Requires `ingest` (GeoNames countries) first: parents are countries.
       await migrate(pool);
       const nutsCountries = new Set<string>([...EU27, 'TR']);
-      console.log('nuts', await ingest(pool, GISCO_NUTS, await loadNuts(config.cacheDir, nutsCountries), { kinds: ['nuts1', 'nuts2', 'nuts3'], countries: [...nutsCountries] }));
+      console.log('nuts', await ingest(pool, GISCO_NUTS, await loadNuts(config.cacheDir, nutsCountries), { kinds: ['nuts1', 'nuts2', 'nuts3'], countries: [...nutsCountries], maxDeleteRatio: deleteRatio() }));
       const lauCountries = new Set<string>(EU27);
-      console.log('lau', await ingest(pool, GISCO_LAU, await loadLau(config.cacheDir, lauCountries), { kinds: ['lau'], countries: [...lauCountries] }));
+      console.log('lau', await ingest(pool, GISCO_LAU, await loadLau(config.cacheDir, lauCountries), { kinds: ['lau'], countries: [...lauCountries], maxDeleteRatio: deleteRatio() }));
       break;
     }
     case 'ingest-holidays': {
@@ -42,7 +45,13 @@ async function main() {
       const to = Number(process.argv[4] ?? new Date().getUTCFullYear() + 2);
       const files = await loadHolidayFiles();
       const input = files.flatMap((f) => compileHolidays(f, from, to));
-      console.log(await ingest(pool, HOLIDAYS_SOURCE, input, { kinds: ['holiday'], countries: files.map((f) => f.country) }));
+      console.log(await ingest(pool, HOLIDAYS_SOURCE, input, { kinds: ['holiday'], countries: files.map((f) => f.country), maxDeleteRatio: deleteRatio() }));
+      break;
+    }
+    case 'link': {
+      await migrate(pool);
+      const p = await linkRegions(pool);
+      console.log({ linked: p.links.length, ambiguous: p.ambiguous.length, unmatched: p.unmatched.length, levels: p.levelByCountry });
       break;
     }
     case 'export':
@@ -60,7 +69,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | export [snapshotId] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | link | export [snapshotId] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();
