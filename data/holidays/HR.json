@@ -1,0 +1,287 @@
+{
+ "country": "HR",
+ "authority": "Republic of Croatia (Hrvatski sabor; published in Narodne novine)",
+ "default_language": "hr",
+ "rules": [
+  {
+   "id": "new-year",
+   "names": {
+    "hr": "Nova godina",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "epiphany",
+   "names": {
+    "hr": "Bogojavljenje ili Sveta tri kralja",
+    "en": "Epiphany"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "hr": "Uskrs",
+    "en": "Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "hr": "Uskrsni ponedjeljak",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "corpus-christi",
+   "names": {
+    "hr": "Tijelovo",
+    "en": "Corpus Christi"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 60,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "hr": "Praznik rada",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "statehood-day",
+   "names": {
+    "hr": "Dan državnosti",
+    "en": "Statehood Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 30
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "anti-fascist-struggle-day",
+   "names": {
+    "hr": "Dan antifašističke borbe",
+    "en": "Anti-Fascist Struggle Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 22
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "victory-day",
+   "names": {
+    "hr": "Dan pobjede i domovinske zahvalnosti i Dan hrvatskih branitelja",
+    "en": "Victory and Homeland Thanksgiving Day and Croatian Defenders' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 5
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "assumption",
+   "names": {
+    "hr": "Velika Gospa",
+    "en": "Assumption of Mary"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "all-saints",
+   "names": {
+    "hr": "Svi sveti",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "remembrance-day",
+   "names": {
+    "hr": "Dan sjećanja na žrtve Domovinskog rata i Dan sjećanja na žrtvu Vukovara i Škabrnje",
+    "en": "Remembrance Day for Homeland War Victims and Vukovar and Škabrnja"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 18
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "hr": "Božić",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "st-stephens",
+   "names": {
+    "hr": "Sveti Stjepan",
+    "en": "St. Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Zakon o blagdanima, spomendanima i neradnim danima u Republici Hrvatskoj (NN 110/2019), čl. 1. st. 1.",
+    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

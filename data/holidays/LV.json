@@ -1,0 +1,287 @@
+{
+ "country": "LV",
+ "authority": "Latvijas Republikas Augstākā Padome / Saeima",
+ "default_language": "lv",
+ "rules": [
+  {
+   "id": "new-year",
+   "names": {
+    "lv": "Jaungada diena",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "lv": "Lielā Piektdiena",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "lv": "Pirmās Lieldienas",
+    "en": "Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "lv": "Otrās Lieldienas",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "lv": "Darba svētki",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "restoration-of-independence",
+   "names": {
+    "lv": "Latvijas Republikas Neatkarības atjaunošanas diena",
+    "en": "Restoration of Independence Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 4
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "whit-sunday",
+   "names": {
+    "lv": "Vasarsvētki",
+    "en": "Whit Sunday (Pentecost)"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 49,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "ligo",
+   "names": {
+    "lv": "Līgo diena",
+    "en": "Midsummer Eve"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 23
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "jani",
+   "names": {
+    "lv": "Jāņu diena",
+    "en": "Midsummer Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "proclamation-day",
+   "names": {
+    "lv": "Latvijas Republikas Proklamēšanas diena",
+    "en": "Proclamation of the Republic Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 18
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas-eve",
+   "names": {
+    "lv": "Ziemassvētki (24. decembris)",
+    "en": "Christmas Eve"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas-day",
+   "names": {
+    "lv": "Ziemassvētki (25. decembris)",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "boxing-day",
+   "names": {
+    "lv": "Ziemassvētki (26. decembris)",
+    "en": "Boxing Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "new-years-eve",
+   "names": {
+    "lv": "Vecgada diena",
+    "en": "New Year's Eve"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 31
+    }
+   },
+   "source": {
+    "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
+    "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

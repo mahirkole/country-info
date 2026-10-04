@@ -1,0 +1,247 @@
+{
+ "country": "EE",
+ "authority": "Riigikogu (Pühade ja tähtpäevade seadus)",
+ "default_language": "et",
+ "rules": [
+  {
+   "id": "independence-day",
+   "names": {
+    "et": "Iseseisvuspäev, Eesti Vabariigi aastapäev",
+    "en": "Independence Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 2,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 1",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "new-years-day",
+   "names": {
+    "et": "Uusaasta",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 1",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "et": "Suur reede",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 2",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "et": "Ülestõusmispühade 1. püha",
+    "en": "Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 3",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "spring-day",
+   "names": {
+    "et": "Kevadpüha",
+    "en": "May Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 4",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "whit-sunday",
+   "names": {
+    "et": "Nelipühade 1. püha",
+    "en": "Whit Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 49,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 5",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "victory-day",
+   "names": {
+    "et": "Võidupüha",
+    "en": "Victory Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 23
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 6",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "midsummer-day",
+   "names": {
+    "et": "Jaanipäev",
+    "en": "Midsummer Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 7",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "restoration-of-independence-day",
+   "names": {
+    "et": "Taasiseseisvumispäev",
+    "en": "Day of Restoration of Independence"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 20
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 8",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas-eve",
+   "names": {
+    "et": "Jõululaupäev",
+    "en": "Christmas Eve"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 8^1",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas-day",
+   "names": {
+    "et": "Esimene jõulupüha",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 9",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "boxing-day",
+   "names": {
+    "et": "Teine jõulupüha",
+    "en": "Boxing Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Pühade ja tähtpäevade seadus, § 2 p 10",
+    "url": "https://www.riigiteataja.ee/public-api/api/v1/akt/120122022005/blob-html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

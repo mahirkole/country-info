@@ -1,0 +1,227 @@
+{
+ "country": "HU",
+ "authority": "Magyarország (Országgyűlés)",
+ "default_language": "hu",
+ "rules": [
+  {
+   "id": "new-year",
+   "names": {
+    "hu": "Újév",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "national-day-1848",
+   "names": {
+    "hu": "Nemzeti ünnep (1848-as forradalom)",
+    "en": "1848 Revolution Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 3,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "hu": "Nagypéntek",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "hu": "Húsvéthétfő",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "hu": "A munka ünnepe",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "whit-monday",
+   "names": {
+    "hu": "Pünkösdhétfő",
+    "en": "Whit Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "state-foundation-day",
+   "names": {
+    "hu": "Az államalapítás ünnepe",
+    "en": "St Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 20
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "republic-day-1956",
+   "names": {
+    "hu": "Nemzeti ünnep (1956-os forradalom)",
+    "en": "1956 Revolution Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 23
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "all-saints",
+   "names": {
+    "hu": "Mindenszentek",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas-day",
+   "names": {
+    "hu": "Karácsony első napja",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas-second-day",
+   "names": {
+    "hu": "Karácsony második napja",
+    "en": "Second Day of Christmas"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "2012. évi I. törvény (Mt.) 102. § (1)",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=a1200001.tv",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

@@ -1,0 +1,178 @@
+{
+ "country": "GR",
+ "authority": "Hellenic Republic (Βουλή των Ελλήνων; ΦΕΚ)",
+ "default_language": "el",
+ "rules": [
+  {
+   "id": "new-year",
+   "names": {
+    "el": "Πρωτοχρονιά",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Ν. 4808/2021 (ΦΕΚ Α' 101/19.6.2021), άρθρο 60 παρ. 1 'Αργία'",
+    "url": "https://www.e-nomothesia.gr/kat-ergasia-kai-asphalise/nomos-4808-2021-phek-101a-19-6-2021.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "epiphany",
+   "names": {
+    "el": "Θεοφάνεια",
+    "en": "Epiphany"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Ν. 4808/2021 (ΦΕΚ Α' 101/19.6.2021), άρθρο 60 παρ. 1 'Αργία'",
+    "url": "https://www.e-nomothesia.gr/kat-ergasia-kai-asphalise/nomos-4808-2021-phek-101a-19-6-2021.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "independence-day",
+   "names": {
+    "el": "Εθνική Επέτειος 25ης Μαρτίου",
+    "en": "Independence Day / Annunciation"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 3,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Ν. 4808/2021 (ΦΕΚ Α' 101/19.6.2021), άρθρο 60 παρ. 1 'Αργία'",
+    "url": "https://www.e-nomothesia.gr/kat-ergasia-kai-asphalise/nomos-4808-2021-phek-101a-19-6-2021.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "orthodox-easter-monday",
+   "names": {
+    "el": "Δευτέρα του Πάσχα",
+    "en": "Orthodox Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Ν. 4808/2021 (ΦΕΚ Α' 101/19.6.2021), άρθρο 60 παρ. 1 'Αργία'",
+    "url": "https://www.e-nomothesia.gr/kat-ergasia-kai-asphalise/nomos-4808-2021-phek-101a-19-6-2021.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "el": "Εργατική Πρωτομαγιά",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Ν. 4808/2021 (ΦΕΚ Α' 101/19.6.2021), άρθρο 60 παρ. 1 'Αργία'",
+    "url": "https://www.e-nomothesia.gr/kat-ergasia-kai-asphalise/nomos-4808-2021-phek-101a-19-6-2021.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "dormition",
+   "names": {
+    "el": "Κοίμηση της Θεοτόκου",
+    "en": "Dormition of the Theotokos"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Ν. 4808/2021 (ΦΕΚ Α' 101/19.6.2021), άρθρο 60 παρ. 1 'Αργία'",
+    "url": "https://www.e-nomothesia.gr/kat-ergasia-kai-asphalise/nomos-4808-2021-phek-101a-19-6-2021.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ohi-day",
+   "names": {
+    "el": "Ημέρα του Όχι",
+    "en": "Ohi Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 28
+    }
+   },
+   "source": {
+    "citation": "Ν. 4808/2021 (ΦΕΚ Α' 101/19.6.2021), άρθρο 60 παρ. 1 'Αργία'",
+    "url": "https://www.e-nomothesia.gr/kat-ergasia-kai-asphalise/nomos-4808-2021-phek-101a-19-6-2021.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "el": "Χριστούγεννα",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Ν. 4808/2021 (ΦΕΚ Α' 101/19.6.2021), άρθρο 60 παρ. 1 'Αργία'",
+    "url": "https://www.e-nomothesia.gr/kat-ergasia-kai-asphalise/nomos-4808-2021-phek-101a-19-6-2021.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "synaxis-theotokos",
+   "names": {
+    "el": "Σύναξη της Θεοτόκου",
+    "en": "Synaxis of the Theotokos"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Ν. 4808/2021 (ΦΕΚ Α' 101/19.6.2021), άρθρο 60 παρ. 1 'Αργία'",
+    "url": "https://www.e-nomothesia.gr/kat-ergasia-kai-asphalise/nomos-4808-2021-phek-101a-19-6-2021.html"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

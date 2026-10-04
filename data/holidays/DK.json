@@ -1,0 +1,227 @@
+{
+ "country": "DK",
+ "authority": "Folketinget / Danish state (Lovtidende, retsinformation.dk)",
+ "default_language": "da",
+ "rules": [
+  {
+   "id": "new-years-day",
+   "names": {
+    "da": "Nytårsdag",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "maundy-thursday",
+   "names": {
+    "da": "Skærtorsdag",
+    "en": "Maundy Thursday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -3,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "da": "Langfredag",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "da": "Første påskedag",
+    "en": "Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "da": "Anden påskedag",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "great-prayer-day",
+   "names": {
+    "da": "Store bededag",
+    "en": "Great Prayer Day"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 26,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023 om konsekvenser ved afskaffelsen af store bededag som helligdag, § 1 og § 5 (abolished from 1 Jan 2024) [doğrulanmadı: 'paskalyadan 26 gün sonraki Cuma' tanımı okunan metinde yok; 2024'ten itibaren tatil değil (Lov 214/2023 § 5 okundu)]",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf"
+   },
+   "verification": "unverified",
+   "to_year": 2023
+  },
+  {
+   "id": "ascension-day",
+   "names": {
+    "da": "Kristi himmelfartsdag",
+    "en": "Ascension Day"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 39,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "whit-sunday",
+   "names": {
+    "da": "Første pinsedag",
+    "en": "Whit Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 49,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "whit-monday",
+   "names": {
+    "da": "Anden pinsedag",
+    "en": "Whit Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas-day",
+   "names": {
+    "da": "Første juledag",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "boxing-day",
+   "names": {
+    "da": "Anden juledag",
+    "en": "Boxing Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Lov nr. 214 af 6. marts 2023, § 7, nr. 1 (indsat i lov om detailsalg fra butikker m.v. § 2, stk. 1)",
+    "url": "https://www.retsinformation.dk/eli/lta/2023/214/pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

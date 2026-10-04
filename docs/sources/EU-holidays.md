@@ -1,21 +1,40 @@
-# Resmi tatil kaynakları – AB27 durumu (son kontrol: 2026-10-04)
+# Resmi tatil kaynakları – durum (son güncelleme: 2026-10-04)
 
-`verified` = atıf yapılan metin resmi siteden okundu (`source.checked_on` dolu). `unverified` = metin okunamadı veya ayrıca teyit gerekiyor.
+**Politika:** `verified` = atıf yapılan resmi metnin **güncel konsolide sürümü** bu çalışmada okundu ve alıntı kaynak sayfada bağımsız olarak bulundu (`source.checked_on`, `source.url` dolu). Eski tarihli metin, hafızadan gelen tanım veya resmi olmayan sitede okunan metin `unverified`'dır. Ayrıntılı okuma notları ve alıntılar: `docs/sources/holidays/<CC>.md` (ajan notları; esas olan `data/holidays/<CC>.json`).
 
-| Ülke | Dosya | Okunan resmi kaynak | Doğrulanan | Eksik / not |
-|---|---|---|---|---|
-| AT | `AT.json` | RIS – Arbeitsruhegesetz § 7 Abs. 2 | 13/13 | Paskalya/Pfingsten Pazarları listede yok (zaten dinlenme günü). |
-| DE | `DE.json` | gesetze-im-internet.de – Einigungsvertrag Art. 2 Abs. 2 | 1/9 (3 Ekim) | Diğer 8 gün Länder yasalarında; tek tek okunmadı. **Bölgesel tatiller (6 Ocak, Fronleichnam, 1 Kasım, Reformationstag vb.) eklenmedi.** |
-| ES | `ES.json` | BOE – RDL 2/2015 (Estatuto de los Trabajadores) art. 37.2 | 4/4 | Yasa yalnızca 4 ulusal günü sabitler (1 Ocak, 1 Mayıs, 12 Ekim, 25 Aralık). Diğer günler (6 Ocak, Viernes Santo, 15 Ağustos, 1 Kasım, 6 ve 8 Aralık) her yıl hükümet/özerk topluluk kararıyla belirlenir; **yıllık BOE çalışma takvimi eklenmeli**. |
-| IT | `IT.json` | Normattiva – DPR 792/1985 art. 1 (dini günler) | 6/11 | 25 Nisan, 1 Mayıs, 2 Haziran, Paskalya Pazartesi, 26 Aralık: Legge 260/1949 metni sayfadan çıkarılamadı → `unverified`. 4 Ekim (San Francesco) 2026'dan itibaren yeni; tatil günü olup olmadığı **doğrulanmadı, eklenmedi**. |
-| TR | `TR.json` | – (mevzuat.gov.tr, Diyanet erişilemedi) | 0 | Bkz. `docs/sources/TR.md`. |
-| FR | – | Légifrance 403 | – | Eklenmedi. |
-| NL | – | wetten.overheid.nl erişilemedi | – | Eklenmedi. |
-| Kalan 19 ülke | – | Denenmedi | – | Eklenmedi. |
+Sayılar 2026 yılı için kural sayısı (doğrulanmış/toplam).
 
-## `npm run check:holidays` (Nager.Date alarmı) bulguları – 2026
-- AT: yalnızca Paskalya/Pfingsten **Pazarı** farkı (beklenen).
-- DE, TR: fark yok.
-- ES: yıllık takvimle belirlenen 6 gün fark (beklenen, yukarıdaki not).
-- IT: Paskalya Pazarı ve 4 Ekim farkı.
-Bu araç yalnızca uyarı verir; veri Nager.Date'ten **kopyalanmaz**.
+| Ülke | Doğrulanan | Okunan resmi kaynak / neden doğrulanmadı |
+|---|---|---|
+| AT | 13/13 | RIS, Arbeitsruhegesetz § 7 Abs. 2 |
+| CZ | 13/13 | zakonyprolidi.cz, Zákon 245/2000 Sb. § 1–2 (konsolide 13.05.2026) |
+| EE | 12/12 | Riigi Teataja, Pühade ja tähtpäevade seadus (RT I, 20.12.2022). Paskalya kaymaları isimden türetildi. |
+| ES | 4/4 | BOE, Estatuto de los Trabajadores art. 37.2 (yalnızca yasanın sabitlediği 4 ulusal gün; **kalan günler yıllık BOE kararı → eksik**) |
+| HR | 14/14 | Narodne novine 110/2019, čl. 1. Corpus Christi ve Paskalya ofsetleri yasada yazmıyor, hesaplanıyor. |
+| HU | 11/11 | net.jogtar.hu, Mt. 102. § (1), 2026.10.1 sürümü |
+| IE | 9/9 | Organisation of Working Time Act 1997, 2. Çizelge (revised, Act 1/2025'e kadar). **St Brigid's Day (Şubat ilk Pazartesisi; 1 Şubat Cuma'ya denk gelirse o gün) eksik** – motor koşullu kural desteklemiyor, revised metinde de bulunamadı. |
+| LV | 14/14 | likumi.lv, "Par svētku, atceres un atzīmējamām dienām" 1. p. (18.03.2025 sürümü). 4 Mayıs/18 Kasım hafta sonu → Pazartesi devri modellenmedi. |
+| PL | 14/14 | Sejm ELI API, Dz.U. 2025 poz. 296 + değişiklikler (6 Ocak 2011'den, 24 Aralık 2025'ten). isap.sejm.gov.pl 403 verdi. |
+| SE | 13/13 | riksdagen.se, Lag (1989:253) 1–2 §. Okunan kopya SFS 2004:1320'ye kadar işlenmiş; sonraki değişiklikler ayrıca kontrol edilmedi. Midsommarafton/Julafton/Nyårsafton yasada yok. |
+| SK | 18/19 | slov-lex.sk, 241/1993 (01.11.2025 sürümü), **§ 4b: 2026'da 8 Mayıs ve 15 Eylül dinlenme günü değil** (Nager.Date burada yanlış). 1 Eylül, 28 Ekim, 17 Kasım yalnızca devlet bayramı (`observance`). 17 Kasım'ın 2024'e kadarki durumu okunmadı (`unverified`). |
+| DK | 10/11 | Lov nr. 214/2023 § 7 listesi (retsinformation PDF). Birincil helligdag hükmü bulunamadı. Store Bededag (2023'e kadar) tanımı hafızadan → `unverified`. |
+| PT | 13/17 | Diário da República, Lei 8/2016 (art. 234 n.º 1). 2013 öncesi 4 kural `unverified`. |
+| DE | 1/9 | Yalnızca Einigungsvertrag Art. 2(2) (3 Ekim) okundu; diğerleri eyalet yasaları. **Bölgesel tatiller eksik.** |
+| IT | 6/11 | DPR 792/1985 art. 1 (dini günler) okundu; Legge 260/1949 metni sayfadan çıkarılamadı. 4 Ekim durumu doğrulanmadı. |
+| TR | 0/17 | mevzuat.gov.tr ve Diyanet erişilemedi (bkz. `TR.md`). |
+| BE | 0/10 | ejustice.just.fgov.be WAF engeli; hafızadan. |
+| LU | 0/11 | legilux JS-only; hafızadan. |
+| FI | 0/13 | Kirkkolaki (652/2023) kilise bayramlarını sayıyor; sivil tatil dayanağı okunmadı. |
+| GR | 0/9 | Yasa 4808/2021 art. 60 yalnızca resmi olmayan sitede okundu. **Temiz Pazartesi, Büyük Cuma, Paskalya, Pentekost Pazartesi eksik.** |
+| LT | 0/14 | Darbo kodeksas m. 123'ün 2016 sürümü okundu; güncel konsolide sürüm yok. |
+| MT | 0/14 | Cap. 252, 12.02.2021 tarihli sürüm; sonraki değişiklikler kontrol edilmedi. |
+| SI | 0/15 | 2005 tarihli UPB1; pisrs.si yalnızca JS. |
+| BG, RO | – | Erişilemedi (lex.bg 403; RO siteleri bağlantı yok). Dosya yok. |
+| CY | – | Resmi bir tatil listesi bulunamadı (yalnızca devlet ofisi sayfası); veri alınmadı. |
+| FR, NL | – | Légifrance 403; wetten.overheid.nl bağlantı yok. Dosya yok. |
+
+## Nager.Date alarmının bulguları (2026) — `npm run check:holidays 2026`
+- **SK:** Nager 8 Mayıs ve 15 Eylül'ü tatil gösteriyor; birincil metin (§ 4b) 2026'da dinlenme günü olmadıklarını söylüyor. Resmi kaynak doğru, aggregator yanlış.
+- Fiili ama yasal olmayan günler (BE Goede Vrijdag/Dag na Hemelvaart, DK Grundlovsdag/Juleaftensdag, SE/FI Julafton/Midsommarafton, LV anma günleri, SI anma günleri, PT Carnaval): bilerek dahil edilmedi.
+- Gerçek boşluklar: ES (yıllık takvim), IE (St Brigid's), GR (hareketli Ortodoks günleri), IT (Pasqua Pazarı, 4 Ekim).
+- AT/HU/IT: Paskalya/Pentekost **Pazarları** listede yok (zaten Pazar).

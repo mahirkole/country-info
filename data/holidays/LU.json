@@ -1,0 +1,228 @@
+{
+ "country": "LU",
+ "authority": "Grand Duchy of Luxembourg",
+ "default_language": "fr",
+ "rules": [
+  {
+   "id": "new-years-day",
+   "names": {
+    "fr": "Nouvel An",
+    "lb": "Neijoerschdag",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "fr": "Lundi de Pâques",
+    "lb": "Ouschterméindeg",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "fr": "Fête du travail",
+    "lb": "Dag vun der Aarbecht",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "europe-day",
+   "names": {
+    "fr": "Journée de l'Europe",
+    "lb": "Europadag",
+    "en": "Europe Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 9
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified",
+   "from_year": 2019
+  },
+  {
+   "id": "ascension",
+   "names": {
+    "fr": "Ascension",
+    "lb": "Christi Himmelfahrt",
+    "en": "Ascension Day"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 39,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "whit-monday",
+   "names": {
+    "fr": "Lundi de Pentecôte",
+    "lb": "Péngschtméindeg",
+    "en": "Whit Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "national-day",
+   "names": {
+    "fr": "Fête nationale",
+    "lb": "Nationalfeierdag",
+    "en": "National Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 23
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "assumption",
+   "names": {
+    "fr": "Assomption",
+    "lb": "Léiffrawëschdag",
+    "en": "Assumption"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "all-saints",
+   "names": {
+    "fr": "Toussaint",
+    "lb": "Allerhellgen",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "fr": "Noël",
+    "lb": "Chrëschtdag",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "st-stephens",
+   "names": {
+    "fr": "Deuxième jour de Noël",
+    "lb": "Stiefesdag",
+    "en": "St. Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L. 232-2",
+    "url": "https://legilux.public.lu/eli/etat/leg/code/travail"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

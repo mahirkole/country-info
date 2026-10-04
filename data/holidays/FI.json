@@ -1,0 +1,254 @@
+{
+ "country": "FI",
+ "authority": "Eduskunta (Kirkkolaki 652/2023); Finlex",
+ "default_language": "fi",
+ "rules": [
+  {
+   "id": "new-years-day",
+   "names": {
+    "fi": "Uudenvuodenpäivä",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "epiphany",
+   "names": {
+    "fi": "Loppiainen",
+    "en": "Epiphany"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "fi": "Pitkäperjantai",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "fi": "Pääsiäispäivä",
+    "en": "Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "fi": "Toinen pääsiäispäivä",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "fi": "Vappu",
+    "en": "May Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Not read; statutory basis not located"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ascension-day",
+   "names": {
+    "fi": "Helatorstai",
+    "en": "Ascension Day"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 39,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "whit-sunday",
+   "names": {
+    "fi": "Helluntai",
+    "en": "Whit Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 49,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "independence-day",
+   "names": {
+    "fi": "Itsenäisyyspäivä",
+    "en": "Independence Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Not read; statutory basis not located"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas-day",
+   "names": {
+    "fi": "Joulupäivä",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "boxing-day",
+   "names": {
+    "fi": "Toinen joulupäivä",
+    "en": "Boxing Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "juhannuspaiva",
+   "names": {
+    "fi": "Juhannuspäivä",
+    "en": "Midsummer Day"
+   },
+   "type": "public",
+   "when": {
+    "on_or_after": {
+     "month": 6,
+     "day": 20,
+     "weekday": 6
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "pyhainpaiva",
+   "names": {
+    "fi": "Pyhäinpäivä",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "on_or_after": {
+     "month": 10,
+     "day": 31,
+     "weekday": 6
+    }
+   },
+   "source": {
+    "citation": "Kirkkolaki (652/2023), 1 luku 6 § Kirkolliset juhlapäivät (church holidays; civil public-holiday status not read)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/2023/652/fin@"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

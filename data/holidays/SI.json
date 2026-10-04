@@ -1,0 +1,292 @@
+{
+ "country": "SI",
+ "authority": "Republika Slovenija (Državni zbor)",
+ "default_language": "sl",
+ "rules": [
+  {
+   "id": "new-year-1",
+   "names": {
+    "sl": "Novo leto",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 1. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "new-year-2",
+   "names": {
+    "sl": "Novo leto (2. januar)",
+    "en": "New Year holiday (2 January)"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 2
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 1. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "preseren-day",
+   "names": {
+    "sl": "Prešernov dan, slovenski kulturni praznik",
+    "en": "Prešeren Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 2,
+     "day": 8
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 1. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "sl": "Velikonočna nedelja",
+    "en": "Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 2. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "sl": "Velikonočni ponedeljek",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 2. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "resistance-day",
+   "names": {
+    "sl": "Dan upora proti okupatorju",
+    "en": "Day of Uprising Against Occupation"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 4,
+     "day": 27
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 1. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "labour-day-1",
+   "names": {
+    "sl": "Praznik dela",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 1. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "labour-day-2",
+   "names": {
+    "sl": "Praznik dela (2. maj)",
+    "en": "Labour Day holiday (2 May)"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 2
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 1. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "pentecost",
+   "names": {
+    "sl": "Binkoštna nedelja",
+    "en": "Pentecost Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 49,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 2. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "statehood-day",
+   "names": {
+    "sl": "Dan državnosti",
+    "en": "Statehood Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 1. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "assumption",
+   "names": {
+    "sl": "Marijino vnebovzetje",
+    "en": "Assumption Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 2. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "reformation-day",
+   "names": {
+    "sl": "Dan reformacije",
+    "en": "Reformation Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 31
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 2. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "all-saints",
+   "names": {
+    "sl": "Dan spomina na mrtve",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 1. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "sl": "Božič",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 2. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "independence-unity-day",
+   "names": {
+    "sl": "Dan samostojnosti in enotnosti",
+    "en": "Independence and Unity Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Zakon o praznikih in dela prostih dnevih v RS (UPB1), Ur. l. RS 112/2005, 1. člen [doğrulanmadı: okunan metin 2005 tarihli konsolide sürüm (UPB1, Ur. l. RS 112/2005); sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

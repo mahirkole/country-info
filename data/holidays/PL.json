@@ -1,0 +1,289 @@
+{
+ "country": "PL",
+ "authority": "Sejm Rzeczypospolitej Polskiej",
+ "default_language": "pl",
+ "rules": [
+  {
+   "id": "new-year",
+   "names": {
+    "pl": "Nowy Rok",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "epiphany",
+   "names": {
+    "pl": "Święto Trzech Króli",
+    "en": "Epiphany"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 24 września 2010 r. (Dz. U. Nr 224 poz. 1459), art. 2 i art. 4 (w życie 1 stycznia 2011); art. 1 pkt 1 lit. b ustawy o dniach wolnych od pracy",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2010/1459/text.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "from_year": 2011
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "pl": "pierwszy dzień Wielkiej Nocy",
+    "en": "Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "pl": "drugi dzień Wielkiej Nocy",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "pl": "Święto Państwowe",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "constitution-day",
+   "names": {
+    "pl": "Święto Narodowe Trzeciego Maja",
+    "en": "Constitution Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 3
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "pentecost",
+   "names": {
+    "pl": "pierwszy dzień Zielonych Świątek",
+    "en": "Pentecost Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 49,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "corpus-christi",
+   "names": {
+    "pl": "dzień Bożego Ciała",
+    "en": "Corpus Christi"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 60,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "assumption",
+   "names": {
+    "pl": "Wniebowzięcie Najświętszej Maryi Panny",
+    "en": "Assumption of Mary"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "all-saints",
+   "names": {
+    "pl": "Wszystkich Świętych",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "independence-day",
+   "names": {
+    "pl": "Narodowe Święto Niepodległości",
+    "en": "Independence Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 11
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas-eve",
+   "names": {
+    "pl": "Wigilia Bożego Narodzenia",
+    "en": "Christmas Eve"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 6 grudnia 2024 r. (Dz. U. poz. 1965), art. 1 (dodaje lit. ka) i art. 5 (w życie 1 lutego 2025); art. 1 pkt 1 lit. ka ustawy o dniach wolnych od pracy",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2024/1965/text.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "from_year": 2025
+  },
+  {
+   "id": "christmas-day",
+   "names": {
+    "pl": "pierwszy dzień Bożego Narodzenia",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "boxing-day",
+   "names": {
+    "pl": "drugi dzień Bożego Narodzenia",
+    "en": "Second Day of Christmas"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Ustawa z dnia 18 stycznia 1951 r. o dniach wolnych od pracy, art. 1 pkt 1 (t.j. Dz. U. 2025 poz. 296)",
+    "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text/T/D20250296L.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

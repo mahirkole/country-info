@@ -1,0 +1,274 @@
+{
+ "country": "LT",
+ "authority": "Lietuvos Respublikos Seimas",
+ "default_language": "lt",
+ "rules": [
+  {
+   "id": "new-year",
+   "names": {
+    "lt": "Naujųjų metų diena",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "state-restoration",
+   "names": {
+    "lt": "Lietuvos valstybės atkūrimo diena",
+    "en": "Restoration of the State Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 2,
+     "day": 16
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "independence-restoration",
+   "names": {
+    "lt": "Lietuvos nepriklausomybės atkūrimo diena",
+    "en": "Independence Restoration Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 3,
+     "day": 11
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "lt": "Velykų sekmadienis",
+    "en": "Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "lt": "Velykų pirmadienis",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "lt": "Tarptautinė darbo diena",
+    "en": "International Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "midsummer",
+   "names": {
+    "lt": "Rasos ir Joninių diena",
+    "en": "Midsummer Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "statehood-day",
+   "names": {
+    "lt": "Valstybės (Lietuvos karaliaus Mindaugo karūnavimo) diena",
+    "en": "Statehood Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 7,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "assumption",
+   "names": {
+    "lt": "Žolinė (Švč. Mergelės Marijos ėmimo į dangų diena)",
+    "en": "Assumption Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "all-saints",
+   "names": {
+    "lt": "Visų Šventųjų diena",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "all-souls",
+   "names": {
+    "lt": "Mirusiųjų atminimo (Vėlinių) diena",
+    "en": "All Souls' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 2
+    }
+   },
+   "source": {
+    "citation": "Darbo kodekso 123 straipsnio pakeitimo įstatymas Nr. XIII-2415, 1 str.; 2 str. (įsigalioja 2020-01-01) [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/2a8f4d62c57911e993cff47c25bfa28c/"
+   },
+   "verification": "unverified",
+   "from_year": 2020
+  },
+  {
+   "id": "christmas-eve",
+   "names": {
+    "lt": "Kūčių diena",
+    "en": "Christmas Eve"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas-day",
+   "names": {
+    "lt": "Kalėdos (pirma diena)",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "boxing-day",
+   "names": {
+    "lt": "Kalėdos (antra diena)",
+    "en": "Second Day of Christmas"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Darbo kodeksas (XII-2603 priedas), 123 str. 1 d. [doğrulanmadı: okunan metin Darbo kodeksas m. 123'ün 2016 sürümü + XIII-2415 değişikliği; güncel konsolide sürüm okunmadı]",
+    "url": "https://e-seimas.lrs.lt/rs/legalact/TAD/10c6bfd07bd511e6a0f68fd135e6f40c/"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

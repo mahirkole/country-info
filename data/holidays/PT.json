@@ -1,0 +1,351 @@
+{
+ "country": "PT",
+ "authority": "República Portuguesa (Assembleia da República; Diário da República)",
+ "default_language": "pt",
+ "rules": [
+  {
+   "id": "new-year",
+   "names": {
+    "pt": "Ano Novo",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "pt": "Sexta-Feira Santa",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "pt": "Domingo de Páscoa",
+    "en": "Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "freedom-day",
+   "names": {
+    "pt": "Dia da Liberdade",
+    "en": "Freedom Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 4,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "pt": "Dia do Trabalhador",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "portugal-day",
+   "names": {
+    "pt": "Dia de Portugal",
+    "en": "Portugal Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 10
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "assumption",
+   "names": {
+    "pt": "Assunção de Nossa Senhora",
+    "en": "Assumption Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "immaculate-conception",
+   "names": {
+    "pt": "Imaculada Conceição",
+    "en": "Immaculate Conception"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 8
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "pt": "Natal",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "corpus-christi",
+   "names": {
+    "pt": "Corpo de Deus",
+    "en": "Corpus Christi"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 60,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º (restabelece os feriados eliminados em 2013)",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "from_year": 2016
+  },
+  {
+   "id": "corpus-christi-pre-2013",
+   "names": {
+    "pt": "Corpo de Deus",
+    "en": "Corpus Christi"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 60,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1 (redação original; eliminado pela Lei n.º 23/2012, de 25 de junho, art. 10.º n.º 1, com efeitos a 1 jan 2013) — not read from the gazette",
+    "url": "https://pgdlisboa.pt/leis/lei_mostra_articulado.php?nid=1755&nversao=3&so_miolo=&tabela=lei_velhas"
+   },
+   "verification": "unverified",
+   "to_year": 2012
+  },
+  {
+   "id": "republic-day",
+   "names": {
+    "pt": "Implantação da República",
+    "en": "Republic Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 5
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º (restabelece os feriados eliminados em 2013)",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "from_year": 2016
+  },
+  {
+   "id": "republic-day-pre-2013",
+   "names": {
+    "pt": "Implantação da República",
+    "en": "Republic Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 5
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1 (redação original; eliminado pela Lei n.º 23/2012, de 25 de junho, art. 10.º n.º 1, com efeitos a 1 jan 2013) — not read from the gazette",
+    "url": "https://pgdlisboa.pt/leis/lei_mostra_articulado.php?nid=1755&nversao=3&so_miolo=&tabela=lei_velhas"
+   },
+   "verification": "unverified",
+   "to_year": 2012
+  },
+  {
+   "id": "all-saints",
+   "names": {
+    "pt": "Dia de Todos os Santos",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º (restabelece os feriados eliminados em 2013)",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "from_year": 2016
+  },
+  {
+   "id": "all-saints-pre-2013",
+   "names": {
+    "pt": "Dia de Todos os Santos",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1 (redação original; eliminado pela Lei n.º 23/2012, de 25 de junho, art. 10.º n.º 1, com efeitos a 1 jan 2013) — not read from the gazette",
+    "url": "https://pgdlisboa.pt/leis/lei_mostra_articulado.php?nid=1755&nversao=3&so_miolo=&tabela=lei_velhas"
+   },
+   "verification": "unverified",
+   "to_year": 2012
+  },
+  {
+   "id": "restoration-of-independence",
+   "names": {
+    "pt": "Restauração da Independência",
+    "en": "Restoration of Independence"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1, na redação da Lei n.º 8/2016, de 1 de abril, art. 2.º (restabelece os feriados eliminados em 2013)",
+    "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "from_year": 2016
+  },
+  {
+   "id": "restoration-of-independence-pre-2013",
+   "names": {
+    "pt": "Restauração da Independência",
+    "en": "Restoration of Independence"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Código do Trabalho (Lei n.º 7/2009), art. 234.º n.º 1 (redação original; eliminado pela Lei n.º 23/2012, de 25 de junho, art. 10.º n.º 1, com efeitos a 1 jan 2013) — not read from the gazette",
+    "url": "https://pgdlisboa.pt/leis/lei_mostra_articulado.php?nid=1755&nversao=3&so_miolo=&tabela=lei_velhas"
+   },
+   "verification": "unverified",
+   "to_year": 2012
+  }
+ ]
+}

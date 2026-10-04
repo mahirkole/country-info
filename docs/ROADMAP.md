@@ -6,7 +6,8 @@ Son güncelleme: 2026-10-04. Dal: `claude/country-info-mvp` (PR açılmadı). He
 - MVP: GeoNames ülke/admin1/admin2 ingest, snapshot/delta/webhook, dosya dışa aktarım.
 - Çok kaynaklı ingest + provenance (`sources`, `source_id`), kaynaklar birbirini silmez, silme koruması (%5).
 - Eurostat GISCO: NUTS (AB27 + TR İBBS = 1.620) ve LAU (AB27 ≈ 95k).
-- Tatil kural motoru; TR (unverified), AT (13/13 verified), ES (4/4), IT (6/11), DE (1/9).
+- Tatil kural motoru (sabit, Paskalya, n. hafta günü, `on_or_after`, listeli) ve 23 ülke dosyası; doğrulama durumu `docs/sources/EU-holidays.md` (11 ülke tam doğrulanmış). Ajan okuma notları `docs/sources/holidays/`.
+- GeoNames şehirleri (`cities15000`, 34.152 kayıt).
 - GeoNames↔NUTS ad eşlemesi (770 admin1'den 169 bağ), `/v1/review-items`.
 - Atıf: `sources.attribution`, `/v1/sources`, `ATTRIBUTION.md`; lisans okuma bulguları `docs/LICENSES.md`.
 
@@ -17,15 +18,20 @@ Son güncelleme: 2026-10-04. Dal: `claude/country-info-mvp` (PR açılmadı). He
 4. Hukuki lisans teyidi (bkz. `docs/LICENSES.md` "teyit edin" maddeleri); Eurostat GISCO'dan LAU/NUTS ticari kullanım için yazılı teyit istenebilir.
 
 ## Konteynerden yapılabilir
-1. **AB27 kalan 19 ülkenin tatilleri** (BE, BG, HR, CY, CZ, DK, EE, FI, GR, HU, IE, LV, LT, LU, MT, PL, PT, RO, SK, SI, SE): her ülke için resmi metni okuyup `data/holidays/<CC>.json` yaz, yalnızca okunanı `verified` yap.
-2. **Eksik tatiller:** ES yıllık BOE takvimi (6 Ocak, Viernes Santo, 1 Kasım, 6/8 Aralık…) ve özerk topluluklar; DE eyalet tatilleri (`region: nuts:DEx`); IT Legge 260/1949 metni (kalan 5 gün), IT 4 Ekim durumu; AT/DE/IT bölgesel/yerel günler.
-3. **Eşleme kapsamını artırma:** GeoNames `alternateNamesV2` (çok dilli adlar) veya ISO 3166-2 (`iso-codes`, LGPL) ile admin1↔NUTS (şu an %22).
-4. **ISO 3166-2** kodları (`data.iso3166_2`) ve çok dilli adlar (CLDR/alternateNames).
-5. **Şehirler** (GeoNames `cities15000`) ve **posta kodları** (GeoNames `postalCodes`, CC BY).
-6. **LAU↔NUTS3 bağlantısı** (GISCO LAU CSV'sinde yok; ayrı eşleme dosyası araştırılacak).
-7. **Operasyon:** `npm run ingest:all` + `docs/OPERATIONS.md`, zamanlanmış ingest (cron), API anahtarı/hız sınırı, OpenAPI şeması, SDK'lar.
-8. **Resmî Gazete izleyici** (TR idari değişiklik olayları; Resmî Gazete erişilebilir).
-9. OSM mahalle/sokak (ODbL değerlendirmesi sonrası).
+1. **Eksik AB tatil dosyaları:** BG (Kodeks na truda čl. 154), RO (Codul muncii art. 139; Ortodoks Paskalya), FR (Légifrance 403, alternatif resmi kaynak?), NL (wetten.overheid.nl erişilemedi), CY (resmi liste bulunamadı; `docs/sources/holidays/CY.md`).
+2. **Doğrulanmamış ülkeleri doğrulama** (alternatif resmi kaynak/sürüm ara): BE, LU, FI, GR, LT, MT, SI, DE eyalet yasaları, IT Legge 260/1949, DK birincil helligdag hükmü ve Store Bededag tanımı, PT 2013 öncesi, SK 17 Kasım 2024, SE değişiklikler (SFS 2004 sonrası).
+3. **Eksik tatiller:** ES yıllık BOE takvimi ve özerk topluluklar; DE bölgesel günler (`region: nuts:DEx`); IE St Brigid's Day (motora koşullu kural: "Şubat ilk Pazartesisi, 1 Şubat Cuma ise o gün"); GR Temiz Pazartesi/Büyük Cuma/Pentekost Pazartesi; LV hafta sonu devri; IT 4 Ekim.
+4. **Eşleme kapsamını artırma:** GeoNames `alternateNamesV2` veya ISO 3166-2 (`iso-codes`, LGPL) ile admin1↔NUTS (şu an %22).
+5. **ISO 3166-2** (`data.iso3166_2`) ve çok dilli adlar (şehir/bölge için alternateNames/CLDR).
+6. **Posta kodları** (GeoNames `postalCodes`, CC BY; ülke lisansı kontrol edilmeli).
+7. **LAU↔NUTS3 bağlantısı** (GISCO LAU CSV'sinde yok).
+8. **Operasyon:** `npm run ingest:all` + `docs/OPERATIONS.md`, zamanlanmış ingest (cron), API anahtarı/hız sınırı, OpenAPI şeması, SDK'lar.
+9. **Resmî Gazete izleyici** (TR idari değişiklik olayları; bu oturumda resmigazete.gov.tr de erişilemedi, önceden 200 idi → tekrar dene).
+10. OSM mahalle/sokak (ODbL değerlendirmesi sonrası).
+
+## Yöntem notu (tatil kaynakları)
+- Ajanlara ülke grupları verildi; çıktı bağımsız kontrol edildi: URL'ler yeniden çekilip alıntıların kaynakta geçtiği doğrulandı (CZ, HU, SK, PL, LV, IE, SI, EE, DK, HR, PT). Aynı yöntem yeni ülkeler için tekrarlanmalı.
+- Aggregator (Nager.Date) yanlış çıkabilir (SK 2026 örneği); yalnızca alarm olarak kullanın.
 
 ## Ürün/iş
 - Hedef segment seçimi ve 5–10 müşteri görüşmesi; fiyat katmanları (ücretsiz: ülke+admin1; ücretli: delta/webhook, tatiller, SLA).

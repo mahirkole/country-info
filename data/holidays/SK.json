@@ -1,0 +1,392 @@
+{
+ "country": "SK",
+ "authority": "Slovenská republika (Národná rada SR)",
+ "default_language": "sk",
+ "rules": [
+  {
+   "id": "new-year-slovak-republic-day",
+   "names": {
+    "sk": "Deň vzniku Slovenskej republiky",
+    "en": "Day of the Establishment of the Slovak Republic"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 1 písm. a)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "epiphany",
+   "names": {
+    "sk": "Zjavenie Pána (Traja králi)",
+    "en": "Epiphany"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. a)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "sk": "Veľký piatok",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. b)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "sk": "Veľkonočný pondelok",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. c)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "sk": "Sviatok práce",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. d)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "victory-over-fascism-to-2025",
+   "names": {
+    "sk": "Deň víťazstva nad fašizmom",
+    "en": "Victory Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 8
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. j) (version to 31.10.2025)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20240101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "to_year": 2025
+  },
+  {
+   "id": "victory-over-fascism-from-2027",
+   "names": {
+    "sk": "Deň víťazstva nad fašizmom",
+    "en": "Victory Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 8
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. j), § 4b (version from 01.11.2025)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "from_year": 2027
+  },
+  {
+   "id": "cyril-methodius",
+   "names": {
+    "sk": "Sviatok svätého Cyrila a svätého Metoda",
+    "en": "Saints Cyril and Methodius Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 7,
+     "day": 5
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 1 písm. b)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "snp-anniversary",
+   "names": {
+    "sk": "Výročie Slovenského národného povstania",
+    "en": "Slovak National Uprising Anniversary"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 29
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 1 písm. c)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "constitution-day",
+   "names": {
+    "sk": "Deň Ústavy Slovenskej republiky",
+    "en": "Constitution Day"
+   },
+   "type": "observance",
+   "when": {
+    "fixed": {
+     "month": 9,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 1 písm. d) [devlet bayramı; § 2 ods. 3 uyarınca dinlenme günü değil]",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "our-lady-of-sorrows-to-2025",
+   "names": {
+    "sk": "Sedembolestná Panna Mária",
+    "en": "Our Lady of Sorrows"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 9,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. e) (version to 31.10.2025)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20240101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "to_year": 2025
+  },
+  {
+   "id": "our-lady-of-sorrows-from-2027",
+   "names": {
+    "sk": "Sedembolestná Panna Mária",
+    "en": "Our Lady of Sorrows"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 9,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. e), § 4b (version from 01.11.2025)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "from_year": 2027
+  },
+  {
+   "id": "czechoslovak-state-day",
+   "names": {
+    "sk": "Deň vzniku samostatného česko-slovenského štátu",
+    "en": "Independent Czecho-Slovak State Day"
+   },
+   "type": "observance",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 28
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 1 písm. e) [devlet bayramı; § 2 ods. 3 uyarınca dinlenme günü değil]",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "all-saints",
+   "names": {
+    "sk": "Sviatok Všetkých svätých",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. f)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "freedom-democracy-day-to-2024",
+   "names": {
+    "sk": "Deň boja za slobodu a demokraciu",
+    "en": "Struggle for Freedom and Democracy Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 17
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 1 písm. f), § 2 ods. 3 [doğrulanmadı: 2024 sürümünde 17 Kasım'ın dinlenme günü olduğu metinden doğrulanmadı]",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html"
+   },
+   "verification": "unverified",
+   "to_year": 2024
+  },
+  {
+   "id": "freedom-democracy-day-from-2025",
+   "names": {
+    "sk": "Deň boja za slobodu a demokraciu",
+    "en": "Struggle for Freedom and Democracy Day"
+   },
+   "type": "observance",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 17
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 1 písm. f), § 2 ods. 3 (01.11.2025 sürümü) [devlet bayramı; dinlenme günü değil]",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified",
+   "from_year": 2025
+  },
+  {
+   "id": "christmas-eve",
+   "names": {
+    "sk": "Štedrý deň",
+    "en": "Christmas Eve"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. g)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christmas-day",
+   "names": {
+    "sk": "Prvý sviatok vianočný",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. h)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "st-stephens-day",
+   "names": {
+    "sk": "Druhý sviatok vianočný",
+    "en": "St. Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Zákon č. 241/1993 Z. z. § 2 ods. 2 písm. i)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

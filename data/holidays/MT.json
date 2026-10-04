@@ -1,0 +1,273 @@
+{
+ "country": "MT",
+ "authority": "Parliament of Malta (Government of Malta)",
+ "default_language": "mt",
+ "rules": [
+  {
+   "id": "freedom-day",
+   "names": {
+    "mt": "Jum il-Ħelsien",
+    "en": "Freedom Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), art. 2 [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "sette-giugno",
+   "names": {
+    "mt": "Sette Giugno",
+    "en": "Sette Giugno"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 7
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), art. 2 [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "victory-day",
+   "names": {
+    "mt": "Jum il-Vittorja",
+    "en": "Victory Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 9,
+     "day": 8
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), art. 2 [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "independence-day",
+   "names": {
+    "mt": "Jum l-Indipendenza",
+    "en": "Independence Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 9,
+     "day": 21
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), art. 2 [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "republic-day",
+   "names": {
+    "mt": "Jum ir-Repubblika",
+    "en": "Republic Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 13
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), art. 2 [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "new-years-day",
+   "names": {
+    "mt": "L-Ewwel tas-Sena",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), Schedule (art. 5(1)) [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "st-pauls-shipwreck",
+   "names": {
+    "mt": "Nawfraġju ta' San Pawl",
+    "en": "Feast of St Paul's Shipwreck"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 2,
+     "day": 10
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), Schedule (art. 5(1)) [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "st-joseph",
+   "names": {
+    "mt": "San Ġużepp",
+    "en": "Feast of St Joseph"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 3,
+     "day": 19
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), Schedule (art. 5(1)) [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "mt": "Il-Ġimgħa l-Kbira",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), Schedule (art. 5(1)) [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "workers-day",
+   "names": {
+    "mt": "Jum il-Ħaddiem",
+    "en": "Workers' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), Schedule (art. 5(1)) [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "sts-peter-paul",
+   "names": {
+    "mt": "San Pietru u San Pawl (L-Imnarja)",
+    "en": "Feast of St Peter and St Paul"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 29
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), Schedule (art. 5(1)) [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "assumption",
+   "names": {
+    "mt": "Santa Marija",
+    "en": "Feast of the Assumption"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), Schedule (art. 5(1)) [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "immaculate-conception",
+   "names": {
+    "mt": "L-Immakulata Kunċizzjoni",
+    "en": "Feast of the Immaculate Conception"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 8
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), Schedule (art. 5(1)) [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "mt": "Il-Milied",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "National Holidays and other Public Holidays Act (Cap. 252), Schedule (art. 5(1)) [doğrulanmadı: okunan metin 12/02/2021 tarihli konsolide sürüm; Başbakan Çizelgeyi Gazete ile değiştirebilir (m. 5(3)), sonraki değişiklikler kontrol edilmedi]",
+    "url": "https://legislation.mt/eli/cap/252/eng/pdf"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

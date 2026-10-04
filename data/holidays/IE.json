@@ -1,0 +1,191 @@
+{
+ "country": "IE",
+ "authority": "Oireachtas (Irish Statute Book / Law Reform Commission)",
+ "default_language": "en",
+ "rules": [
+  {
+   "id": "christmas",
+   "names": {
+    "ga": "Lá Nollag",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Organisation of Working Time Act 1997, Second Schedule, para. 1(a)",
+    "url": "https://revisedacts.lawreform.ie/eli/1997/act/20/revised/en/html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "st-stephens",
+   "names": {
+    "ga": "Lá Fhéile Stiofáin",
+    "en": "St. Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Organisation of Working Time Act 1997, Second Schedule, para. 1(b)",
+    "url": "https://revisedacts.lawreform.ie/eli/1997/act/20/revised/en/html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "st-patricks",
+   "names": {
+    "ga": "Lá Fhéile Pádraig",
+    "en": "St. Patrick's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 3,
+     "day": 17
+    }
+   },
+   "source": {
+    "citation": "Organisation of Working Time Act 1997, Second Schedule, para. 1(c)",
+    "url": "https://revisedacts.lawreform.ie/eli/1997/act/20/revised/en/html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "ga": "Luan Cásca",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Organisation of Working Time Act 1997, Second Schedule, para. 1(d)",
+    "url": "https://revisedacts.lawreform.ie/eli/1997/act/20/revised/en/html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "may-bank-holiday",
+   "names": {
+    "ga": "Luan Bealtaine",
+    "en": "May Bank Holiday (first Monday in May)"
+   },
+   "type": "public",
+   "when": {
+    "nth_weekday": {
+     "month": 5,
+     "weekday": 1,
+     "n": 1
+    }
+   },
+   "source": {
+    "citation": "Organisation of Working Time Act 1997, Second Schedule, para. 1(d)",
+    "url": "https://revisedacts.lawreform.ie/eli/1997/act/20/revised/en/html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "june-bank-holiday",
+   "names": {
+    "ga": "Luan an Mheithimh",
+    "en": "June Bank Holiday (first Monday in June)"
+   },
+   "type": "public",
+   "when": {
+    "nth_weekday": {
+     "month": 6,
+     "weekday": 1,
+     "n": 1
+    }
+   },
+   "source": {
+    "citation": "Organisation of Working Time Act 1997, Second Schedule, para. 1(d)",
+    "url": "https://revisedacts.lawreform.ie/eli/1997/act/20/revised/en/html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "august-bank-holiday",
+   "names": {
+    "ga": "Luan Lúnasa",
+    "en": "August Bank Holiday (first Monday in August)"
+   },
+   "type": "public",
+   "when": {
+    "nth_weekday": {
+     "month": 8,
+     "weekday": 1,
+     "n": 1
+    }
+   },
+   "source": {
+    "citation": "Organisation of Working Time Act 1997, Second Schedule, para. 1(d)",
+    "url": "https://revisedacts.lawreform.ie/eli/1997/act/20/revised/en/html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "october-bank-holiday",
+   "names": {
+    "ga": "Luan Dheireadh Fómhair",
+    "en": "October Bank Holiday (last Monday in October)"
+   },
+   "type": "public",
+   "when": {
+    "nth_weekday": {
+     "month": 10,
+     "weekday": 1,
+     "n": -1
+    }
+   },
+   "source": {
+    "citation": "Organisation of Working Time Act 1997, Second Schedule, para. 1(e)",
+    "url": "https://revisedacts.lawreform.ie/eli/1997/act/20/revised/en/html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "new-years-day",
+   "names": {
+    "ga": "Lá Caille",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Organisation of Working Time Act 1997, Second Schedule, para. 1(f)",
+    "url": "https://revisedacts.lawreform.ie/eli/1997/act/20/revised/en/html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

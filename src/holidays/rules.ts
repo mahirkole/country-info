@@ -6,6 +6,7 @@ export type When =
   | { fixed: { month: number; day: number } }
   | { easter: { offset: number; calendar?: 'gregorian' | 'orthodox' } }
   | { nth_weekday: { month: number; weekday: number; n: number } } // weekday 0=Sun..6=Sat; n=-1 means last
+  | { on_or_after: { month: number; day: number; weekday: number } } // first `weekday` on or after month/day (e.g. Saturday on or after 20 June)
   | { listed: Record<string, string | { date: string; verification: Verification }> }; // year -> date
 
 export interface HolidayRule {
@@ -78,6 +79,10 @@ export function datesFor(rule: HolidayRule, year: number): { date: string; verif
   }
   if ('easter' in w) return [{ date: fmt(addDays(easter(year, w.easter.calendar), w.easter.offset)) }];
   if ('nth_weekday' in w) return [{ date: fmt(nthWeekday(year, w.nth_weekday.month, w.nth_weekday.weekday, w.nth_weekday.n)) }];
+  if ('on_or_after' in w) {
+    const start = utc(year, w.on_or_after.month, w.on_or_after.day);
+    return [{ date: fmt(addDays(start, (w.on_or_after.weekday - start.getUTCDay() + 7) % 7)) }];
+  }
   const v = w.listed[String(year)];
   if (v === undefined) return [];
   const { date, verification } = typeof v === 'string' ? { date: v, verification: undefined } : v;

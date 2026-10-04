@@ -1,0 +1,207 @@
+{
+ "country": "BE",
+ "authority": "Federal State of Belgium",
+ "default_language": "fr",
+ "rules": [
+  {
+   "id": "new-years-day",
+   "names": {
+    "fr": "Jour de l'An",
+    "nl": "Nieuwjaar",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "fr": "Lundi de Pâques",
+    "nl": "Paasmaandag",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "fr": "Fête du Travail",
+    "nl": "Dag van de Arbeid",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ascension",
+   "names": {
+    "fr": "Ascension",
+    "nl": "O.L.H. Hemelvaart",
+    "en": "Ascension Day"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 39,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "whit-monday",
+   "names": {
+    "fr": "Lundi de Pentecôte",
+    "nl": "Pinkstermaandag",
+    "en": "Whit Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "national-day",
+   "names": {
+    "fr": "Fête nationale",
+    "nl": "Nationale feestdag",
+    "en": "Belgian National Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 7,
+     "day": 21
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "assumption",
+   "names": {
+    "fr": "Assomption",
+    "nl": "O.L.V. Hemelvaart",
+    "en": "Assumption"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "all-saints",
+   "names": {
+    "fr": "Toussaint",
+    "nl": "Allerheiligen",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "armistice",
+   "names": {
+    "fr": "Armistice",
+    "nl": "Wapenstilstand",
+    "en": "Armistice Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 11
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "fr": "Noël",
+    "nl": "Kerstmis",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Loi du 4 janvier 1974 relative aux jours fériés, art. 1er",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/1974/01/04/1974010431/justel"
+   },
+   "verification": "unverified"
+  }
+ ]
+}
