@@ -6,7 +6,7 @@ Son güncelleme: 2026-10-04. Dal: `claude/country-info-mvp` (PR açılmadı). He
 - MVP: GeoNames ülke/admin1/admin2 ingest, snapshot/delta/webhook, dosya dışa aktarım.
 - Çok kaynaklı ingest + provenance (`sources`, `source_id`), kaynaklar birbirini silmez, silme koruması (%5).
 - Eurostat GISCO: NUTS (AB27 + TR İBBS = 1.620) ve LAU (AB27 ≈ 95k).
-- Tatil kural motoru (sabit, Paskalya, n. hafta günü, `on_or_after`, listeli) ve 23 ülke dosyası; doğrulama durumu `docs/sources/EU-holidays.md` (11 ülke tam doğrulanmış). Ajan okuma notları `docs/sources/holidays/`.
+- Tatil kural motoru (sabit, Paskalya, n. hafta günü, `on_or_after`, listeli) ve 23 ülke dosyası; doğrulama durumu `docs/sources/EU-holidays.md` (10 ülke tam doğrulanmış). Ajan okuma notları `docs/sources/holidays/`.
 - GeoNames şehirleri (`cities15000`, 34.152 kayıt).
 - GeoNames↔NUTS ad eşlemesi (770 admin1'den 169 bağ), `/v1/review-items`.
 - Atıf: `sources.attribution`, `/v1/sources`, `ATTRIBUTION.md`; lisans okuma bulguları `docs/LICENSES.md`.

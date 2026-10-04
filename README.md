@@ -14,7 +14,7 @@
 | Dosya dışa aktarım (JSON/CSV/NDJSON + manifest + sha256) | ✅ |
 | Çok kaynaklı ingest + provenance (`source_id`, `sources`), kaynaklar birbirini silmez | ✅ |
 | AB27 + Türkiye NUTS/İBBS (1.620 kayıt) ve AB27 LAU (≈95k belediye) – Eurostat GISCO | ✅ |
-| Resmi tatiller: kural motoru + 23 ülke dosyası (TR + AB27'den 22; 11 ülkenin kuralları tamamen resmi metinden doğrulanmış, bkz. `docs/sources/EU-holidays.md`). BG, CY, FR, NL, RO henüz yok | 🟡 |
+| Resmi tatiller: kural motoru + 23 ülke dosyası (TR + AB27'den 22; 10 ülkenin kuralları tamamen resmi metinden doğrulanmış, bkz. `docs/sources/EU-holidays.md`). BG, CY, FR, NL, RO henüz yok | 🟡 |
 | GeoNames↔NUTS ad eşlemesi (`npm run link`; 770 admin1'den ~170'i eşleşir, kalanı GeoNames'in İngilizce adları yüzünden eşleşmez) | 🟡 |
 | TÜİK/NVİ, BG/CY/FR/NL/RO tatilleri | ⏳ |
 | Şehirler: GeoNames `cities15000` (34.152 yerleşim, saat dilimi ve nüfus dahil) | ✅ |
