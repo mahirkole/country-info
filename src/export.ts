@@ -29,7 +29,8 @@ async function sha256(path: string): Promise<{ sha256: string; bytes: number }> 
  * Write the files for one snapshot under `<out>/snapshots/<id>/` and refresh
  * `<out>/latest/` and `<out>/manifest.json`:
  *   countries.json / countries.csv   full country list
- *   regions.ndjson                   all subdivisions, one JSON per line
+ *   regions.ndjson                   all subdivisions (admin, NUTS, LAU), one JSON per line
+ *   holidays.ndjson / holidays.csv   all holiday occurrences
  *   delta.ndjson                     change log of this snapshot (empty for the first import = all inserts)
  */
 export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?: number): Promise<ManifestEntry> {
@@ -60,9 +61,20 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
 
   await writeFile(join(dir, 'regions.ndjson'), '');
   for (let after = ''; ; ) {
-    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind <> 'country' AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
+    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind NOT IN ('country', 'holiday') AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
     if (rows.length === 0) break;
     await appendFile(join(dir, 'regions.ndjson'), rows.map((r) => JSON.stringify(r) + '\n').join(''));
+    after = rows[rows.length - 1].id;
+  }
+
+  await writeFile(join(dir, 'holidays.ndjson'), '');
+  const hcsv = join(dir, 'holidays.csv');
+  await writeFile(hcsv, csvRow(['date', 'country', 'rule_id', 'name', 'type', 'region', 'verification', 'source']));
+  for (let after = ''; ; ) {
+    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'holiday' AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
+    if (rows.length === 0) break;
+    await appendFile(join(dir, 'holidays.ndjson'), rows.map((r) => JSON.stringify(r) + '\n').join(''));
+    await appendFile(hcsv, rows.map((r) => csvRow([r.data.date, r.country_code, r.data.rule_id, r.name, r.data.type, r.data.region, r.data.verification, r.data.source?.citation])).join(''));
     after = rows[rows.length - 1].id;
   }
 
@@ -80,7 +92,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
   }
 
   const files: ManifestEntry['files'] = {};
-  for (const f of ['countries.json', 'countries.csv', 'regions.ndjson', 'delta.ndjson']) {
+  for (const f of ['countries.json', 'countries.csv', 'regions.ndjson', 'holidays.ndjson', 'holidays.csv', 'delta.ndjson']) {
     files[f] = { path: `snapshots/${snap.id}/${f}`, ...(await sha256(join(dir, f))) };
   }
   const entry: ManifestEntry = { snapshot_id: Number(snap.id), from_seq: Number(snap.from_seq), to_seq: Number(snap.to_seq), created_at: new Date(snap.finished_at ?? Date.now()).toISOString(), files };

@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import type pg from 'pg';
 import { config } from './config.js';
 
-const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data, updated_seq';
+const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data, source_id, updated_seq';
 const MAX_LIMIT = 1000;
 
 function page(q: { limit?: string; after?: string }) {
@@ -57,6 +57,44 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
       return paged(rows, limit, 'id');
     },
   );
+
+  // ---- holidays --------------------------------------------------------
+  /**
+   * Holidays of a country for a year. Without `region` only nationwide holidays are returned;
+   * with `region=<entity id>` the holidays of that region and its ancestors are added.
+   */
+  app.get<{ Params: { code: string }; Querystring: { year?: string; region?: string; type?: string } }>('/v1/countries/:code/holidays', async (req, reply) => {
+    const cc = req.params.code.toUpperCase();
+    const year = Number(req.query.year ?? new Date().getUTCFullYear());
+    if (!Number.isInteger(year) || year < 1900 || year > 2200) return reply.code(400).send({ error: 'invalid year' });
+    const rows = (
+      await pool.query(
+        `WITH RECURSIVE chain AS (
+           SELECT id, parent_id FROM entities WHERE id = $4::text
+           UNION SELECT e.id, e.parent_id FROM entities e JOIN chain c ON e.id = c.parent_id
+         )
+         SELECT ${COLS} FROM entities
+         WHERE kind = 'holiday' AND country_code = $1 AND data->>'date' >= $2 AND data->>'date' <= $3
+           AND ($5::text IS NULL OR data->>'type' = $5)
+           AND (parent_id = 'country:' || $1 OR parent_id IN (SELECT id FROM chain))
+         ORDER BY data->>'date', id`,
+        [cc, `${year}-01-01`, `${year}-12-31`, req.query.region ?? null, req.query.type ?? null],
+      )
+    ).rows;
+    return { data: rows };
+  });
+
+  /** Holidays on one date, optionally for one country (all scopes, including regional). */
+  app.get<{ Querystring: { date?: string; country?: string } }>('/v1/holidays', async (req, reply) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(req.query.date ?? '')) return reply.code(400).send({ error: 'date must be YYYY-MM-DD' });
+    const rows = (
+      await pool.query(
+        `SELECT ${COLS} FROM entities WHERE kind = 'holiday' AND data->>'date' = $1 AND ($2::text IS NULL OR country_code = $2) ORDER BY country_code, id LIMIT 1000`,
+        [req.query.date, req.query.country?.toUpperCase() ?? null],
+      )
+    ).rows;
+    return { data: rows };
+  });
 
   // ---- regions ---------------------------------------------------------
   app.get<{ Params: { id: string } }>('/v1/regions/:id', async (req, reply) => {
@@ -115,7 +153,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   });
 
   // ---- webhooks (admin) -----------------------------------------------
-  app.post<{ Body: { url?: string; countries?: string[] } }>('/v1/webhooks', { preHandler: requireAdmin }, async (req, reply) => {
+  app.post<{ Body: { url?: string; countries?: string[]; kinds?: string[] } }>('/v1/webhooks', { preHandler: requireAdmin }, async (req, reply) => {
     const url = req.body?.url ?? '';
     try {
       const u = new URL(url);
@@ -124,13 +162,14 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
       return reply.code(400).send({ error: 'url must be a valid http(s) URL' });
     }
     const countries = req.body.countries?.map((c) => c.toUpperCase()) ?? null;
+    const kinds = req.body.kinds ?? null;
     const secret = randomBytes(24).toString('hex');
-    const r = await pool.query('INSERT INTO webhook_subscriptions (url, secret, countries) VALUES ($1, $2, $3) RETURNING id, url, countries, active', [url, secret, countries]);
+    const r = await pool.query('INSERT INTO webhook_subscriptions (url, secret, countries, kinds) VALUES ($1, $2, $3, $4) RETURNING id, url, countries, kinds, active', [url, secret, countries, kinds]);
     return reply.code(201).send({ ...r.rows[0], secret }); // secret is shown only here
   });
 
   app.get('/v1/webhooks', { preHandler: requireAdmin }, async () => ({
-    data: (await pool.query('SELECT id, url, countries, active, created_at FROM webhook_subscriptions ORDER BY id')).rows,
+    data: (await pool.query('SELECT id, url, countries, kinds, active, created_at FROM webhook_subscriptions ORDER BY id')).rows,
   }));
 
   app.delete<{ Params: { id: string } }>('/v1/webhooks/:id', { preHandler: requireAdmin }, async (req, reply) => {

@@ -29,6 +29,11 @@ Tüketiciler `seq` cursor'ı ile sıralı, kayıpsız delta alır. Dosya dağıt
 | Posta kodları | GeoNames `postalCodes` (sonraki adım) | CC-BY 4.0 |
 | Tatiller | Nager.Date / `date-holidays` (sonraki adım) | MIT; bölgesel kapsam ve doğruluk kontrol edilmeli |
 
+## Çok kaynaklı model (Aşama A–B–D)
+- Her `entity` tam bir `source_id`'ye aittir; `ingest()` yalnızca kendi kaynağının, verilen `kinds` (ve `countries`) kapsamındaki eksik kayıtlarını siler ve başka kaynağın kimliğini sahiplenemez.
+- Aynı gerçek-dünya kavramı farklı kaynaklarda ayrı kayıttır (`gn:*` ↔ `nuts:*`); `entity_links` ve `review_items` tabloları bu eşleme/çelişki için hazır, doldurulması henüz yapılmadı.
+- Tatiller `kind='holiday'` entity'leridir (`hol:<CC>:<tarih>:<kural>`); böylece delta/webhook/export aynen çalışır. Kurallar `data/holidays/<CC>.json` içinde, her kuralda atıf ve `verification` alanı (`verified|unverified|tentative`) bulunur.
+
 ## Bilinen sınırlar
 - Admin kodları GeoNames kodlarıdır; **ISO 3166-2 değildir**. ISO 3166-2 eşlemesi ayrı bir kaynakla eklenmeli (`data.iso3166_2`).
 - `population`/`area_km2` kaynakta sık değişir; delta'da gürültü yaratabilir. Gerekirse hash dışında tutulur.

@@ -10,6 +10,8 @@
     "cli": "tsx src/cli.ts",
     "migrate": "tsx src/cli.ts migrate",
     "ingest": "tsx src/cli.ts ingest",
+    "ingest:gisco": "tsx src/cli.ts ingest-gisco",
+    "ingest:holidays": "tsx src/cli.ts ingest-holidays",
     "export": "tsx src/cli.ts export",
     "serve": "tsx src/cli.ts serve",
     "test": "vitest run"

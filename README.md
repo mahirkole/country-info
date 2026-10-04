@@ -12,7 +12,11 @@
 | Snapshot + değişiklik günlüğü (delta), cursor tabanlı API | ✅ |
 | Webhook (HMAC imzalı, yeniden deneme, ülke filtresi) | ✅ |
 | Dosya dışa aktarım (JSON/CSV/NDJSON + manifest + sha256) | ✅ |
-| Şehir, mahalle, sokak (OpenStreetMap), tatiller, özel günler, posta kodları | ⏳ bkz. `docs/DESIGN.md` |
+| Çok kaynaklı ingest + provenance (`source_id`, `sources`), kaynaklar birbirini silmez | ✅ |
+| AB27 + Türkiye NUTS/İBBS (1.620 kayıt) ve AB27 LAU (≈95k belediye) – Eurostat GISCO | ✅ |
+| Resmi tatiller: kural motoru + Türkiye (2024–2028; **henüz resmi kaynakla doğrulanmadı**, bkz. `docs/sources/TR.md`) | 🟡 |
+| AB27 tatilleri, TÜİK/NVİ, GeoNames↔NUTS eşleme (`entity_links`), inceleme kuyruğu | ⏳ |
+| Şehir, mahalle, sokak (OpenStreetMap), posta kodları | ⏳ bkz. `docs/DESIGN.md` |
 
 ## Hızlı başlangıç
 
@@ -20,6 +24,8 @@
 cp .env.example .env            # DATABASE_URL vb.
 npm install
 npm run ingest                  # migrate + GeoNames'ten içe aktar (idempotent)
+npm run ingest:gisco            # NUTS (AB27+TR) ve LAU (AB27); önce `ingest` gerekir
+npm run ingest:holidays         # data/holidays/*.json -> tatil kayıtları
 npm run export                  # out/ altına dosyaları yaz
 npm run serve                   # API :3000 (+ webhook işçisi)
 npm test                        # TEST_DATABASE_URL ile DB testleri de çalışır
@@ -33,9 +39,11 @@ GET  /v1/countries/:iso2
 GET  /v1/countries/:iso2/regions?level=1|2
 GET  /v1/regions/:id            GET /v1/regions/:id/children
 GET  /v1/search?q=ist&country=TR&kind=admin1
+GET  /v1/countries/:iso2/holidays?year=&region=<entity id>&type=   # region verilmezse yalnızca ülke geneli
+GET  /v1/holidays?date=YYYY-MM-DD&country=
 GET  /v1/snapshots
 GET  /v1/changes?since=<seq>&until=&country=TR,DE&kind=&limit=   # delta akışı
-POST /v1/webhooks   {url, countries?}   (Authorization: Bearer $ADMIN_TOKEN; secret yalnızca yanıtta görünür)
+POST /v1/webhooks   {url, countries?, kinds?}   (Authorization: Bearer $ADMIN_TOKEN; secret yalnızca yanıtta görünür)
 GET/DELETE /v1/webhooks[/:id]
 GET  /files/manifest.json, /files/latest/*, /files/snapshots/<id>/*
 ```
@@ -47,7 +55,7 @@ GET  /files/manifest.json, /files/latest/*, /files/snapshots/<id>/*
 Her ingest sonrası değişiklik varsa abonelere `snapshot.completed` bildirimi gider (küçük gövde; veri `changes_url` ile çekilir). Başlıklar: `x-countryinfo-signature: sha256=HMAC(secret, "<timestamp>.<body>")`, `x-countryinfo-timestamp`, `x-countryinfo-delivery`. 2xx dışı yanıtta 30s·2ⁿ ile 8 denemeye kadar tekrar denenir.
 
 ### Dosyalar
-`snapshots/<id>/` altında `countries.json`, `countries.csv`, `regions.ndjson`, `delta.ndjson`; `latest/` en son kopya; `manifest.json` boyut ve sha256 içerir.
+`snapshots/<id>/` altında `countries.json`, `countries.csv`, `regions.ndjson`, `holidays.ndjson`, `holidays.csv`, `delta.ndjson`; `latest/` en son kopya; `manifest.json` boyut ve sha256 içerir.
 
 ## Lisans ve atıf
-GeoNames verisi CC-BY 4.0'dır; dağıtılan veride atıf gerekir. İleride eklenecek OpenStreetMap verisi ODbL'dir (atıf + share-alike). Ayrıntı: `docs/DESIGN.md`.
+Kaynak lisansları `docs/LICENSES.md`'de. GeoNames verisi CC-BY 4.0'dır; dağıtılan veride atıf gerekir. İleride eklenecek OpenStreetMap verisi ODbL'dir (atıf + share-alike). Ayrıntı: `docs/DESIGN.md`.

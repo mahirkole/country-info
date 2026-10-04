@@ -1,0 +1,493 @@
+{
+ "country": "TR",
+ "authority": "T.C. mevzuatı ve Diyanet İşleri Başkanlığı",
+ "default_language": "tr",
+ "rules": [
+  {
+   "id": "yilbasi",
+   "names": {
+    "tr": "Yılbaşı",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Ulusal Bayram ve Genel Tatiller Hakkında Kanun",
+    "url": "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=2429&MevzuatTur=1&MevzuatTertip=3"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ulusal-egemenlik-ve-cocuk-bayrami",
+   "names": {
+    "tr": "Ulusal Egemenlik ve Çocuk Bayramı",
+    "en": "National Sovereignty and Children's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 4,
+     "day": 23
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Ulusal Bayram ve Genel Tatiller Hakkında Kanun",
+    "url": "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=2429&MevzuatTur=1&MevzuatTertip=3"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "emek-ve-dayanisma-gunu",
+   "names": {
+    "tr": "Emek ve Dayanışma Günü",
+    "en": "Labour and Solidarity Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Ulusal Bayram ve Genel Tatiller Hakkında Kanun",
+    "url": "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=2429&MevzuatTur=1&MevzuatTertip=3"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ataturku-anma-genclik-ve-spor-bayrami",
+   "names": {
+    "tr": "Atatürk'ü Anma, Gençlik ve Spor Bayramı",
+    "en": "Commemoration of Atatürk, Youth and Sports Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 19
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Ulusal Bayram ve Genel Tatiller Hakkında Kanun",
+    "url": "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=2429&MevzuatTur=1&MevzuatTertip=3"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "demokrasi-ve-milli-birlik-gunu",
+   "names": {
+    "tr": "Demokrasi ve Milli Birlik Günü",
+    "en": "Democracy and National Unity Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 7,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Ulusal Bayram ve Genel Tatiller Hakkında Kanun",
+    "url": "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=2429&MevzuatTur=1&MevzuatTertip=3"
+   },
+   "verification": "unverified",
+   "from_year": 2017
+  },
+  {
+   "id": "zafer-bayrami",
+   "names": {
+    "tr": "Zafer Bayramı",
+    "en": "Victory Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 30
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Ulusal Bayram ve Genel Tatiller Hakkında Kanun",
+    "url": "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=2429&MevzuatTur=1&MevzuatTertip=3"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "cumhuriyet-bayrami-arifesi",
+   "names": {
+    "tr": "Cumhuriyet Bayramı Arifesi (yarım gün)",
+    "en": "Republic Day Eve (half day)"
+   },
+   "type": "half_day",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 28
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Ulusal Bayram ve Genel Tatiller Hakkında Kanun",
+    "url": "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=2429&MevzuatTur=1&MevzuatTertip=3"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "cumhuriyet-bayrami",
+   "names": {
+    "tr": "Cumhuriyet Bayramı",
+    "en": "Republic Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 29
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Ulusal Bayram ve Genel Tatiller Hakkında Kanun",
+    "url": "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=2429&MevzuatTur=1&MevzuatTertip=3"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ramazan-bayrami-arifesi",
+   "names": {
+    "tr": "Ramazan Bayramı Arifesi (yarım gün)",
+    "en": "Eid al-Fitr Eve (half day)"
+   },
+   "type": "half_day",
+   "when": {
+    "listed": {
+     "2024": {
+      "date": "2024-04-09",
+      "verification": "unverified"
+     },
+     "2025": {
+      "date": "2025-03-29",
+      "verification": "unverified"
+     },
+     "2026": {
+      "date": "2026-03-19",
+      "verification": "unverified"
+     },
+     "2027": {
+      "date": "2027-03-09",
+      "verification": "tentative"
+     },
+     "2028": {
+      "date": "2028-02-26",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Kanun; tarihler Diyanet İşleri Başkanlığı dini günler takvimi (yıllık duyuru)",
+    "url": "https://dinhizmetleri.diyanet.gov.tr/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ramazan-bayrami-1",
+   "names": {
+    "tr": "Ramazan Bayramı 1. Gün",
+    "en": "Eid al-Fitr Day 1"
+   },
+   "type": "public",
+   "when": {
+    "listed": {
+     "2024": {
+      "date": "2024-04-10",
+      "verification": "unverified"
+     },
+     "2025": {
+      "date": "2025-03-30",
+      "verification": "unverified"
+     },
+     "2026": {
+      "date": "2026-03-20",
+      "verification": "unverified"
+     },
+     "2027": {
+      "date": "2027-03-10",
+      "verification": "tentative"
+     },
+     "2028": {
+      "date": "2028-02-27",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Kanun; tarihler Diyanet İşleri Başkanlığı dini günler takvimi (yıllık duyuru)",
+    "url": "https://dinhizmetleri.diyanet.gov.tr/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ramazan-bayrami-2",
+   "names": {
+    "tr": "Ramazan Bayramı 2. Gün",
+    "en": "Eid al-Fitr Day 2"
+   },
+   "type": "public",
+   "when": {
+    "listed": {
+     "2024": {
+      "date": "2024-04-11",
+      "verification": "unverified"
+     },
+     "2025": {
+      "date": "2025-03-31",
+      "verification": "unverified"
+     },
+     "2026": {
+      "date": "2026-03-21",
+      "verification": "unverified"
+     },
+     "2027": {
+      "date": "2027-03-11",
+      "verification": "tentative"
+     },
+     "2028": {
+      "date": "2028-02-28",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Kanun; tarihler Diyanet İşleri Başkanlığı dini günler takvimi (yıllık duyuru)",
+    "url": "https://dinhizmetleri.diyanet.gov.tr/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ramazan-bayrami-3",
+   "names": {
+    "tr": "Ramazan Bayramı 3. Gün",
+    "en": "Eid al-Fitr Day 3"
+   },
+   "type": "public",
+   "when": {
+    "listed": {
+     "2024": {
+      "date": "2024-04-12",
+      "verification": "unverified"
+     },
+     "2025": {
+      "date": "2025-04-01",
+      "verification": "unverified"
+     },
+     "2026": {
+      "date": "2026-03-22",
+      "verification": "unverified"
+     },
+     "2027": {
+      "date": "2027-03-12",
+      "verification": "tentative"
+     },
+     "2028": {
+      "date": "2028-02-29",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Kanun; tarihler Diyanet İşleri Başkanlığı dini günler takvimi (yıllık duyuru)",
+    "url": "https://dinhizmetleri.diyanet.gov.tr/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "kurban-bayrami-arifesi",
+   "names": {
+    "tr": "Kurban Bayramı Arifesi (yarım gün)",
+    "en": "Eid al-Adha Eve (half day)"
+   },
+   "type": "half_day",
+   "when": {
+    "listed": {
+     "2024": {
+      "date": "2024-06-15",
+      "verification": "unverified"
+     },
+     "2025": {
+      "date": "2025-06-05",
+      "verification": "unverified"
+     },
+     "2026": {
+      "date": "2026-05-26",
+      "verification": "unverified"
+     },
+     "2027": {
+      "date": "2027-05-15",
+      "verification": "tentative"
+     },
+     "2028": {
+      "date": "2028-05-04",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Kanun; tarihler Diyanet İşleri Başkanlığı dini günler takvimi (yıllık duyuru)",
+    "url": "https://dinhizmetleri.diyanet.gov.tr/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "kurban-bayrami-1",
+   "names": {
+    "tr": "Kurban Bayramı 1. Gün",
+    "en": "Eid al-Adha Day 1"
+   },
+   "type": "public",
+   "when": {
+    "listed": {
+     "2024": {
+      "date": "2024-06-16",
+      "verification": "unverified"
+     },
+     "2025": {
+      "date": "2025-06-06",
+      "verification": "unverified"
+     },
+     "2026": {
+      "date": "2026-05-27",
+      "verification": "unverified"
+     },
+     "2027": {
+      "date": "2027-05-16",
+      "verification": "tentative"
+     },
+     "2028": {
+      "date": "2028-05-05",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Kanun; tarihler Diyanet İşleri Başkanlığı dini günler takvimi (yıllık duyuru)",
+    "url": "https://dinhizmetleri.diyanet.gov.tr/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "kurban-bayrami-2",
+   "names": {
+    "tr": "Kurban Bayramı 2. Gün",
+    "en": "Eid al-Adha Day 2"
+   },
+   "type": "public",
+   "when": {
+    "listed": {
+     "2024": {
+      "date": "2024-06-17",
+      "verification": "unverified"
+     },
+     "2025": {
+      "date": "2025-06-07",
+      "verification": "unverified"
+     },
+     "2026": {
+      "date": "2026-05-28",
+      "verification": "unverified"
+     },
+     "2027": {
+      "date": "2027-05-17",
+      "verification": "tentative"
+     },
+     "2028": {
+      "date": "2028-05-06",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Kanun; tarihler Diyanet İşleri Başkanlığı dini günler takvimi (yıllık duyuru)",
+    "url": "https://dinhizmetleri.diyanet.gov.tr/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "kurban-bayrami-3",
+   "names": {
+    "tr": "Kurban Bayramı 3. Gün",
+    "en": "Eid al-Adha Day 3"
+   },
+   "type": "public",
+   "when": {
+    "listed": {
+     "2024": {
+      "date": "2024-06-18",
+      "verification": "unverified"
+     },
+     "2025": {
+      "date": "2025-06-08",
+      "verification": "unverified"
+     },
+     "2026": {
+      "date": "2026-05-29",
+      "verification": "unverified"
+     },
+     "2027": {
+      "date": "2027-05-18",
+      "verification": "tentative"
+     },
+     "2028": {
+      "date": "2028-05-07",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Kanun; tarihler Diyanet İşleri Başkanlığı dini günler takvimi (yıllık duyuru)",
+    "url": "https://dinhizmetleri.diyanet.gov.tr/"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "kurban-bayrami-4",
+   "names": {
+    "tr": "Kurban Bayramı 4. Gün",
+    "en": "Eid al-Adha Day 4"
+   },
+   "type": "public",
+   "when": {
+    "listed": {
+     "2024": {
+      "date": "2024-06-19",
+      "verification": "unverified"
+     },
+     "2025": {
+      "date": "2025-06-09",
+      "verification": "unverified"
+     },
+     "2026": {
+      "date": "2026-05-30",
+      "verification": "unverified"
+     },
+     "2027": {
+      "date": "2027-05-19",
+      "verification": "tentative"
+     },
+     "2028": {
+      "date": "2028-05-08",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "2429 sayılı Kanun; tarihler Diyanet İşleri Başkanlığı dini günler takvimi (yıllık duyuru)",
+    "url": "https://dinhizmetleri.diyanet.gov.tr/"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

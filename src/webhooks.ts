@@ -14,15 +14,25 @@ export function sign(secret: string, body: string, timestamp: string): string {
  */
 export async function enqueueDeliveries(db: pg.Pool | pg.PoolClient, snapshotId: number): Promise<number> {
   const snap = (await db.query('SELECT id, source, from_seq, to_seq, inserted, updated, deleted FROM snapshots WHERE id = $1', [snapshotId])).rows[0];
-  const perCountry = (
-    await db.query('SELECT country_code::text AS cc, count(*)::int AS n FROM changes WHERE snapshot_id = $1 GROUP BY 1', [snapshotId])
-  ).rows as { cc: string; n: number }[];
-  const subs = (await db.query('SELECT id, countries FROM webhook_subscriptions WHERE active')).rows as { id: number; countries: string[] | null }[];
+  const perCountryKind = (
+    await db.query('SELECT country_code::text AS cc, kind, count(*)::int AS n FROM changes WHERE snapshot_id = $1 GROUP BY 1, 2', [snapshotId])
+  ).rows as { cc: string; kind: string; n: number }[];
+  const subs = (await db.query('SELECT id, countries, kinds FROM webhook_subscriptions WHERE active')).rows as {
+    id: number;
+    countries: string[] | null;
+    kinds: string[] | null;
+  }[];
 
   let queued = 0;
   for (const s of subs) {
-    const matched = s.countries ? perCountry.filter((c) => s.countries!.includes(c.cc)) : perCountry;
-    if (matched.length === 0) continue;
+    const rows = perCountryKind.filter((c) => (!s.countries || s.countries.includes(c.cc)) && (!s.kinds || s.kinds.includes(c.kind)));
+    if (rows.length === 0) continue;
+    const matched: { cc: string; n: number }[] = [];
+    for (const r of rows) {
+      const m = matched.find((x) => x.cc === r.cc);
+      if (m) m.n += r.n;
+      else matched.push({ cc: r.cc, n: r.n });
+    }
     const payload = {
       event: 'snapshot.completed',
       snapshot_id: Number(snap.id),
@@ -31,7 +41,7 @@ export async function enqueueDeliveries(db: pg.Pool | pg.PoolClient, snapshotId:
       to_seq: Number(snap.to_seq),
       totals: { inserted: snap.inserted, updated: snap.updated, deleted: snap.deleted },
       changes_by_country: Object.fromEntries(matched.map((c) => [c.cc, c.n])),
-      changes_url: `/v1/changes?since=${snap.from_seq}&until=${snap.to_seq}${s.countries ? `&country=${s.countries.join(',')}` : ''}`,
+      changes_url: `/v1/changes?since=${snap.from_seq}&until=${snap.to_seq}${s.countries ? `&country=${s.countries.join(',')}` : ''}${s.kinds && s.kinds.length === 1 ? `&kind=${s.kinds[0]}` : ''}`,
     };
     await db.query('INSERT INTO webhook_deliveries (subscription_id, snapshot_id, payload) VALUES ($1, $2, $3)', [s.id, snapshotId, JSON.stringify(payload)]);
     queued++;

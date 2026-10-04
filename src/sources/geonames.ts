@@ -1,24 +1,18 @@
-import { mkdir, readFile, writeFile, stat } from 'node:fs/promises';
-import { join } from 'node:path';
-import type { EntityInput } from '../model.js';
+import { fetchText } from './fetch.js';
+import type { EntityInput, SourceMeta } from '../model.js';
 import { unStatus } from './un.js';
+
+export const GEONAMES: SourceMeta = {
+  id: 'geonames',
+  authority: 'GeoNames',
+  url: 'https://download.geonames.org/export/dump/',
+  license: 'CC-BY 4.0',
+};
 
 const BASE = 'https://download.geonames.org/export/dump';
 
-export async function fetchCached(file: string, cacheDir: string, maxAgeMs = 24 * 3600 * 1000): Promise<string> {
-  await mkdir(cacheDir, { recursive: true });
-  const path = join(cacheDir, file);
-  try {
-    if (Date.now() - (await stat(path)).mtimeMs < maxAgeMs) return readFile(path, 'utf8');
-  } catch {
-    /* not cached */
-  }
-  const res = await fetch(`${BASE}/${file}`);
-  if (!res.ok) throw new Error(`GET ${file}: ${res.status}`);
-  const text = await res.text();
-  await writeFile(path, text);
-  return text;
-}
+export const fetchCached = (file: string, cacheDir: string, maxAgeMs?: number) =>
+  fetchText(`${BASE}/${file}`, file, cacheDir, maxAgeMs);
 
 const rows = (text: string) => text.split('\n').filter((l) => l.trim() !== '' && !l.startsWith('#')).map((l) => l.split('\t'));
 const num = (s: string | undefined) => (s === undefined || s === '' || Number.isNaN(Number(s)) ? null : Number(s));

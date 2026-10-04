@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import type pg from 'pg';
-import type { EntityInput } from './model.js';
+import type { EntityInput, SourceMeta } from './model.js';
 import { enqueueDeliveries } from './webhooks.js';
 
 export interface IngestResult {
@@ -53,12 +53,20 @@ function* chunks<T>(xs: T[], n = CHUNK): Generator<T[]> {
   for (let i = 0; i < xs.length; i += n) yield xs.slice(i, i + n);
 }
 
+export interface IngestScope {
+  kinds: string[];
+  /** Limit deletion to these countries; omit when the input covers every country the source owns. */
+  countries?: string[];
+}
+
 /**
- * Reconcile the database with `input` for the given kinds. Entities of those
- * kinds that are absent from `input` are deleted. Everything happens in one
- * transaction and produces one snapshot plus an ordered change log.
+ * Reconcile the database with `input`. Only entities owned by `source`, of the
+ * scope's kinds (and countries, if given), that are absent from `input` are
+ * deleted, so independent sources never remove each other's records. Everything
+ * happens in one transaction and produces one snapshot plus an ordered change log.
  */
-export async function ingest(pool: pg.Pool, source: string, input: EntityInput[], kinds: string[]): Promise<IngestResult> {
+export async function ingest(pool: pg.Pool, source: SourceMeta, input: EntityInput[], scope: IngestScope): Promise<IngestResult> {
+  const { kinds, countries } = scope;
   const ids = new Set<string>();
   for (const e of input) {
     if (ids.has(e.id)) throw new Error(`duplicate entity id in source: ${e.id}`);
@@ -70,8 +78,20 @@ export async function ingest(pool: pg.Pool, source: string, input: EntityInput[]
     await client.query('BEGIN');
     await client.query('SELECT pg_advisory_xact_lock($1)', [ADVISORY_LOCK]);
 
+    await client.query(
+      `INSERT INTO sources (id, authority, url, license, version, retrieved_at) VALUES ($1, $2, $3, $4, $5, now())
+       ON CONFLICT (id) DO UPDATE SET authority = EXCLUDED.authority, url = EXCLUDED.url, license = EXCLUDED.license,
+         version = EXCLUDED.version, retrieved_at = now()`,
+      [source.id, source.authority, source.url ?? null, source.license ?? null, source.version ?? null],
+    );
+
     const existing = new Map<string, { hash: string; kind: string }>();
-    for (const r of (await client.query('SELECT id, kind, content_hash FROM entities WHERE kind = ANY($1)', [kinds])).rows) {
+    for (const r of (
+      await client.query(
+        'SELECT id, kind, content_hash FROM entities WHERE source_id = $1 AND kind = ANY($2) AND ($3::text[] IS NULL OR country_code = ANY($3))',
+        [source.id, kinds, countries ?? null],
+      )
+    ).rows) {
       existing.set(r.id, { hash: r.content_hash, kind: r.kind });
     }
     const hashes = new Map(input.map((e) => [e.id, hashOf(e)]));
@@ -81,11 +101,17 @@ export async function ingest(pool: pg.Pool, source: string, input: EntityInput[]
     const deleteIds = [...existing.keys()].filter((id) => !ids.has(id)).sort();
     const unchanged = input.length - inserts.length - updates.length;
 
+    // Ids not owned by this source in scope but already present belong to someone else: refuse to take them over.
+    for (const part of chunks(inserts.map((e) => e.id))) {
+      const clash = (await client.query('SELECT id, source_id FROM entities WHERE id = ANY($1)', [part])).rows[0];
+      if (clash) throw new Error(`entity ${clash.id} already exists (source ${clash.source_id}); source ${source.id} cannot claim it`);
+    }
+
     const fromSeq = Number((await client.query('SELECT COALESCE(max(seq), 0) AS s FROM changes')).rows[0].s);
     const snap = (
       await client.query(
         'INSERT INTO snapshots (source, from_seq, to_seq) VALUES ($1, $2, $2) RETURNING id',
-        [source, fromSeq],
+        [source.id, fromSeq],
       )
     ).rows[0];
     const snapshotId = Number(snap.id);
@@ -118,12 +144,12 @@ export async function ingest(pool: pg.Pool, source: string, input: EntityInput[]
 
       // Upserts first, then deletes; FK to parent is deferred to commit.
       for (const part of chunks(changes.filter((c) => c.entity) as (Change & { seq: number })[])) {
-        const recs = part.map((c) => ({ ...c.entity!, content_hash: hashes.get(c.id)!, updated_seq: c.seq }));
+        const recs = part.map((c) => ({ ...c.entity!, content_hash: hashes.get(c.id)!, updated_seq: c.seq, source_id: source.id }));
         await client.query(
-          `INSERT INTO entities (id, kind, parent_id, country_code, code, name, name_ascii, lat, lon, data, content_hash, updated_seq)
-           SELECT id, kind, parent_id, country_code, code, name, name_ascii, lat, lon, COALESCE(data, '{}'::jsonb), content_hash, updated_seq
+          `INSERT INTO entities (id, kind, parent_id, country_code, code, name, name_ascii, lat, lon, data, content_hash, updated_seq, source_id)
+           SELECT id, kind, parent_id, country_code, code, name, name_ascii, lat, lon, COALESCE(data, '{}'::jsonb), content_hash, updated_seq, source_id
            FROM jsonb_to_recordset($1::jsonb) AS r(id text, kind text, parent_id text, country_code text, code text, name text,
-             name_ascii text, lat float8, lon float8, data jsonb, content_hash text, updated_seq bigint)
+             name_ascii text, lat float8, lon float8, data jsonb, content_hash text, updated_seq bigint, source_id text)
            ON CONFLICT (id) DO UPDATE SET kind = EXCLUDED.kind, parent_id = EXCLUDED.parent_id, country_code = EXCLUDED.country_code,
              code = EXCLUDED.code, name = EXCLUDED.name, name_ascii = EXCLUDED.name_ascii, lat = EXCLUDED.lat, lon = EXCLUDED.lon,
              data = EXCLUDED.data, content_hash = EXCLUDED.content_hash, updated_seq = EXCLUDED.updated_seq, updated_at = now()`,
