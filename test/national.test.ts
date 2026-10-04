@@ -4,7 +4,10 @@ import { mapFrance } from '../src/sources/national/fr.js';
 import { parseIstat } from '../src/sources/national/it.js';
 import { parseCbs } from '../src/sources/national/nl.js';
 import { mapNorway } from '../src/sources/national/no.js';
+import { mapSweden, pickLatestTable } from '../src/sources/national/se.js';
 import { parseCsvRows } from '../src/sources/csv.js';
+import { readXlsx, columnIndex } from '../src/sources/xlsx.js';
+import { zipSync, strToU8 } from 'fflate';
 import { NATIONAL, nationalSource, LicenseNotEstablished } from '../src/sources/national/index.js';
 import { isAdminType, ADMIN_TYPES } from '../src/taxonomy.js';
 
@@ -69,19 +72,24 @@ describe('registry and taxonomy', () => {
 });
 
 describe('IT adapter', () => {
-  const H = 'Codice Regione;"Codice UTS\n(valida)";Prov;Prog;Codice Comune formato alfanumerico;Denominazione (Italiana e straniera);Denominazione in italiano;Denominazione altra lingua;Rip;Ripartizione;Regione;"Denominazione UTS";Tipologia;Capoluogo;Sigla;N;N;N;N;Catastale;NUTS1;NUTS2;NUTS3;N1;N2;N3\n';
-  const row = (c: string[]) => c.join(';') + '\n';
-  const csv =
-    H +
-    row(['01', '201', '001', '001', '001001', 'Agliè', 'Agliè', '', '1', 'Nord-ovest', 'Piemonte', 'Torino', '3', '0', 'TO', '1001', '1001', '1001', '1001', 'A074', 'ITC', 'ITC1', 'ITC11', 'ITC', 'ITC1', 'ITC11']) +
-    row(['01', '201', '001', '272', '001272', 'Torino', 'Torino', '', '1', 'Nord-ovest', 'Piemonte', 'Torino', '3', '1', 'TO', '1272', '1272', '1272', '1272', 'L219', 'ITC', 'ITC1', 'ITC11', 'ITC', 'ITC1', 'ITC11']) +
-    row(['04', '021', '021', '008', '021008', 'Bolzano/Bozen', 'Bolzano', 'Bozen', '2', 'Nord-est', 'Trentino-Alto Adige/Südtirol', 'Bolzano/Bozen', '2', '1', 'BZ', '21008', '21008', '21008', '21008', 'A952', 'ITH', 'ITH1', 'ITH10', 'ITH', 'ITH1', 'ITH10']);
-  it('parses a header with an embedded newline and builds region > UTS > comune once each', () => {
-    expect(parseCsvRows(csv, ';')[0]![1]).toBe('Codice UTS\n(valida)');
-    const e = parseIstat(csv);
+  const H = ['Codice Regione', "Codice dell'Unità territoriale sovracomunale \n(valida a fini statistici)", 'Codice Provincia (Storico)(1)', 'Progressivo del Comune (2)', 'Codice Comune formato alfanumerico', 'Denominazione (Italiana e straniera)', 'Denominazione in italiano', 'Denominazione altra lingua', 'Codice Ripartizione Geografica', 'Ripartizione geografica', 'Denominazione Regione', "Denominazione dell'Unità territoriale sovracomunale \n(valida a fini statistici)", 'Tipologia di Unità territoriale sovracomunale ', 'Flag Comune capoluogo di Provincia/Città metropolitana/libero consorzio', 'Sigla automobilistica', 'Codice Catastale del Comune', 'Codice NUTS1 2021', 'Codice NUTS3 2021', 'Codice NUTS2 2024 (3) ', 'Codice NUTS3 2024'];
+  const R = (reg: string, uts: string, com: string, name: string, it: string, other: string, regName: string, utsName: string, type: string, cap: string, sigla: string, cat: string, n2: string, n3: string) =>
+    [reg, uts, '', '', com, name, it, other, '1', 'x', regName, utsName, type, cap, sigla, cat, 'ITC', 'OLD', n2, n3];
+  const rows = [
+    H,
+    R('01', '201', '001001', 'Agliè', 'Agliè', '', 'Piemonte', 'Torino', '3', '0', 'TO', 'A074', 'ITC1', 'ITC11'),
+    R('01', '201', '001272', 'Torino', 'Torino', '', 'Piemonte', 'Torino', '3', '1', 'TO', 'L219', 'ITC1', 'ITC11'),
+    R('04', '021', '021008', 'Bolzano/Bozen', 'Bolzano', 'Bozen', 'Trentino-Alto Adige/Südtirol', 'Bolzano/Bozen', '2', '1', 'BZ', 'A952', 'ITH1', 'ITH10'),
+  ];
+  it('finds columns by header text and builds region > UTS > comune once each, using the latest NUTS year', () => {
+    const e = parseIstat(rows);
     expect(e.map((x) => x.id)).toEqual(['div:IT:reg-01', 'div:IT:uts-201', 'div:IT:com-001001', 'div:IT:com-001272', 'div:IT:reg-04', 'div:IT:uts-021', 'div:IT:com-021008']);
-    expect(e.find((x) => x.id === 'div:IT:com-021008')).toMatchObject({ name: 'Bolzano/Bozen', parent_id: 'div:IT:uts-021', data: { name_other: 'Bozen', capoluogo: true, type: 'municipality' } });
-    expect(e.find((x) => x.id === 'div:IT:uts-201')!.data).toMatchObject({ type: 'province', nuts3: 'ITC11', sigla: 'TO', uts_type_code: '3' });
+    expect(e.find((x) => x.id === 'div:IT:com-021008')).toMatchObject({ name: 'Bolzano/Bozen', parent_id: 'div:IT:uts-021', data: { name_other: 'Bozen', capoluogo: true, type: 'municipality', cadastral_code: 'A952' } });
+    expect(e.find((x) => x.id === 'div:IT:uts-201')!.data).toMatchObject({ type: 'province', nuts3: 'ITC11', sigla: 'TO', uts_type_code: '3' }); // NUTS 2024, not the 2021 column
+  });
+  it('fails loudly when a required column disappears', () => {
+    expect(() => parseIstat([H.filter((h) => !h.startsWith('Codice Regione')), ['x']])).toThrow(/Codice Regione/);
+    expect(parseIstat([])).toEqual([]);
   });
 });
 
@@ -104,5 +112,44 @@ describe('NO adapter', () => {
     const e = mapNorway([{ fylkesnummer: '03', fylkesnavn: 'Oslo', kommuner: [{ kommunenummer: '0301', kommunenavn: 'Oslo' }] }]);
     expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual(['div:NO:fylke-03<country:NO', 'div:NO:kommune-0301<div:NO:fylke-03']);
     expect(e[0]!.data).toMatchObject({ type: 'county', type_local: 'fylke', level: 1 });
+  });
+});
+
+describe('SE adapter', () => {
+  const meta = (labels: Record<string, string>) => ({ dimension: { Region: { label: 'region', category: { index: Object.keys(labels), label: labels } } } });
+  it('builds county > municipality from the SCB Region dimension, Swedish names with English alongside', () => {
+    const e = mapSweden(
+      meta({ '00': 'Riket', '01': 'Stockholms län', '0114': 'Upplands Väsby', '03': 'Uppsala län', '0305': 'Håbo' }),
+      meta({ '00': 'Sweden', '01': 'Stockholm county', '0114': 'Upplands Väsby', '03': 'Uppsala county', '0305': 'Håbo' }),
+    );
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual(['div:SE:lan-01<country:SE', 'div:SE:kommun-0114<div:SE:lan-01', 'div:SE:lan-03<country:SE', 'div:SE:kommun-0305<div:SE:lan-03']);
+    expect(e[0]).toMatchObject({ name: 'Stockholms län', data: { name_en: 'Stockholm county', type: 'county', type_local: 'län', level: 1 } });
+  });
+  it('picks the newest yearly table of the series', () => {
+    const t = pickLatestTable([
+      { id: 'TAB6030', label: 'Population by region, country of birth and sex. Year 2000-2024', lastPeriod: '2024' },
+      { id: 'TAB6646', label: 'Population by region, country of birth and sex.  Year 2025', lastPeriod: '2025' },
+      { id: 'TAB1', label: 'Population by region, country of birth and sex.  Year 2023', lastPeriod: '2023' },
+    ]);
+    expect(t.id).toBe('TAB6646');
+    expect(() => pickLatestTable([])).toThrow(/no SCB table/);
+  });
+});
+
+describe('xlsx reader', () => {
+  it('reads shared strings, inline strings and numbers, with sparse columns', () => {
+    const sheet = '<worksheet><sheetData><row r="1"><c r="A1" t="s"><v>0</v></c><c r="C1" t="inlineStr"><is><t>inl &amp; ine</t></is></c></row><row r="2"><c r="B2"><v>42</v></c><c r="AA2" t="s"><v>1</v></c></row></sheetData></worksheet>';
+    const bytes = zipSync({
+      'xl/workbook.xml': strToU8('<workbook><sheets><sheet name="CODICI al 21_02_2026" sheetId="1" r:id="rId1"/></sheets></workbook>'),
+      'xl/_rels/workbook.xml.rels': strToU8('<Relationships><Relationship Id="rId1" Target="worksheets/sheet1.xml"/></Relationships>'),
+      'xl/sharedStrings.xml': strToU8('<sst><si><t>Codice</t></si><si><r><t>Rich </t></r><r><t>text</t></r></si></sst>'),
+      'xl/worksheets/sheet1.xml': strToU8(sheet),
+    });
+    const [s] = readXlsx(bytes);
+    expect(s!.name).toBe('CODICI al 21_02_2026');
+    expect(s!.rows[0]).toEqual(['Codice', '', 'inl & ine']);
+    expect(s!.rows[1]![1]).toBe('42');
+    expect(s!.rows[1]![26]).toBe('Rich text');
+    expect(columnIndex('AA9')).toBe(26);
   });
 });

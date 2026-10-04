@@ -2,7 +2,8 @@ import type { EntityInput } from '../../model.js';
 import { fetchText } from '../fetch.js';
 import { division, type NationalSource } from './types.js';
 
-const API = 'https://ws.geonorge.no/kommuneinfo/v1';
+// ws.geonorge.no is a temporary proxy; the maintained host is api.kartverket.no (same paths).
+const API = 'https://api.kartverket.no/kommuneinfo/v1';
 
 interface Fylke { fylkesnummer: string; fylkesnavn: string }
 interface FylkeDetail extends Fylke { kommuner: { kommunenummer: string; kommunenavn: string }[] }
@@ -25,9 +26,9 @@ export const NO: NationalSource = {
     id: 'nat-no',
     authority: 'Kartverket (Norwegian Mapping Authority) – Administrative inndelinger REST-API (Geonorge)',
     url: `${API}/`,
-    license: 'Geonorge catalogue record (read): access constraints "Åpne data", "No conditions apply to access and use"; the record links no licence text (use constraints: "Lisens"). Geometries (avgrensningsboks) are not stored.',
+    license: 'CC BY 4.0: the Kartverket dataset records "Administrative enheter kommuner" and fylker link Creative Commons BY 4.0 and Kartverket\'s terms allow commercial use (docs/licenses/nat-no.md); the API record itself says only "No conditions apply to access and use" and is marked "Arkivert". Geometries (avgrensningsboks) are not stored.',
     version: 'kommuneinfo v1 (current)',
-    attribution: 'Source: Kartverket, Administrative inndelinger (Geonorge).',
+    attribution: '©Kartverket. Place names are obtained from SSR ©Kartverket. (CC BY 4.0)',
   },
   licenseStatus: 'partial',
   levels: ['county (fylke)', 'municipality (kommune)'],

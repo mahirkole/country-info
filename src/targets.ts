@@ -35,7 +35,8 @@ const nationalTargets = (): RefreshTarget[] => {
     FR: { cadence: 'monthly', rows: [30000, 40000], licenseUrls: ['https://api.gouv.fr/les-api/api-geo'], verdict: 'amber', commercial: 'Open Data per api.gouv.fr; INSEE licence text not located' },
     IT: { cadence: 'monthly', rows: [7500, 8600], licenseUrls: ['https://www.istat.it/note-legali/'], verdict: 'green', commercial: 'CC BY 4.0 (ISTAT Note legali)' },
     NL: { cadence: 'annual', rows: [300, 420], licenseUrls: ['https://www.cbs.nl/en-gb/about-us/website/copyright'], verdict: 'amber', commercial: 'CC BY 4.0 for website content; table-specific text not located' },
-    NO: { cadence: 'monthly', rows: [350, 400], licenseUrls: ['https://kartkatalog.geonorge.no/api/getdata/3fcce35c-759b-4c6e-adb9-f03478c6fb72'], verdict: 'amber', commercial: 'open data per catalogue; licence link absent' },
+    SE: { cadence: 'annual', rows: [300, 330], licenseUrls: ['https://www.scb.se/en/services/open-data-api/', 'https://statistikdatabasen.scb.se/api/v2/config'], verdict: 'green', commercial: 'CC0 (SCB open data): use, disseminate and sell without attribution; see docs/licenses/nat-se.md' },
+    NO: { cadence: 'monthly', rows: [350, 400], licenseUrls: ['https://kartkatalog.geonorge.no/api/getdata/041f1e6e-bdbc-4091-b48f-8a5990f3cc5b'], verdict: 'green', commercial: 'CC BY 4.0 (dataset records), commercial use allowed per Kartverket terms; API record status Arkivert, see docs/licenses/nat-no.md' },
   };
   return Object.entries(NATIONAL).map(([cc, s]) => {
     const i = info[cc];
