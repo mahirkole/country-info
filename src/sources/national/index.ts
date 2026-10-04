@@ -5,13 +5,14 @@ import { IT } from './it.js';
 import { NL } from './nl.js';
 import { NO } from './no.js';
 import { SE } from './se.js';
+import { CZ } from './cz.js';
 
 /**
  * One adapter per country, each reading that country's own official data.
  * To add a country: read the publisher's license first (docs/LICENSES.md), write
  * `src/sources/national/<cc>.ts` exporting a NationalSource, register it here, add a test.
  */
-export const NATIONAL: Record<string, NationalSource> = { US, FR, IT, NL, NO, SE };
+export const NATIONAL: Record<string, NationalSource> = { US, FR, IT, NL, NO, SE, CZ };
 
 export class LicenseNotEstablished extends Error {}
 

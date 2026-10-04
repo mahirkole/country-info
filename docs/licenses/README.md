@@ -28,4 +28,10 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | nat-pt | 🟢 | DGT CAOP CC BY 4.0; freguesia kodu INE'ye ait |
 | nat-cz | 🟢 | ČÚZK/ČSÚ CC BY 4.0 (atıf + metaveri + değişiklik belirtme) |
 | official-holidays | 🟡 | 8 ülkede (AT, CZ, DE, ES, HU, IT, PL, SE) mevzuat telif dışı/yeniden kullanım okundu; LV/HR işaretli; 12 ülke okunamadı |
-| nat-ca, nat-jp, nat-ch, nat-kr, nat-br, nat-in, nat-tr | araştırılıyor | ajan sürüyor |
+| nat-ca | 🟢 | Statistics Canada Open Licence: kullanım, satış, katma değerli ürün, alt-lisans açıkça serbest; yalnızca atıf metni + onay izlenimi yasağı. Açık nokta: SGC sayfalarında lisans işareti yok ("most" veri ürünleri) |
+| nat-jp | 🟢 | MIC: 公共データ利用規約 1.0 (CC BY 4.0 uyumlu), ticari kullanım açık; atıf + "değiştirildi" notu şart; xlsx dosya kimliği kararsız URL |
+| nat-ch | 🟡 | opendata.swiss kaynaklarının hepsi `terms_open` (ticari serbest, kaynak önerilir); yeniden dağıtım/satış cümlesi yok, BFS kendi şart sayfası 404 |
+| nat-kr | 🟡 / 🔴 | 행정동 verisi "제한 없음" (tanımsız); 법정동 연계 KOGL Tip 3 (türev yasak → türetilmiş API için 🔴); TLS hataları |
+| nat-br | ⚪ | IBGE şartları 403 (Cloudflare); lisans metni okunamadı |
+| **nat-in** | **🔴** | LGD Copyright Policy yalnızca "doğruysa serbest çoğaltma, kaynak belirt"; ticari/türev/satış yok; GODL PDF'leri erişilemedi |
+| **nat-tr** | **🔴** | TÜİK Yasal Uyarı: "kaynak gösterilerek izne gerek olmaksızın yeniden kullanım mümkün" ama aynı sayfada "telif hakkı ve tüm haklar TÜİK'e aittir"; ticari kullanım/satış belirtilmemiş; İBBS'ye özgü koşul bulunamadı; NVİ/data.gov.tr/PTT ⚪ → **yazılı teyit olmadan alınmaz** |

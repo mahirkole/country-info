@@ -5,6 +5,7 @@ import { parseIstat } from '../src/sources/national/it.js';
 import { parseCbs } from '../src/sources/national/nl.js';
 import { mapNorway } from '../src/sources/national/no.js';
 import { mapSweden, pickLatestTable } from '../src/sources/national/se.js';
+import { parseCzso } from '../src/sources/national/cz.js';
 import { parseCsvRows } from '../src/sources/csv.js';
 import { readXlsx, columnIndex } from '../src/sources/xlsx.js';
 import { zipSync, strToU8 } from 'fflate';
@@ -151,5 +152,22 @@ describe('xlsx reader', () => {
     expect(s!.rows[1]![1]).toBe('42');
     expect(s!.rows[1]![26]).toBe('Rich text');
     expect(columnIndex('AA9')).toBe(26);
+  });
+});
+
+describe('CZ adapter', () => {
+  const row = (o: Record<string, string>) => ({ platnost_datum: '2026-01-01', obec_typ: 'Obec', kraj_zkratka: 'KVK', ...o });
+  it('builds region > kraj > okres > obec once each', () => {
+    const e = parseCzso([
+      row({ obec_text: 'Abertamy', obec_kod: '554979', obec_typ: 'Město', okres_text: 'Karlovy Vary', okres_csu_cis101_lau_kod: 'CZ0412', okres_csu_cis109_nuts_kod: 'CZ0412', kraj_text: 'Karlovarský kraj', kraj_csu_cis108_nuts_kod: 'CZ041', region_text: 'Severozápad', region_csu_cis107_nuts_kod: 'CZ04' }),
+      row({ obec_text: 'Aš', obec_kod: '554499', okres_text: 'Cheb', okres_csu_cis101_lau_kod: 'CZ0413', kraj_text: 'Karlovarský kraj', kraj_csu_cis108_nuts_kod: 'CZ041', region_text: 'Severozápad', region_csu_cis107_nuts_kod: 'CZ04' }),
+      row({ obec_text: 'incomplete', obec_kod: '1' }),
+    ]);
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual([
+      'div:CZ:reg-CZ04<country:CZ', 'div:CZ:kraj-CZ041<div:CZ:reg-CZ04', 'div:CZ:okres-CZ0412<div:CZ:kraj-CZ041', 'div:CZ:obec-554979<div:CZ:okres-CZ0412',
+      'div:CZ:okres-CZ0413<div:CZ:kraj-CZ041', 'div:CZ:obec-554499<div:CZ:okres-CZ0413',
+    ]);
+    expect(e[3]).toMatchObject({ name: 'Abertamy', data: { level: 4, type: 'municipality', type_local: 'město' } });
+    expect(e[1]!.data).toMatchObject({ type: 'region', type_local: 'kraj', abbreviation: 'KVK', nuts: 'CZ041' });
   });
 });

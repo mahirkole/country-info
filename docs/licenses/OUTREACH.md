@@ -15,4 +15,10 @@ Hukuki görüş değildir; bu liste, okunan metinde boşluk kalan veya izin şar
 | 3 | nat-ch (🔴/⚪) | BFS (raumnomenklaturen@bfs.admin.ch) | Amtliches Gemeindeverzeichnis hangi opendata.swiss şartıyla (OPEN/BY/ASK) yayımlanıyor | Gönderilmedi |
 | 3 | TÜİK, NVİ, PTT | Kurum iletişim kanalları (Türkiye) | Kullanım koşulları, toplu erişim, ticari yeniden dağıtım | Kullanıcı eylemi gerekir |
 
+| 1 | **nat-tr (🔴)** | TÜİK (Bilgi Edinme / veri talebi), NVİ (Adres Kayıt), data.gov.tr / CBDDO | TÜİK Yasal Uyarı "kaynak gösterilerek izin gerekmeden yeniden kullanım" diyor ama telif TÜİK'te: İBBS ve il/ilçe kodlarının ticari API/dosya satışı için yazılı izin; NVİ UAVT/MAKS toplu erişimi ve ticari yeniden dağıtım; PTT posta kodları | **Kullanıcı eylemi gerekir** (Türkiye) |
+| 2 | nat-in (🔴) | LGD / MoPR, Census of India | LGD verisinin GODL-India kapsamında ticari yeniden kullanımı | Gönderilmedi |
+| 2 | nat-kr (🟡/🔴) | MOIS / KOSTAT (data.go.kr) | 행정동 verisinin KOGL türü; 법정동 KOGL-3 için türev izni | Gönderilmedi |
+| 3 | nat-br (⚪) | IBGE | Kullanım şartları (403 nedeniyle okunamadı) | Gönderilmedi |
+| 3 | nat-be (⚪) | Statbel | Open data şartları (CAPTCHA nedeniyle okunamadı) — insan okuması da yeterli | Gönderilmedi |
+
 Not: ajanların diğer dalga dossier'leri (SE, GB, AU, DE, ES, AT, BE, FI, DK, PL, IE, PT, CZ, CA, JP, CH, KR, BR, IN, TR) geldikçe bu listeye eklenir.

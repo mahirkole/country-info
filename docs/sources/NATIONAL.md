@@ -24,8 +24,10 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 | EU27 | Eurostat GISCO NUTS/LAU | nuts1-3, lau | ✅ | read | **Yüklü** (`gisco-*`) |
 | Diğer | – | – | – | – | Araştırılmadı |
 
+| CZ | ČSÚ Struktura území ČR (CSV) | region soudržnosti (NUTS 2), kraj (NUTS 3), okres, obec | ✅ | **read** (CC BY 4.0) | **Yüklü: 6.357** (8 / 14 / 77 / 6.258) |
+
 ## Dossier sonrası ek adaylar (lisans 🟢, ayrıntı `docs/licenses/README.md`)
-DE (Destatis GV-ISys xlsx / BKG VG250), AT (Statistik Austria), FI (Tilastokeskus API, 308 belediye), CZ (ČSÚ yapı CSV, ČÚZK), PT (DGT CAOP), AU yapıları. 🟡: GB, ES, DK, PL, NL (zaten yüklü). ⚪: BE (CAPTCHA).
+DE (Destatis GV-ISys xlsx / BKG VG250), AT (Statistik Austria reglisten.zip), FI (Tilastokeskus sınıflandırma API'si, 308 belediye — **kunta→maakunta eşleme servisi 500 veriyor, hiyerarşi için beklemede**), PT (DGT CAOP), AU yapıları, CA (StatCan SGC), JP (MIC xlsx). CZ yüklendi. 🟡: GB, ES, DK, PL, NL (zaten yüklü). ⚪: BE (CAPTCHA).
 
 ## Tasarım notları
 - GeoNames (`geonames`) hâlâ dünya geneli taban katman; ulusal kaynaklar `division` olarak **yanına** eklenir, GeoNames'i silmez. "Yalnızca resmi" mod için bkz. `docs/ROADMAP.md`.
