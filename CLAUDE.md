@@ -11,5 +11,8 @@
 - Bilmediğiniz resmi bilgiyi hafızadan yazmayın; okuyamadığınız şeyi `unverified` bırakın ve belgeleyin.
 - `ingest()` kaynağın kendi kayıtlarını siler; başka kaynağın kimliğini sahiplenmez. Silme koruması %5.
 
+- Ulusal kaynak (ülke adaptörü) eklerken `docs/sources/NATIONAL.md`'deki sırayı izleyin; `licenseStatus: 'unread'` kaynak yüklenmez, `partial` ise nedeni `meta.license`'a açıkça yazılır.
+- İdari birimler `division` kind'ıdır (`data.level`, `data.type` ortak sözlükten `src/taxonomy.ts`, `data.type_local` yerel ad).
+
 ## Komutlar
-`npm run ingest | ingest:gisco | ingest:holidays | link | check:holidays | export | serve`, `npm test` (+ `TEST_DATABASE_URL`), `npx tsc --noEmit -p .`
+`npm run ingest | ingest:gisco | ingest:national <CC|all> | ingest:holidays | link | check:holidays | export | serve`, `npm test` (+ `TEST_DATABASE_URL`), `npx tsc --noEmit -p .`

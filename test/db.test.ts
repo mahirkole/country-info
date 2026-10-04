@@ -148,6 +148,20 @@ d('database', () => {
     await app.close();
   });
 
+  it('serves national divisions by level and type, isolated per source', async () => {
+    await ingest(pool, SRC, [E('country:FR', 'country', 'FR', 'France', null)], { kinds: ['country'] });
+    const nat = { id: 'nat-fr', authority: 'INSEE' };
+    const div = (id: string, parent: string, level: number, type: string) => ({ ...E(`div:FR:${id}`, 'division', 'FR', id, parent, { level, type }) });
+    await ingest(pool, nat, [div('reg-11', 'country:FR', 1, 'region'), div('dep-75', 'div:FR:reg-11', 2, 'department'), div('com-75056', 'div:FR:dep-75', 3, 'municipality')], { kinds: ['division'], countries: ['FR'] });
+    const app = await buildApp(pool, { adminToken: 'tok', exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    const ids = async (u: string) => (await app.inject(u)).json().data.map((r: { id: string }) => r.id);
+    expect(await ids('/v1/countries/FR/divisions?level=2')).toEqual(['div:FR:dep-75']);
+    expect(await ids('/v1/countries/FR/divisions?type=municipality&source=nat-fr')).toEqual(['div:FR:com-75056']);
+    expect(await ids('/v1/countries/FR/divisions?source=other')).toEqual([]);
+    expect(await ids('/v1/regions/div:FR:dep-75/children')).toEqual(['div:FR:com-75056']);
+    await app.close();
+  });
+
   it('is atomic: a bad source leaves nothing behind', async () => {
     await expect(ingest(pool, SRC, [E('gn:9', 'admin1', 'TR', 'Orphan', 'country:NOPE')], { kinds: KINDS })).rejects.toThrow();
     expect((await pool.query('SELECT count(*)::int n FROM snapshots')).rows[0].n).toBe(0);

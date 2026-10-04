@@ -110,6 +110,26 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     return { data: rows };
   });
 
+  /**
+   * Administrative divisions from national sources, any level and local type.
+   * `source` limits to one source id (e.g. nat-fr); `level` is 1 = first level below the country.
+   */
+  app.get<{ Params: { code: string }; Querystring: { level?: string; type?: string; source?: string; limit?: string; after?: string } }>(
+    '/v1/countries/:code/divisions',
+    async (req) => {
+      const { limit, after } = page(req.query);
+      const rows = (
+        await pool.query(
+          `SELECT ${COLS} FROM entities WHERE kind = 'division' AND country_code = $1 AND id > $2
+             AND ($3::text IS NULL OR source_id = $3) AND ($4::int IS NULL OR (data->>'level')::int = $4) AND ($5::text IS NULL OR data->>'type' = $5)
+           ORDER BY id LIMIT $6`,
+          [req.params.code.toUpperCase(), after, req.query.source ?? null, req.query.level ? Number(req.query.level) : null, req.query.type ?? null, limit + 1],
+        )
+      ).rows;
+      return paged(rows, limit, 'id');
+    },
+  );
+
   // ---- regions ---------------------------------------------------------
   app.get<{ Params: { id: string } }>('/v1/regions/:id', async (req, reply) => {
     const r = await pool.query(`SELECT ${COLS} FROM entities WHERE id = $1`, [req.params.id]);

@@ -1,4 +1,4 @@
-export type EntityKind = 'country' | 'admin1' | 'admin2' | 'nuts1' | 'nuts2' | 'nuts3' | 'lau' | 'city' | 'holiday';
+export type EntityKind = 'country' | 'admin1' | 'admin2' | 'nuts1' | 'nuts2' | 'nuts3' | 'lau' | 'city' | 'division' | 'holiday';
 
 /** Where a batch of records came from; stored in `sources` and referenced by every entity. */
 export interface SourceMeta {

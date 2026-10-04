@@ -13,6 +13,7 @@
     "ingest:gisco": "tsx src/cli.ts ingest-gisco",
     "ingest:holidays": "tsx src/cli.ts ingest-holidays",
     "link": "tsx src/cli.ts link",
+    "ingest:national": "tsx src/cli.ts ingest-national",
     "check:holidays": "tsx src/cli.ts check-holidays",
     "export": "tsx src/cli.ts export",
     "serve": "tsx src/cli.ts serve",

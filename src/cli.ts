@@ -6,6 +6,7 @@ import { GEONAMES } from './sources/geonames.js';
 import { GISCO_NUTS, GISCO_LAU, loadNuts, loadLau } from './sources/gisco.js';
 import { EU27 } from './sources/eu.js';
 import { linkRegions } from './linking.js';
+import { NATIONAL, nationalSource } from './sources/national/index.js';
 import { loadHolidayFiles, HOLIDAYS_SOURCE } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { diffHolidays, fetchNager } from './holidays/check.js';
@@ -64,6 +65,19 @@ async function main() {
       }
       break;
     }
+    case 'ingest-national': {
+      // Usage: ingest-national <CC>|all. Each country's own official source; GeoNames countries must exist first.
+      await migrate(pool);
+      const arg = (process.argv[3] ?? '').toUpperCase();
+      const list = arg === 'ALL' ? Object.keys(NATIONAL) : [arg];
+      for (const cc of list) {
+        const src = nationalSource(cc);
+        if (src.licenseStatus === 'partial') console.warn(`${cc}: license only partially established — ${src.meta.license}`);
+        const input = await src.load(config.cacheDir);
+        console.log(cc, await ingest(pool, src.meta, input, { kinds: ['division'], countries: [cc], maxDeleteRatio: deleteRatio() }));
+      }
+      break;
+    }
     case 'export':
       console.log(await exportSnapshot(pool, config.exportDir, process.argv[3] ? Number(process.argv[3]) : undefined));
       break;
@@ -79,7 +93,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | link | check-holidays [year] | export [snapshotId] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | link | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();
