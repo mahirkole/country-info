@@ -14,8 +14,9 @@
 | Dosya dışa aktarım (JSON/CSV/NDJSON + manifest + sha256) | ✅ |
 | Çok kaynaklı ingest + provenance (`source_id`, `sources`), kaynaklar birbirini silmez | ✅ |
 | AB27 + Türkiye NUTS/İBBS (1.620 kayıt) ve AB27 LAU (≈95k belediye) – Eurostat GISCO | ✅ |
-| Resmi tatiller: kural motoru + Türkiye (2024–2028; **henüz resmi kaynakla doğrulanmadı**, bkz. `docs/sources/TR.md`) | 🟡 |
-| AB27 tatilleri, TÜİK/NVİ, GeoNames↔NUTS eşleme (`entity_links`), inceleme kuyruğu | ⏳ |
+| Resmi tatiller: kural motoru + TR, AT, DE, ES, IT (her kayıtta atıf ve `verification`; yalnızca resmi metinden okunanlar `verified`, bkz. `docs/sources/EU-holidays.md`) | 🟡 |
+| GeoNames↔NUTS ad eşlemesi (`npm run link`; 770 admin1'den ~170'i eşleşir, kalanı GeoNames'in İngilizce adları yüzünden eşleşmez) | 🟡 |
+| Kalan 22 AB ülkesinin tatilleri, TÜİK/NVİ | ⏳ |
 | Şehir, mahalle, sokak (OpenStreetMap), posta kodları | ⏳ bkz. `docs/DESIGN.md` |
 
 ## Hızlı başlangıç
@@ -26,6 +27,8 @@ npm install
 npm run ingest                  # migrate + GeoNames'ten içe aktar (idempotent)
 npm run ingest:gisco            # NUTS (AB27+TR) ve LAU (AB27); önce `ingest` gerekir
 npm run ingest:holidays         # data/holidays/*.json -> tatil kayıtları
+npm run link                    # GeoNames admin1 <-> NUTS eşleme
+npm run check:holidays [yıl]    # tatilleri Nager.Date ile karşılaştırır (yalnızca alarm)
 npm run export                  # out/ altına dosyaları yaz
 npm run serve                   # API :3000 (+ webhook işçisi)
 npm test                        # TEST_DATABASE_URL ile DB testleri de çalışır
@@ -41,6 +44,8 @@ GET  /v1/regions/:id            GET /v1/regions/:id/children
 GET  /v1/search?q=ist&country=TR&kind=admin1
 GET  /v1/countries/:iso2/holidays?year=&region=<entity id>&type=   # region verilmezse yalnızca ülke geneli
 GET  /v1/holidays?date=YYYY-MM-DD&country=
+GET  /v1/holidays/coverage       # ülke başına doğrulanmış/doğrulanmamış tatil sayısı
+GET  /v1/review-items            # (admin) belirsiz eşlemeler
 GET  /v1/snapshots
 GET  /v1/changes?since=<seq>&until=&country=TR,DE&kind=&limit=   # delta akışı
 POST /v1/webhooks   {url, countries?, kinds?}   (Authorization: Bearer $ADMIN_TOKEN; secret yalnızca yanıtta görünür)

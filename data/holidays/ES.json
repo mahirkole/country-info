@@ -1,0 +1,87 @@
+{
+ "country": "ES",
+ "authority": "Reino de España (Boletín Oficial del Estado)",
+ "default_language": "es",
+ "rules": [
+  {
+   "id": "anio-nuevo",
+   "names": {
+    "es": "Año Nuevo",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Real Decreto Legislativo 2/2015 (Estatuto de los Trabajadores), art. 37.2",
+    "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "fiesta-del-trabajo",
+   "names": {
+    "es": "Fiesta del Trabajo",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Real Decreto Legislativo 2/2015 (Estatuto de los Trabajadores), art. 37.2",
+    "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "fiesta-nacional",
+   "names": {
+    "es": "Fiesta Nacional de España",
+    "en": "National Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 12
+    }
+   },
+   "source": {
+    "citation": "Real Decreto Legislativo 2/2015 (Estatuto de los Trabajadores), art. 37.2",
+    "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "natividad-del-senor",
+   "names": {
+    "es": "Natividad del Señor",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Real Decreto Legislativo 2/2015 (Estatuto de los Trabajadores), art. 37.2",
+    "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

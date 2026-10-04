@@ -49,3 +49,50 @@ describe('TR data file', () => {
     expect(compileHolidays(tr, 2016, 2016).some((x) => x.code === 'demokrasi-ve-milli-birlik-gunu')).toBe(false);
   });
 });
+
+import { diffHolidays } from '../src/holidays/check.js';
+
+describe('official holiday files', () => {
+  const load = async (cc: string) => (await loadHolidayFiles()).find((f) => f.country === cc)!;
+  const dates = (cc: string, h: ReturnType<typeof compileHolidays>) => h.filter((x) => x.country_code === cc).map((x) => x.data.date as string);
+
+  it('AT 2026: 13 holidays from ARG §7, Easter-relative days correct', async () => {
+    const h = compileHolidays(await load('AT'), 2026, 2026);
+    expect(h).toHaveLength(13);
+    expect(h.every((x) => x.data.verification === 'verified' && (x.data.source as { checked_on?: string }).checked_on)).toBe(true);
+    const by = (id: string) => h.find((x) => x.code === id)!.data.date;
+    expect([by('ostermontag'), by('christi-himmelfahrt'), by('pfingstmontag'), by('fronleichnam')]).toEqual(['2026-04-06', '2026-05-14', '2026-05-25', '2026-06-04']);
+  });
+  it('DE 2026: Easter days and unity day; only 3 Oct is marked verified', async () => {
+    const h = compileHolidays(await load('DE'), 2026, 2026);
+    expect(h.find((x) => x.code === 'karfreitag')!.data.date).toBe('2026-04-03');
+    expect(h.filter((x) => x.data.verification === 'verified').map((x) => x.code)).toEqual(['tag-der-deutschen-einheit']);
+  });
+  it('ES: only the four nationwide days fixed by the Estatuto de los Trabajadores', async () => {
+    expect(dates('ES', compileHolidays(await load('ES'), 2026, 2026))).toEqual(['2026-01-01', '2026-05-01', '2026-10-12', '2026-12-25']);
+  });
+  it('IT: 11 days, 6 of them verified from DPR 792/1985', async () => {
+    const h = compileHolidays(await load('IT'), 2026, 2026);
+    expect(h).toHaveLength(11);
+    expect(h.filter((x) => x.data.verification === 'verified')).toHaveLength(6);
+    expect(h.find((x) => x.code === 'lunedi-dellangelo')!.data.date).toBe('2026-04-06');
+  });
+  it('no verified record lacks a source URL and read date', async () => {
+    for (const f of await loadHolidayFiles()) {
+      for (const x of compileHolidays(f, 2026, 2026).filter((y) => y.data.verification === 'verified')) {
+        const s = x.data.source as { url?: string; checked_on?: string };
+        expect([f.country, x.code, !!s.url, !!s.checked_on]).toEqual([f.country, x.code, true, true]);
+      }
+    }
+  });
+});
+
+describe('diffHolidays', () => {
+  it('reports differences in both directions and ignores half days and regional', async () => {
+    const f = (await loadHolidayFiles()).find((x) => x.country === 'ES')!;
+    const ours = compileHolidays(f, 2026, 2026);
+    const d = diffHolidays(ours, [{ date: '2026-01-01', name: 'x' }, { date: '2026-01-06', name: 'Epifanía' }]);
+    expect(d.onlyOurs).toEqual(['2026-05-01', '2026-10-12', '2026-12-25']);
+    expect(d.onlyTheirs).toEqual([{ date: '2026-01-06', name: 'Epifanía' }]);
+  });
+});

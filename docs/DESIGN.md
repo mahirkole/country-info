@@ -31,7 +31,8 @@ Tüketiciler `seq` cursor'ı ile sıralı, kayıpsız delta alır. Dosya dağıt
 
 ## Çok kaynaklı model (Aşama A–B–D)
 - Her `entity` tam bir `source_id`'ye aittir; `ingest()` yalnızca kendi kaynağının, verilen `kinds` (ve `countries`) kapsamındaki eksik kayıtlarını siler ve başka kaynağın kimliğini sahiplenemez.
-- Aynı gerçek-dünya kavramı farklı kaynaklarda ayrı kayıttır (`gn:*` ↔ `nuts:*`); `entity_links` ve `review_items` tabloları bu eşleme/çelişki için hazır, doldurulması henüz yapılmadı.
+- Aynı gerçek-dünya kavramı farklı kaynaklarda ayrı kayıttır (`gn:*` ↔ `nuts:*`); `npm run link` GeoNames admin1 ↔ NUTS eşlemesini ad üzerinden kurar: ülke başına en çok eşleşen NUTS seviyesi seçilir, birebir eşleşenler `entity_links`'e, belirsizler `review_items`'a gider (tahmin yok). Gerçek veride 770 admin1'den 169'u bağlandı, 0 belirsiz; kalan 601 çoğunlukla GeoNames'in İngilizce adlarından ("Bavaria" ↔ "Bayern") kaynaklanır. İyileştirme: `alternateNamesV2` veya ISO 3166-2 eşlemesi.
+- `ingest()` kaynağın mevcut kayıtlarının %5'inden fazlası silinecekse (≥100 kayıtta) işlemi geri alır (`DeleteGuardError`); bilinçli toplu silme için `ALLOW_BULK_DELETE=1`.
 - Tatiller `kind='holiday'` entity'leridir (`hol:<CC>:<tarih>:<kural>`); böylece delta/webhook/export aynen çalışır. Kurallar `data/holidays/<CC>.json` içinde, her kuralda atıf ve `verification` alanı (`verified|unverified|tentative`) bulunur.
 
 ## Bilinen sınırlar

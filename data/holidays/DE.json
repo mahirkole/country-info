@@ -1,0 +1,171 @@
+{
+ "country": "DE",
+ "authority": "Bundesrepublik Deutschland / Länder",
+ "default_language": "de",
+ "rules": [
+  {
+   "id": "tag-der-deutschen-einheit",
+   "names": {
+    "de": "Tag der Deutschen Einheit",
+    "en": "German Unity Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 3
+    }
+   },
+   "source": {
+    "citation": "Einigungsvertrag Art. 2 Abs. 2",
+    "url": "https://www.gesetze-im-internet.de/einigvtr/art_2.html",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "neujahr",
+   "names": {
+    "de": "Neujahr",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Feiertagsgesetze der Länder (in allen Ländern gesetzlicher Feiertag; Länderquellen nicht einzeln geprüft)"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "karfreitag",
+   "names": {
+    "de": "Karfreitag",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Feiertagsgesetze der Länder (in allen Ländern gesetzlicher Feiertag; Länderquellen nicht einzeln geprüft)"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ostermontag",
+   "names": {
+    "de": "Ostermontag",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Feiertagsgesetze der Länder (in allen Ländern gesetzlicher Feiertag; Länderquellen nicht einzeln geprüft)"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "tag-der-arbeit",
+   "names": {
+    "de": "Tag der Arbeit",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Feiertagsgesetze der Länder (in allen Ländern gesetzlicher Feiertag; Länderquellen nicht einzeln geprüft)"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christi-himmelfahrt",
+   "names": {
+    "de": "Christi Himmelfahrt",
+    "en": "Ascension Day"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 39,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Feiertagsgesetze der Länder (in allen Ländern gesetzlicher Feiertag; Länderquellen nicht einzeln geprüft)"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "pfingstmontag",
+   "names": {
+    "de": "Pfingstmontag",
+    "en": "Whit Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Feiertagsgesetze der Länder (in allen Ländern gesetzlicher Feiertag; Länderquellen nicht einzeln geprüft)"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "erster-weihnachtstag",
+   "names": {
+    "de": "1. Weihnachtstag",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Feiertagsgesetze der Länder (in allen Ländern gesetzlicher Feiertag; Länderquellen nicht einzeln geprüft)"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "zweiter-weihnachtstag",
+   "names": {
+    "de": "2. Weihnachtstag",
+    "en": "St. Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Feiertagsgesetze der Länder (in allen Ländern gesetzlicher Feiertag; Länderquellen nicht einzeln geprüft)"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

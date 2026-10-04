@@ -1,0 +1,267 @@
+{
+ "country": "AT",
+ "authority": "Republik Österreich (Rechtsinformationssystem des Bundes)",
+ "default_language": "de",
+ "rules": [
+  {
+   "id": "neujahr",
+   "names": {
+    "de": "Neujahr",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "heilige-drei-koenige",
+   "names": {
+    "de": "Heilige Drei Könige",
+    "en": "Epiphany"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "ostermontag",
+   "names": {
+    "de": "Ostermontag",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "staatsfeiertag",
+   "names": {
+    "de": "Staatsfeiertag",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "christi-himmelfahrt",
+   "names": {
+    "de": "Christi Himmelfahrt",
+    "en": "Ascension Day"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 39,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "pfingstmontag",
+   "names": {
+    "de": "Pfingstmontag",
+    "en": "Whit Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "fronleichnam",
+   "names": {
+    "de": "Fronleichnam",
+    "en": "Corpus Christi"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 60,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "mariae-himmelfahrt",
+   "names": {
+    "de": "Mariä Himmelfahrt",
+    "en": "Assumption Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "nationalfeiertag",
+   "names": {
+    "de": "Nationalfeiertag",
+    "en": "National Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "allerheiligen",
+   "names": {
+    "de": "Allerheiligen",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "mariae-empfaengnis",
+   "names": {
+    "de": "Mariä Empfängnis",
+    "en": "Immaculate Conception"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 8
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "weihnachten",
+   "names": {
+    "de": "Weihnachten",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "stephanstag",
+   "names": {
+    "de": "Stephanstag",
+    "en": "St. Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Arbeitsruhegesetz (ARG) § 7 Abs. 2",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008541",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  }
+ ]
+}

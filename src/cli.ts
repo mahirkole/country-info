@@ -8,6 +8,7 @@ import { EU27 } from './sources/eu.js';
 import { linkRegions } from './linking.js';
 import { loadHolidayFiles, HOLIDAYS_SOURCE } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
+import { diffHolidays, fetchNager } from './holidays/check.js';
 import { exportSnapshot } from './export.js';
 import { processDeliveries } from './webhooks.js';
 import { buildApp } from './api.js';
@@ -54,6 +55,15 @@ async function main() {
       console.log({ linked: p.links.length, ambiguous: p.ambiguous.length, unmatched: p.unmatched.length, levels: p.levelByCountry });
       break;
     }
+    case 'check-holidays': {
+      // Alarm only: compare our nationwide public holidays with Nager.Date for the given year (default: current).
+      const year = Number(process.argv[3] ?? new Date().getUTCFullYear());
+      for (const f of await loadHolidayFiles()) {
+        const d = diffHolidays(compileHolidays(f, year, year), await fetchNager(f.country, year));
+        console.log(f.country, year, d.onlyOurs.length + d.onlyTheirs.length === 0 ? 'ok' : d);
+      }
+      break;
+    }
     case 'export':
       console.log(await exportSnapshot(pool, config.exportDir, process.argv[3] ? Number(process.argv[3]) : undefined));
       break;
@@ -69,7 +79,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | link | export [snapshotId] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | link | check-holidays [year] | export [snapshotId] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

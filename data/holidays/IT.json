@@ -1,0 +1,222 @@
+{
+ "country": "IT",
+ "authority": "Repubblica Italiana (Normattiva)",
+ "default_language": "it",
+ "rules": [
+  {
+   "id": "capodanno",
+   "names": {
+    "it": "Capodanno (Maria Santissima Madre di Dio)",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Decreto del Presidente della Repubblica 28 dicembre 1985, n. 792, art. 1",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1985-12-28;792",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "epifania",
+   "names": {
+    "it": "Epifania",
+    "en": "Epiphany"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Decreto del Presidente della Repubblica 28 dicembre 1985, n. 792, art. 1",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1985-12-28;792",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "assunzione",
+   "names": {
+    "it": "Assunzione della Beata Vergine Maria (Ferragosto)",
+    "en": "Assumption Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Decreto del Presidente della Repubblica 28 dicembre 1985, n. 792, art. 1",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1985-12-28;792",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "ognissanti",
+   "names": {
+    "it": "Tutti i Santi",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Decreto del Presidente della Repubblica 28 dicembre 1985, n. 792, art. 1",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1985-12-28;792",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "immacolata-concezione",
+   "names": {
+    "it": "Immacolata Concezione",
+    "en": "Immaculate Conception"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 8
+    }
+   },
+   "source": {
+    "citation": "Decreto del Presidente della Repubblica 28 dicembre 1985, n. 792, art. 1",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1985-12-28;792",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "natale",
+   "names": {
+    "it": "Natale",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Decreto del Presidente della Repubblica 28 dicembre 1985, n. 792, art. 1",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:presidente.repubblica:decreto:1985-12-28;792",
+    "checked_on": "2026-10-04"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "liberazione",
+   "names": {
+    "it": "Anniversario della Liberazione",
+    "en": "Liberation Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 4,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Legge 27 maggio 1949, n. 260 e successive modificazioni (testo non verificato dalla fonte)",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1949-05-27;260"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "festa-del-lavoro",
+   "names": {
+    "it": "Festa del Lavoro",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Legge 27 maggio 1949, n. 260 e successive modificazioni (testo non verificato dalla fonte)",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1949-05-27;260"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "festa-della-repubblica",
+   "names": {
+    "it": "Festa della Repubblica",
+    "en": "Republic Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 2
+    }
+   },
+   "source": {
+    "citation": "Legge 27 maggio 1949, n. 260 e successive modificazioni (testo non verificato dalla fonte)",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1949-05-27;260"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "lunedi-dellangelo",
+   "names": {
+    "it": "Lunedì dell'Angelo (Pasquetta)",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Legge 27 maggio 1949, n. 260 e successive modificazioni (testo non verificato dalla fonte)",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1949-05-27;260"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "santo-stefano",
+   "names": {
+    "it": "Santo Stefano",
+    "en": "St. Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Legge 27 maggio 1949, n. 260 e successive modificazioni (testo non verificato dalla fonte)",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1949-05-27;260"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

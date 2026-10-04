@@ -13,7 +13,8 @@ export interface HolidayRule {
   names: Record<string, string>;
   type: 'public' | 'half_day' | 'observance';
   when: When;
-  source: { citation: string; url?: string };
+  /** `checked_on` (ISO date) is set only when the cited text was actually read from the official source. */
+  source: { citation: string; url?: string; checked_on?: string };
   verification?: Verification;
   /** Entity id of the region (e.g. `nuts:DE2`) this holiday is limited to; omit for nationwide. */
   region?: string;

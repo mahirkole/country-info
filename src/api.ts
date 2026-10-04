@@ -84,6 +84,20 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     return { data: rows };
   });
 
+  /** Per country: year range and how many holiday records are verified against an official text. */
+  app.get('/v1/holidays/coverage', async () => ({
+    data: (
+      await pool.query(
+        `SELECT country_code::text AS country, min((data->>'date')::date)::text AS first_date, max((data->>'date')::date)::text AS last_date,
+                count(*)::int AS total,
+                count(*) FILTER (WHERE data->>'verification' = 'verified')::int AS verified,
+                count(*) FILTER (WHERE data->>'verification' = 'unverified')::int AS unverified,
+                count(*) FILTER (WHERE data->>'verification' = 'tentative')::int AS tentative
+         FROM entities WHERE kind = 'holiday' GROUP BY 1 ORDER BY 1`,
+      )
+    ).rows,
+  }));
+
   /** Holidays on one date, optionally for one country (all scopes, including regional). */
   app.get<{ Querystring: { date?: string; country?: string } }>('/v1/holidays', async (req, reply) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(req.query.date ?? '')) return reply.code(400).send({ error: 'date must be YYYY-MM-DD' });
