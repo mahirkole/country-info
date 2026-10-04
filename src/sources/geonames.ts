@@ -6,7 +6,8 @@ export const GEONAMES: SourceMeta = {
   id: 'geonames',
   authority: 'GeoNames',
   url: 'https://download.geonames.org/export/dump/',
-  license: 'CC-BY 4.0',
+  license: 'Creative Commons Attribution (CC BY); commercial use allowed, credit required',
+  attribution: 'Contains data from GeoNames (https://www.geonames.org), licensed under Creative Commons Attribution (CC BY).',
 };
 
 const BASE = 'https://download.geonames.org/export/dump';

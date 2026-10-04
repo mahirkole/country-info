@@ -91,8 +91,15 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
     after = Number(rows[rows.length - 1].seq);
   }
 
+  const sources = (await pool.query('SELECT id, authority, url, license, version, attribution FROM sources ORDER BY id')).rows;
+  await writeFile(
+    join(dir, 'ATTRIBUTION.md'),
+    '# Data sources and attribution\n\nIf you redistribute this data, keep the credit lines below.\n\n' +
+      sources.map((s) => `## ${s.id}\n- Authority: ${s.authority}\n- License: ${s.license ?? 'n/a'}\n${s.version ? `- Version: ${s.version}\n` : ''}${s.url ? `- URL: ${s.url}\n` : ''}- Credit: ${s.attribution ?? '(none required)'}\n`).join('\n'),
+  );
+
   const files: ManifestEntry['files'] = {};
-  for (const f of ['countries.json', 'countries.csv', 'regions.ndjson', 'holidays.ndjson', 'holidays.csv', 'delta.ndjson']) {
+  for (const f of ['countries.json', 'countries.csv', 'regions.ndjson', 'holidays.ndjson', 'holidays.csv', 'ATTRIBUTION.md', 'delta.ndjson']) {
     files[f] = { path: `snapshots/${snap.id}/${f}`, ...(await sha256(join(dir, f))) };
   }
   const entry: ManifestEntry = { snapshot_id: Number(snap.id), from_seq: Number(snap.from_seq), to_seq: Number(snap.to_seq), created_at: new Date(snap.finished_at ?? Date.now()).toISOString(), files };

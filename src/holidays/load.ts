@@ -6,7 +6,8 @@ import { type HolidayFile } from './rules.js';
 export const HOLIDAYS_SOURCE: SourceMeta = {
   id: 'official-holidays',
   authority: 'National legislation and official announcements (see per-record source)',
-  license: 'Facts; citations per record',
+  license: 'Dates and names are facts; each record cites the legal text or official announcement it derives from',
+  attribution: 'Holiday dates compiled from national legislation and official announcements; see the source cited on each record.',
 };
 
 export async function loadHolidayFiles(dir = join(process.cwd(), 'data', 'holidays')): Promise<HolidayFile[]> {

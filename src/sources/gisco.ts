@@ -10,15 +10,17 @@ export const GISCO_NUTS: SourceMeta = {
   id: 'gisco-nuts',
   authority: 'Eurostat GISCO',
   url: `${BASE}/nuts/csv/NUTS_AT_${NUTS_VERSION}.csv`,
-  license: 'Eurostat reuse policy (CC BY 4.0); © EuroGeographics for administrative boundaries',
+  license: 'Eurostat general reuse policy: commercial and non-commercial reuse authorised if the source is acknowledged',
   version: `NUTS ${NUTS_VERSION}`,
+  attribution: `Source: Eurostat / GISCO, Territorial units for statistics (NUTS ${NUTS_VERSION}), https://ec.europa.eu/eurostat/web/gisco`,
 };
 export const GISCO_LAU: SourceMeta = {
   id: 'gisco-lau',
   authority: 'Eurostat GISCO',
   url: `${BASE}/lau/csv/LAU_RG_01M_${LAU_VERSION}_4326.csv`,
-  license: 'Eurostat reuse policy (CC BY 4.0); © EuroGeographics for administrative boundaries',
+  license: 'Eurostat general reuse policy: commercial and non-commercial reuse authorised if the source is acknowledged',
   version: `LAU ${LAU_VERSION}`,
+  attribution: `Source: Eurostat / GISCO, Local administrative units (LAU ${LAU_VERSION}), https://ec.europa.eu/eurostat/web/gisco`,
 };
 
 /** RFC 4180-ish CSV (quoted fields, embedded commas/newlines, BOM). */

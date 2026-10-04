@@ -153,6 +153,11 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     return { data: rows };
   });
 
+  /** Where data comes from, under which license, and the credit line to show when redistributing it. */
+  app.get('/v1/sources', async () => ({
+    data: (await pool.query('SELECT id, authority, url, license, version, attribution, retrieved_at FROM sources ORDER BY id')).rows,
+  }));
+
   // ---- snapshots & deltas ---------------------------------------------
   app.get('/v1/snapshots', async () => ({
     data: (await pool.query('SELECT id, source, started_at, finished_at, from_seq, to_seq, inserted, updated, deleted, unchanged FROM snapshots ORDER BY id DESC LIMIT 100')).rows,

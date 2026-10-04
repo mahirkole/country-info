@@ -7,6 +7,8 @@ export interface SourceMeta {
   url?: string;
   license?: string;
   version?: string;
+  /** Credit line to display when redistributing this source's data. */
+  attribution?: string;
 }
 
 /** Canonical record produced by a source; this is what gets hashed and diffed. */

@@ -17,7 +17,7 @@ const d = url ? describe : describe.skip;
 const E = (id: string, kind: EntityInput['kind'], cc: string, name: string, parent: string | null, data = {}): EntityInput =>
   ({ id, kind, parent_id: parent, country_code: cc, code: id.split(':')[1]!, name, name_ascii: null, lat: null, lon: null, data });
 const KINDS = ['country', 'admin1', 'admin2'];
-const SRC = { id: 't', authority: 'test' };
+const SRC = { id: 't', authority: 'test', attribution: 'Credit line for t' };
 const v1 = [
   E('country:TR', 'country', 'TR', 'Turkey', null, { population: 1 }),
   E('country:DE', 'country', 'DE', 'Germany', null),
@@ -167,6 +167,7 @@ d('database', () => {
     expect(p2.data).toHaveLength(1);
     expect((await get('/v1/changes?country=DE')).data).toHaveLength(1);
     expect((await app.inject('/v1/countries/ZZ')).statusCode).toBe(404);
+    expect((await get('/v1/sources')).data).toMatchObject([{ id: 't', attribution: 'Credit line for t' }]);
     await app.close();
   });
 
@@ -208,6 +209,7 @@ d('database', () => {
     expect((await readFile(join(out, 'latest/countries.csv'), 'utf8')).split('\n')[1]).toMatch(/^DE,/);
     expect((await readFile(join(out, 'latest/regions.ndjson'), 'utf8')).trim().split('\n')).toHaveLength(2);
     expect(await readFile(join(out, 'latest/holidays.csv'), 'utf8')).toMatch(/^date,country/);
+    expect(await readFile(join(out, 'latest/ATTRIBUTION.md'), 'utf8')).toMatch(/## t\n- Authority: test[\s\S]*Credit: Credit line for t/);
     expect((await readFile(join(out, 'latest/delta.ndjson'), 'utf8')).trim().split('\n')).toHaveLength(4);
   });
 });
