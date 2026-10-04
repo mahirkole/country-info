@@ -17,7 +17,7 @@
 | Resmi tatiller: kural motoru + 23 ülke dosyası (TR + AB27'den 22; 10 ülkenin kuralları tamamen resmi metinden doğrulanmış, bkz. `docs/sources/EU-holidays.md`). BG, CY, FR, NL, RO henüz yok | 🟡 |
 | GeoNames↔NUTS ad eşlemesi (`npm run link`; 770 admin1'den ~170'i eşleşir, kalanı GeoNames'in İngilizce adları yüzünden eşleşmez) | 🟡 |
 | TÜİK/NVİ, BG/CY/FR/NL/RO tatilleri | ⏳ |
-| Ulusal resmi kaynaklar (ülke başına adaptör, `division` kayıtları): US (3,3k) ve FR (35k) yüklü; CH lisans nedeniyle bloklu; IT/JP/NL/NO/SE/GB/AU sırada (`docs/sources/NATIONAL.md`) | 🟡 |
+| Ulusal resmi kaynaklar (ülke başına adaptör, `division` kayıtları): US (3,3k), FR (35k), IT (8k), NL (358), NO (372) yüklü; CH lisans nedeniyle bloklu; JP/SE/GB/AU sırada (`docs/sources/NATIONAL.md`) | 🟡 |
 | Şehirler: GeoNames `cities15000` (34.152 yerleşim, saat dilimi ve nüfus dahil) | ✅ |
 | Mahalle, sokak (OpenStreetMap), posta kodları | ⏳ bkz. `docs/DESIGN.md` |
 
@@ -29,7 +29,7 @@ npm install
 npm run ingest                  # migrate + GeoNames'ten içe aktar (idempotent)
 npm run ingest:gisco            # NUTS (AB27+TR) ve LAU (AB27); önce `ingest` gerekir
 npm run ingest:holidays         # data/holidays/*.json -> tatil kayıtları
-npm run ingest:national <CC|all>  # ülkenin kendi resmi kaynağı (US, FR)
+npm run ingest:national <CC|all>  # ülkenin kendi resmi kaynağı (US, FR, IT, NL, NO)
 npm run link                    # GeoNames admin1 <-> NUTS eşleme
 npm run check:holidays [yıl]    # tatilleri Nager.Date ile karşılaştırır (yalnızca alarm)
 npm run export                  # out/ altına dosyaları yaz

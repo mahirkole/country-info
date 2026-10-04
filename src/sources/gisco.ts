@@ -1,5 +1,6 @@
 import type { EntityInput, SourceMeta } from '../model.js';
 import { fetchText } from './fetch.js';
+import { parseCsv } from './csv.js';
 import { toIso } from './eu.js';
 
 export const NUTS_VERSION = '2024';
@@ -23,35 +24,7 @@ export const GISCO_LAU: SourceMeta = {
   attribution: `Source: Eurostat / GISCO, Local administrative units (LAU ${LAU_VERSION}), https://ec.europa.eu/eurostat/web/gisco`,
 };
 
-/** RFC 4180-ish CSV (quoted fields, embedded commas/newlines, BOM). */
-export function parseCsv(text: string): Record<string, string>[] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let cell = '';
-  let quoted = false;
-  const src = text.replace(/^﻿/, '');
-  for (let i = 0; i < src.length; i++) {
-    const ch = src[i]!;
-    if (quoted) {
-      if (ch === '"') {
-        if (src[i + 1] === '"') (cell += '"', i++);
-        else quoted = false;
-      } else cell += ch;
-    } else if (ch === '"') quoted = true;
-    else if (ch === ',') (row.push(cell), (cell = ''));
-    else if (ch === '\n' || ch === '\r') {
-      if (ch === '\r' && src[i + 1] === '\n') i++;
-      row.push(cell);
-      cell = '';
-      if (row.some((c) => c !== '')) rows.push(row);
-      row = [];
-    } else cell += ch;
-  }
-  if (cell !== '' || row.length) (row.push(cell), rows.push(row));
-  const [header, ...body] = rows;
-  if (!header) return [];
-  return body.map((r) => Object.fromEntries(header.map((h, i) => [h.trim(), (r[i] ?? '').trim()])));
-}
+export { parseCsv };
 
 const clean = (s: string | undefined) => (s ?? '').replace(/ /g, ' ').trim();
 const num = (s: string | undefined) => (s === undefined || s === '' || Number.isNaN(Number(s)) ? null : Number(s));

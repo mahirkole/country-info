@@ -18,7 +18,7 @@ Son güncelleme: 2026-10-04. Dal: `claude/country-info-mvp` (PR açılmadı). He
 4. Hukuki lisans teyidi (bkz. `docs/LICENSES.md` "teyit edin" maddeleri); Eurostat GISCO'dan LAU/NUTS ticari kullanım için yazılı teyit istenebilir.
 
 ## Ulusal resmi kaynak programı (yeni, öncelikli)
-Hedef: her ülkenin kendi resmi verisinden tüm idari seviyeler (şehir, il, ilçe, eyalet, county, kanton, prefektörlük, bölge, mahalle, sokak…). Çerçeve hazır (`src/sources/national/`, `src/taxonomy.ts`, `/v1/countries/:cc/divisions`); US ve FR yüklü. Sırada: IT, NL, NO, SE, GB, JP, AU adaptörleri (önce lisans metni okunacak), CH lisans teyidi, DK yeni adres, CA erişim, TR (kullanıcı ağı). Ülke listesi ve durum: `docs/sources/NATIONAL.md`.
+Hedef: her ülkenin kendi resmi verisinden tüm idari seviyeler (şehir, il, ilçe, eyalet, county, kanton, prefektörlük, bölge, mahalle, sokak…). Çerçeve hazır (`src/sources/national/`, `src/taxonomy.ts`, `/v1/countries/:cc/divisions`); US, FR, IT, NL, NO yüklü. Sırada: SE, GB, JP, AU adaptörleri (önce lisans metni okunacak), CH lisans teyidi, DK yeni adres, CA erişim, TR (kullanıcı ağı). Ülke listesi ve durum: `docs/sources/NATIONAL.md`.
 - Sonra: GeoNames katmanını `source_class` ile ayır; `?official_only=true`; ulusal kaynak olan ülkelerde GeoNames'i devre dışı bırakma seçeneği; `entity_links` ile `gn:*` ↔ `div:*` eşleme.
 
 ## Konteynerden yapılabilir

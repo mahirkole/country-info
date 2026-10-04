@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { parseStates, parseCounties } from '../src/sources/national/us.js';
 import { mapFrance } from '../src/sources/national/fr.js';
+import { parseIstat } from '../src/sources/national/it.js';
+import { parseCbs } from '../src/sources/national/nl.js';
+import { mapNorway } from '../src/sources/national/no.js';
+import { parseCsvRows } from '../src/sources/csv.js';
 import { NATIONAL, nationalSource, LicenseNotEstablished } from '../src/sources/national/index.js';
 import { isAdminType, ADMIN_TYPES } from '../src/taxonomy.js';
 
@@ -61,5 +65,44 @@ describe('registry and taxonomy', () => {
     for (const t of ['canton', 'prefecture', 'county', 'department', 'commune']) expect(isAdminType(t)).toBe(true);
     expect(isAdminType('galaxy')).toBe(false);
     expect(ADMIN_TYPES).toContain('other');
+  });
+});
+
+describe('IT adapter', () => {
+  const H = 'Codice Regione;"Codice UTS\n(valida)";Prov;Prog;Codice Comune formato alfanumerico;Denominazione (Italiana e straniera);Denominazione in italiano;Denominazione altra lingua;Rip;Ripartizione;Regione;"Denominazione UTS";Tipologia;Capoluogo;Sigla;N;N;N;N;Catastale;NUTS1;NUTS2;NUTS3;N1;N2;N3\n';
+  const row = (c: string[]) => c.join(';') + '\n';
+  const csv =
+    H +
+    row(['01', '201', '001', '001', '001001', 'Agliè', 'Agliè', '', '1', 'Nord-ovest', 'Piemonte', 'Torino', '3', '0', 'TO', '1001', '1001', '1001', '1001', 'A074', 'ITC', 'ITC1', 'ITC11', 'ITC', 'ITC1', 'ITC11']) +
+    row(['01', '201', '001', '272', '001272', 'Torino', 'Torino', '', '1', 'Nord-ovest', 'Piemonte', 'Torino', '3', '1', 'TO', '1272', '1272', '1272', '1272', 'L219', 'ITC', 'ITC1', 'ITC11', 'ITC', 'ITC1', 'ITC11']) +
+    row(['04', '021', '021', '008', '021008', 'Bolzano/Bozen', 'Bolzano', 'Bozen', '2', 'Nord-est', 'Trentino-Alto Adige/Südtirol', 'Bolzano/Bozen', '2', '1', 'BZ', '21008', '21008', '21008', '21008', 'A952', 'ITH', 'ITH1', 'ITH10', 'ITH', 'ITH1', 'ITH10']);
+  it('parses a header with an embedded newline and builds region > UTS > comune once each', () => {
+    expect(parseCsvRows(csv, ';')[0]![1]).toBe('Codice UTS\n(valida)');
+    const e = parseIstat(csv);
+    expect(e.map((x) => x.id)).toEqual(['div:IT:reg-01', 'div:IT:uts-201', 'div:IT:com-001001', 'div:IT:com-001272', 'div:IT:reg-04', 'div:IT:uts-021', 'div:IT:com-021008']);
+    expect(e.find((x) => x.id === 'div:IT:com-021008')).toMatchObject({ name: 'Bolzano/Bozen', parent_id: 'div:IT:uts-021', data: { name_other: 'Bozen', capoluogo: true, type: 'municipality' } });
+    expect(e.find((x) => x.id === 'div:IT:uts-201')!.data).toMatchObject({ type: 'province', nuts3: 'ITC11', sigla: 'TO', uts_type_code: '3' });
+  });
+});
+
+describe('NL adapter', () => {
+  it('trims CBS padding and builds landsdeel > provincie > gemeente', () => {
+    const e = parseCbs([
+      { Code_1: 'GM1680    ', Naam_2: 'Aa en Hunze      ', Code_26: 'LD01  ', Naam_27: 'Noord-Nederland  ', Code_28: 'PV22  ', Naam_29: 'Drenthe  ' },
+      { Code_1: 'GM0014    ', Naam_2: 'Groningen        ', Code_26: 'LD01  ', Naam_27: 'Noord-Nederland  ', Code_28: 'PV20  ', Naam_29: 'Groningen' },
+      { Code_1: 'NL01      ', Naam_2: 'Nederland        ', Code_26: '.     ', Naam_27: '.', Code_28: '.', Naam_29: '.' },
+    ]);
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual([
+      'div:NL:LD01<country:NL', 'div:NL:PV22<div:NL:LD01', 'div:NL:GM1680<div:NL:PV22', 'div:NL:PV20<div:NL:LD01', 'div:NL:GM0014<div:NL:PV20',
+    ]);
+    expect(e[2]).toMatchObject({ name: 'Aa en Hunze', data: { type: 'municipality', type_local: 'gemeente' } });
+  });
+});
+
+describe('NO adapter', () => {
+  it('builds fylke > kommune', () => {
+    const e = mapNorway([{ fylkesnummer: '03', fylkesnavn: 'Oslo', kommuner: [{ kommunenummer: '0301', kommunenavn: 'Oslo' }] }]);
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual(['div:NO:fylke-03<country:NO', 'div:NO:kommune-0301<div:NO:fylke-03']);
+    expect(e[0]!.data).toMatchObject({ type: 'county', type_local: 'fylke', level: 1 });
   });
 });
