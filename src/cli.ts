@@ -25,8 +25,8 @@ async function main() {
       break;
     case 'ingest': {
       await migrate(pool);
-      const input = await loadGeoNames(config.cacheDir, config.ingestAdmin2);
-      const kinds = config.ingestAdmin2 ? ['country', 'admin1', 'admin2'] : ['country', 'admin1'];
+      const input = await loadGeoNames(config.cacheDir, { admin2: config.ingestAdmin2, cities: config.ingestCities });
+      const kinds = ['country', 'admin1', ...(config.ingestAdmin2 ? ['admin2'] : []), ...(config.ingestCities ? ['city'] : [])];
       console.log(await ingest(pool, GEONAMES, input, { kinds, maxDeleteRatio: deleteRatio() }));
       break;
     }

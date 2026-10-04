@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCountryInfo, parseAdmin1, parseAdmin2 } from '../src/sources/geonames.js';
+import { parseCountryInfo, parseAdmin1, parseAdmin2, parseCities } from '../src/sources/geonames.js';
 import { UN_MEMBERS, unStatus } from '../src/sources/un.js';
 import { changedFields, hashOf } from '../src/ingest.js';
 import { csvRow } from '../src/export.js';
@@ -69,5 +69,19 @@ describe('gisco', () => {
     const l = parseLau('GISCO_ID,CNTR_CODE,LAU_NAME,POP_2024,POP_DENS_2024,AREA_KM2,YEAR\nAT_90001,AT,Wien,1900000,4500,414.6,2024\nAL_AL141,AL,Kurbin,0,0,269,2024\n', new Set(EU27));
     expect(l).toHaveLength(1);
     expect(l[0]).toMatchObject({ id: 'lau:AT_90001', kind: 'lau', parent_id: 'country:AT', code: '90001', data: { population: 1900000 } });
+  });
+});
+
+describe('cities', () => {
+  const row = (...c: string[]) => c.join('\t') + '\n';
+  const line = row('296137', 'Yumurtalık', 'Yumurtalik', 'alt1,alt2', '36.76863', '35.78938', 'P', 'PPLA2', 'TR', '', '81', '8631795', '', '', '17654', '', '19', 'Europe/Istanbul', '2025-05-11');
+  it('parses a city with its admin1 parent, timezone and population', () => {
+    const [c] = parseCities(line, new Map([['TR.81', 'gn:1']]), new Set(['TR']));
+    expect(c).toMatchObject({ id: 'gn:296137', kind: 'city', parent_id: 'gn:1', country_code: 'TR', name: 'Yumurtalık', name_ascii: 'Yumurtalik', lat: 36.76863 });
+    expect(c!.data).toMatchObject({ population: 17654, timezone: 'Europe/Istanbul', feature_code: 'PPLA2' });
+  });
+  it('falls back to the country when admin1 is unknown, skips unknown countries', () => {
+    expect(parseCities(line, new Map(), new Set(['TR']))[0]!.parent_id).toBe('country:TR');
+    expect(parseCities(line, new Map(), new Set(['DE']))).toEqual([]);
   });
 });

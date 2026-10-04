@@ -1,4 +1,5 @@
-import { fetchText } from './fetch.js';
+import { unzipSync, strFromU8 } from 'fflate';
+import { fetchBytes, fetchText } from './fetch.js';
 import type { EntityInput, SourceMeta } from '../model.js';
 import { unStatus } from './un.js';
 
@@ -106,14 +107,47 @@ export function parseAdmin2(text: string, admin1ByCode: Map<string, string>): En
   return out;
 }
 
-export async function loadGeoNames(cacheDir: string, withAdmin2: boolean): Promise<EntityInput[]> {
+/**
+ * cities15000.txt (tab separated, 19 columns): places with population > 15000.
+ * Parent is the admin1 (`CC.<admin1 code>`) when known, else the country.
+ */
+export function parseCities(text: string, admin1ByCode: Map<string, string>, countries: ReadonlySet<string>): EntityInput[] {
+  const out: EntityInput[] = [];
+  for (const r of rows(text)) {
+    const [gid, name, ascii, , lat, lon, , featureCode, cc, , a1, a2, , , pop, , , tz] = r;
+    if (!gid || !name || !cc || !countries.has(cc)) continue;
+    out.push({
+      id: `gn:${gid}`,
+      kind: 'city',
+      parent_id: (a1 && admin1ByCode.get(`${cc}.${a1}`)) || `country:${cc}`,
+      country_code: cc,
+      code: null,
+      name,
+      name_ascii: ascii || null,
+      lat: num(lat),
+      lon: num(lon),
+      data: { geonames_id: Number(gid), feature_code: featureCode || null, population: num(pop), timezone: tz || null, admin1_code: a1 || null, admin2_code: a2 || null },
+    });
+  }
+  return out;
+}
+
+export interface GeoNamesOptions {
+  admin2: boolean;
+  cities: boolean;
+}
+
+export async function loadGeoNames(cacheDir: string, opts: GeoNamesOptions): Promise<EntityInput[]> {
   const countries = parseCountryInfo(await fetchCached('countryInfo.txt', cacheDir));
   const known = new Set(countries.map((c) => c.country_code));
   const admin1 = parseAdmin1(await fetchCached('admin1CodesASCII.txt', cacheDir)).filter((e) => known.has(e.country_code));
   const all = [...countries, ...admin1];
-  if (withAdmin2) {
-    const byCode = new Map(admin1.map((e) => [e.code!, e.id]));
-    all.push(...parseAdmin2(await fetchCached('admin2Codes.txt', cacheDir), byCode));
+  const byCode = new Map(admin1.map((e) => [e.code!, e.id]));
+  if (opts.admin2) all.push(...parseAdmin2(await fetchCached('admin2Codes.txt', cacheDir), byCode));
+  if (opts.cities) {
+    const zip = await fetchBytes(`${BASE}/cities15000.zip`, 'cities15000.zip', cacheDir);
+    const text = strFromU8(unzipSync(zip)['cities15000.txt']!);
+    all.push(...parseCities(text, byCode, known));
   }
   return all;
 }

@@ -5,4 +5,5 @@ export const config = {
   exportDir: process.env.EXPORT_DIR ?? 'out',
   cacheDir: process.env.CACHE_DIR ?? '.cache',
   ingestAdmin2: (process.env.INGEST_ADMIN2 ?? 'true') !== 'false',
+  ingestCities: (process.env.INGEST_CITIES ?? 'true') !== 'false',
 };
