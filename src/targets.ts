@@ -1,0 +1,89 @@
+import type pg from 'pg';
+import type { EntityInput, SourceMeta } from './model.js';
+import type { IngestScope } from './ingest.js';
+import { config } from './config.js';
+import { EU27 } from './sources/eu.js';
+import { GEONAMES, loadGeoNames } from './sources/geonames.js';
+import { GISCO_LAU, GISCO_NUTS, loadLau, loadNuts } from './sources/gisco.js';
+import { NATIONAL } from './sources/national/index.js';
+import { HOLIDAYS_SOURCE, loadHolidayFiles } from './holidays/load.js';
+import { compileHolidays } from './holidays/rules.js';
+import { logBody } from './sources/fetch.js';
+
+export type Cadence = 'daily' | 'weekly' | 'monthly' | 'annual' | 'event';
+export type Verdict = 'green' | 'amber' | 'red' | 'unread';
+
+/** Everything the refresh runner needs to keep one source up to date. */
+export interface RefreshTarget {
+  meta: SourceMeta;
+  cadence: Cadence;
+  /** Sanity band for the number of records one run must produce; outside it the run is not applied. */
+  expectedRows: [number, number];
+  scope: IngestScope;
+  load(cacheDir: string): Promise<EntityInput[]>;
+  /** Pages whose text defines the license; watched for changes (license drift). */
+  licenseUrls: string[];
+  licenseVerdict: Verdict;
+  commercialUse: string;
+}
+
+const NUTS_COUNTRIES = [...EU27, 'TR'];
+
+const nationalTargets = (): RefreshTarget[] => {
+  const info: Record<string, { cadence: Cadence; rows: [number, number]; licenseUrls: string[]; verdict: Verdict; commercial: string }> = {
+    US: { cadence: 'annual', rows: [3000, 3600], licenseUrls: ['https://www.census.gov/about/policies/open-gov/open-data.html'], verdict: 'amber', commercial: 'federal government work (17 U.S.C. § 105); page statement not located' },
+    FR: { cadence: 'monthly', rows: [30000, 40000], licenseUrls: ['https://api.gouv.fr/les-api/api-geo'], verdict: 'amber', commercial: 'Open Data per api.gouv.fr; INSEE licence text not located' },
+    IT: { cadence: 'monthly', rows: [7500, 8600], licenseUrls: ['https://www.istat.it/note-legali/'], verdict: 'green', commercial: 'CC BY 4.0 (ISTAT Note legali)' },
+    NL: { cadence: 'annual', rows: [300, 420], licenseUrls: ['https://www.cbs.nl/en-gb/about-us/website/copyright'], verdict: 'amber', commercial: 'CC BY 4.0 for website content; table-specific text not located' },
+    NO: { cadence: 'monthly', rows: [350, 400], licenseUrls: ['https://kartkatalog.geonorge.no/api/getdata/3fcce35c-759b-4c6e-adb9-f03478c6fb72'], verdict: 'amber', commercial: 'open data per catalogue; licence link absent' },
+  };
+  return Object.entries(NATIONAL).map(([cc, s]) => {
+    const i = info[cc];
+    if (!i) throw new Error(`national source ${cc} has no refresh metadata in src/targets.ts`);
+    return { meta: s.meta, cadence: i.cadence, expectedRows: i.rows, scope: { kinds: ['division'], countries: [cc] }, load: s.load.bind(s), licenseUrls: i.licenseUrls, licenseVerdict: i.verdict, commercialUse: i.commercial };
+  });
+};
+
+export function allTargets(): RefreshTarget[] {
+  const geoKinds = ['country', 'admin1', ...(config.ingestAdmin2 ? ['admin2'] : []), ...(config.ingestCities ? ['city'] : [])];
+  return [
+    {
+      meta: GEONAMES, cadence: 'weekly', expectedRows: [60_000, 200_000], scope: { kinds: geoKinds },
+      load: (dir) => loadGeoNames(dir, { admin2: config.ingestAdmin2, cities: config.ingestCities }),
+      licenseUrls: ['https://www.geonames.org/export/'], licenseVerdict: 'green', commercialUse: 'CC BY, commercial use allowed, credit required',
+    },
+    {
+      meta: GISCO_NUTS, cadence: 'annual', expectedRows: [1500, 1800], scope: { kinds: ['nuts1', 'nuts2', 'nuts3'], countries: NUTS_COUNTRIES },
+      load: (dir) => loadNuts(dir, new Set(NUTS_COUNTRIES)),
+      licenseUrls: ['https://ec.europa.eu/eurostat/web/main/help/copyright-notice'], licenseVerdict: 'amber', commercialUse: 'Eurostat general policy: commercial reuse authorised with source acknowledged; GISCO statistical-units pages show no extra restriction',
+    },
+    {
+      meta: GISCO_LAU, cadence: 'annual', expectedRows: [85_000, 110_000], scope: { kinds: ['lau'], countries: [...EU27] },
+      load: (dir) => loadLau(dir, new Set(EU27)),
+      licenseUrls: ['https://ec.europa.eu/eurostat/web/main/help/copyright-notice'], licenseVerdict: 'amber', commercialUse: 'as NUTS; population/area may originate from national institutes (third-party exception)',
+    },
+    ...nationalTargets(),
+    {
+      meta: HOLIDAYS_SOURCE, cadence: 'monthly', expectedRows: [500, 50_000], scope: { kinds: ['holiday'] },
+      async load() {
+        const files = await loadHolidayFiles();
+        logBody(JSON.stringify(files));
+        const to = new Date().getUTCFullYear() + 2;
+        return files.flatMap((f) => compileHolidays(f, 2024, to));
+      },
+      licenseUrls: [], licenseVerdict: 'amber', commercialUse: 'facts with per-record citation; reuse terms of each statute site to be confirmed',
+    },
+  ];
+}
+
+/** Store the static per-source metadata (cadence, bands, verdict) so the API can show it before the first run. */
+export async function syncTargetMetadata(pool: pg.Pool, targets: RefreshTarget[]): Promise<void> {
+  for (const t of targets) {
+    await pool.query(
+      `INSERT INTO sources (id, authority, url, license, version, attribution, cadence, expected_min, expected_max, license_verdict, commercial_use)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+       ON CONFLICT (id) DO UPDATE SET cadence = $7, expected_min = $8, expected_max = $9, license_verdict = $10, commercial_use = $11`,
+      [t.meta.id, t.meta.authority, t.meta.url ?? null, t.meta.license ?? null, null, t.meta.attribution ?? null, t.cadence, t.expectedRows[0], t.expectedRows[1], t.licenseVerdict, t.commercialUse],
+    );
+  }
+}

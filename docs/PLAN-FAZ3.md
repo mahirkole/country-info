@@ -1,5 +1,5 @@
 > Bu belge `docs/ROADMAP.md`'nin ayrıntılı plan dizisidir (2026-10-04). Uygulanan her fazı burada işaretleyin; kısa durum özeti `docs/ROADMAP.md`'dedir.
-> Plan onaylanmadan uygulanmadı: şu an hiçbir Faz 3 maddesi yapılmış değildir.
+> **Uygulama durumu (2026-10-04):** Faz 3-A temel altyapı **uygulandı** (migration 004, `src/refresh.ts`, `src/targets.ts`, `src/license-watch.ts`, `/v1/status`, CI ve refresh iş akışları, `docs/OPERATIONS.md`). Eksik 3-A maddeleri: ETag/Last-Modified koşullu indirme, ham indirme arşivi, `replaced_by` ardıl ilişkileri (sürüm-geçişi etiketi var), tatil yıllık kontrol betiği. 3-B: şablon (`docs/licenses/TEMPLATE.md`) hazır, araştırma sürüyor.
 
 # Faz 3 — Geniş kapsamlı plan dizisi (güncelleme + lisans/satış uygunluğu merkezde)
 

@@ -1,0 +1,30 @@
+name: refresh
+# Keeps every source up to date. Needs the repository secret DATABASE_URL (the production database).
+on:
+  schedule:
+    - cron: '17 3 * * *' # daily; `refresh --due` only touches sources whose cadence has elapsed
+  workflow_dispatch:
+    inputs:
+      args:
+        description: 'Extra arguments, e.g. "--source nat-it --force" or "--dry-run"'
+        required: false
+        default: ''
+concurrency: refresh
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      # 1. Did any license page change? A change blocks that source until a human runs `license:ack`.
+      - run: npm run check:licenses
+      # 2. Refresh what is due. Exit code 1 means a source failed or needs review (see docs/OPERATIONS.md).
+      - run: npm run refresh -- ${{ github.event.inputs.args || '--due' }}
+      - name: Status
+        if: always()
+        run: |
+          psql "$DATABASE_URL" -c "select id,status,cadence,next_due_at,last_changed_at from sources order by id" || true

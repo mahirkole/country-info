@@ -175,8 +175,27 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
 
   /** Where data comes from, under which license, and the credit line to show when redistributing it. */
   app.get('/v1/sources', async () => ({
-    data: (await pool.query('SELECT id, authority, url, license, version, attribution, retrieved_at FROM sources ORDER BY id')).rows,
+    data: (
+      await pool.query(
+        `SELECT id, authority, url, license, version, attribution, retrieved_at, cadence, status, last_checked_at, last_changed_at, next_due_at,
+                license_verdict, commercial_use, license_checked_at,
+                (next_due_at IS NOT NULL AND next_due_at < now() - interval '2 days') AS stale
+         FROM sources ORDER BY id`,
+      )
+    ).rows,
   }));
+
+  /** Freshness summary for monitoring: anything stale, failed, awaiting review or with a changed license page. */
+  app.get('/v1/status', async () => {
+    const rows = (
+      await pool.query(
+        `SELECT id, status, next_due_at, last_checked_at, (next_due_at IS NOT NULL AND next_due_at < now() - interval '2 days') AS stale FROM sources ORDER BY id`,
+      )
+    ).rows;
+    const attention = rows.filter((r) => r.status !== 'ok' || r.stale).map((r) => ({ id: r.id, status: r.status, stale: r.stale }));
+    const lastRun = (await pool.query('SELECT source_id, status, finished_at FROM source_runs ORDER BY id DESC LIMIT 1')).rows[0] ?? null;
+    return { ok: attention.length === 0, sources: rows.length, attention, last_run: lastRun };
+  });
 
   // ---- snapshots & deltas ---------------------------------------------
   app.get('/v1/snapshots', async () => ({

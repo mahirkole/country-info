@@ -63,10 +63,18 @@ export interface IngestScope {
    * when at least MIN_FOR_DELETE_GUARD records exist. Pass 1 to allow any deletion.
    */
   maxDeleteRatio?: number;
+  /**
+   * Abort if more than this share of existing records would be updated or deleted at once (refresh uses
+   * it; a vintage release legitimately changes more and passes 1). Unset = no check.
+   */
+  maxChangeRatio?: number;
+  /** Stored on the snapshot, e.g. "vintage_change: NUTS 2021 -> NUTS 2024". */
+  reason?: string;
 }
 
 export const MIN_FOR_DELETE_GUARD = 100;
 export class DeleteGuardError extends Error {}
+export class ChangeGuardError extends Error {}
 
 /**
  * Reconcile the database with `input`. Only entities owned by `source`, of the
@@ -75,7 +83,7 @@ export class DeleteGuardError extends Error {}
  * happens in one transaction and produces one snapshot plus an ordered change log.
  */
 export async function ingest(pool: pg.Pool, source: SourceMeta, input: EntityInput[], scope: IngestScope): Promise<IngestResult> {
-  const { kinds, countries, maxDeleteRatio = 0.05 } = scope;
+  const { kinds, countries, maxDeleteRatio = 0.05, maxChangeRatio, reason } = scope;
   const ids = new Set<string>();
   for (const e of input) {
     if (ids.has(e.id)) throw new Error(`duplicate entity id in source: ${e.id}`);
@@ -115,6 +123,12 @@ export async function ingest(pool: pg.Pool, source: SourceMeta, input: EntityInp
       );
     }
 
+    if (maxChangeRatio !== undefined && existing.size >= MIN_FOR_DELETE_GUARD && (updates.length + deleteIds.length) / existing.size > maxChangeRatio) {
+      throw new ChangeGuardError(
+        `source ${source.id}: ${updates.length} updates and ${deleteIds.length} deletions of ${existing.size} records exceed ${maxChangeRatio * 100}%; treat as a release (new vintage) or review the source.`,
+      );
+    }
+
     // Ids not owned by this source in scope but already present belong to someone else: refuse to take them over.
     for (const part of chunks(inserts.map((e) => e.id))) {
       const clash = (await client.query('SELECT id, source_id FROM entities WHERE id = ANY($1)', [part])).rows[0];
@@ -124,8 +138,8 @@ export async function ingest(pool: pg.Pool, source: SourceMeta, input: EntityInp
     const fromSeq = Number((await client.query('SELECT COALESCE(max(seq), 0) AS s FROM changes')).rows[0].s);
     const snap = (
       await client.query(
-        'INSERT INTO snapshots (source, from_seq, to_seq) VALUES ($1, $2, $2) RETURNING id',
-        [source.id, fromSeq],
+        'INSERT INTO snapshots (source, from_seq, to_seq, reason) VALUES ($1, $2, $2, $3) RETURNING id',
+        [source.id, fromSeq, reason ?? null],
       )
     ).rows[0];
     const snapshotId = Number(snap.id);

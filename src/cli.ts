@@ -7,6 +7,9 @@ import { GISCO_NUTS, GISCO_LAU, loadNuts, loadLau } from './sources/gisco.js';
 import { EU27 } from './sources/eu.js';
 import { linkRegions } from './linking.js';
 import { NATIONAL, nationalSource } from './sources/national/index.js';
+import { allTargets, syncTargetMetadata } from './targets.js';
+import { dueSourceIds, runRefresh } from './refresh.js';
+import { ackLicense, checkLicenses } from './license-watch.js';
 import { loadHolidayFiles, HOLIDAYS_SOURCE } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { diffHolidays, fetchNager } from './holidays/check.js';
@@ -78,6 +81,47 @@ async function main() {
       }
       break;
     }
+    case 'refresh': {
+      // refresh [--due] [--source a,b] [--force] [--dry-run]; exit code 1 if any source failed or needs review.
+      await migrate(pool);
+      const args = process.argv.slice(3);
+      const flag = (n: string) => args.includes(n);
+      const srcArg = args[args.indexOf('--source') + 1];
+      const targets = allTargets();
+      await syncTargetMetadata(pool, targets);
+      let chosen = targets;
+      if (flag('--source')) chosen = targets.filter((t) => (srcArg ?? '').split(',').includes(t.meta.id));
+      else if (flag('--due')) {
+        const due = new Set(await dueSourceIds(pool, targets));
+        chosen = targets.filter((t) => due.has(t.meta.id));
+      }
+      if (chosen.length === 0) console.log('nothing to do');
+      let bad = 0;
+      for (const t of chosen) {
+        const r = await runRefresh(pool, t, { cacheDir: config.cacheDir, force: flag('--force'), dryRun: flag('--dry-run') });
+        console.log(`${r.status.padEnd(12)} ${r.source.padEnd(20)} rows=${r.rows ?? '-'} +${r.inserted ?? 0} ~${r.updated ?? 0} -${r.deleted ?? 0} ${r.detail ?? ''}`);
+        if (r.status === 'failed' || r.status === 'needs_review') bad++;
+      }
+      if (bad) process.exitCode = 1;
+      break;
+    }
+    case 'check-licenses': {
+      await migrate(pool);
+      const targets = allTargets();
+      await syncTargetMetadata(pool, targets);
+      const only = process.argv[3];
+      const res = await checkLicenses(pool, only ? targets.filter((t) => t.meta.id === only) : targets, config.cacheDir);
+      for (const r of res) console.log(`${r.status.padEnd(10)} ${r.source} ${r.detail ?? ''}`);
+      if (res.some((r) => r.status === 'changed' || r.status === 'error')) process.exitCode = 1;
+      break;
+    }
+    case 'license-ack': {
+      const t = allTargets().find((x) => x.meta.id === process.argv[3]);
+      if (!t) throw new Error('usage: license-ack <source-id>');
+      await ackLicense(pool, t, config.cacheDir);
+      console.log('acknowledged', t.meta.id);
+      break;
+    }
     case 'export':
       console.log(await exportSnapshot(pool, config.exportDir, process.argv[3] ? Number(process.argv[3]) : undefined));
       break;
@@ -93,7 +137,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | link | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

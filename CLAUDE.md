@@ -14,5 +14,8 @@
 - Ulusal kaynak (ülke adaptörü) eklerken `docs/sources/NATIONAL.md`'deki sırayı izleyin; `licenseStatus: 'unread'` kaynak yüklenmez, `partial` ise nedeni `meta.license`'a açıkça yazılır.
 - İdari birimler `division` kind'ıdır (`data.level`, `data.type` ortak sözlükten `src/taxonomy.ts`, `data.type_local` yerel ad).
 
+- Kaynak güncellemesi `docs/OPERATIONS.md`'deki `refresh` ile yapılır (ham hash, bant, vintage, lisans izleme); yeni kaynak `src/targets.ts`'e sıklık, satır bandı ve lisans sayfalarıyla eklenir.
+- Her kaynağın lisans dossier'i `docs/licenses/<source-id>.md` (şablon: `TEMPLATE.md`); dossier'siz kaynak ticari pakete girmez.
+
 ## Komutlar
-`npm run ingest | ingest:gisco | ingest:national <CC|all> | ingest:holidays | link | check:holidays | export | serve`, `npm test` (+ `TEST_DATABASE_URL`), `npx tsc --noEmit -p .`
+`npm run refresh [-- --due|--source id|--force|--dry-run] | check:sources | check:licenses | license:ack -- <id> | ingest | ingest:gisco | ingest:national <CC|all> | ingest:holidays | link | check:holidays | export | serve`, `npm test` (+ `TEST_DATABASE_URL`), `npx tsc --noEmit -p .`
