@@ -15,6 +15,7 @@
 - İdari birimler `division` kind'ıdır (`data.level`, `data.type` ortak sözlükten `src/taxonomy.ts`, `data.type_local` yerel ad).
 
 - Kaynak güncellemesi `docs/OPERATIONS.md`'deki `refresh` ile yapılır (ham hash, bant, vintage, lisans izleme); yeni kaynak `src/targets.ts`'e sıklık, satır bandı ve lisans sayfalarıyla eklenir.
+- **Satış kuralı:** `license_verdict` green/amber olmayan kaynak (şu an `gisco-lau` 🔴, BM M49 🔴) ticari pakete girmez; satılan/dağıtılan çıktı `npm run export -- --commercial` ile üretilir. Yazılı teyit listesi: `docs/licenses/OUTREACH.md`.
 - Her kaynağın lisans dossier'i `docs/licenses/<source-id>.md` (şablon: `TEMPLATE.md`); dossier'siz kaynak ticari pakete girmez.
 
 ## Komutlar

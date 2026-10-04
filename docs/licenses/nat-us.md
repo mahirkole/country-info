@@ -1,0 +1,39 @@
+> **Ajan araştırması, 2026-10-04.** Bağımsız ikinci geçiş yapıldı (atıf URL'leri yeniden çekildi, özgün dildeki alıntılar kaynakta arandı; bulunamayan satırlar ajanın kendi Türkçe notlarıdır). Ek olarak üretici (ben) şunları doğrudan okudum: LAU sayfasındaki "specific download rules… must be complied with" cümlesi ve BM Terms of Use "personal, non-commercial use, without any right to resell or redistribute… or to compile or create derivative works".
+
+# Lisans dossier'i: nat-us
+
+> Hukuki görüş değildir. Yalnızca yayıncının sayfasından **okunan** metin alıntılanır; okunamayan alan "OKUNAMADI" yazılır, tahmin edilmez.
+
+- **Okuma tarihi:** 2026-10-04
+- **Yayıncı / veri seti:** U.S. Census Bureau — ANSI/FIPS reference code files (2020), https://www2.census.gov/geo/docs/reference/codes2020/
+- **Kullandığımız alanlar / dosyalar:** national_county2020.txt, national_cousub2020.txt, national_place2020.txt, state dosyaları vb. (STATE|STATEFP|COUNTYFP|COUNTYNS|COUNTYNAME|CLASSFP|FUNCSTAT). Geometri yok, kişisel veri yok.
+- Ham sayfa kopyaları: `raw/`
+
+| # | Soru | Cevap | Kanıt (birebir alıntı) | URL | Sayfa sha256 |
+|---|---|---|---|---|---|
+| 1 | Lisans adı/sürümü ve lisans metni URL'si | Lisans yok; ABD federal hükümet eseri — telif koruması yok (kamu malı). Dosya dizininde ayrı lisans/readme beyanı yok. | "Copyright protection under this title is not available for any work of the United States Government" (17 U.S.C. § 105(a)) | https://www.law.cornell.edu/uscode/text/17/105 | e0f425493dd80314c4777e99d29a229f1e72ffedd433891c958dec0500fed6d5 |
+| 2 | Ticari kullanım | evet (telif engeli yok; Census "ticari faaliyet" katalizörü olarak tanımlıyor). census.gov'da açık "ticari kullanım serbest" cümlesi OKUNAMADI. | "Census Bureau data continues to be a key national resource, serving as a catalyst for entrepreneurship, innovation, scientific discovery, and commercial activity." | https://www.census.gov/about/policies/open-gov/open-data.html | d346963aeb8d16e2f5b3f9a8f3bd240dffde3b6a80c981a70a1282030bc0ea66 |
+| 3 | Ham veriyi yeniden dağıtma | telif açısından evet (17 USC 105). Census'un buna ilişkin açık cümlesi OKUNAMADI. (Not: 105 yalnız ABD hükümetinin kendi eserlerini kapsar; yabancı telif için ayrıca geçerli değildir — bu dosyalar Census eseri.) | 17 U.S.C. § 105(a) (yukarıda). | https://www.law.cornell.edu/uscode/text/17/105 | e0f42549... |
+| 4 | Türetilmiş veritabanı / API satışı | telif açısından evet. Census'un API ToS'u yalnız Census API'sine uygulanır (biz FTP dosyası kullanıyoruz) ve değiştirilmiş içeriği "Census Bureau kaynaklı" diye sunmayı yasaklar. | "You may not modify or falsely represent content accessed through the API and still claim the source is the Census Bureau." | https://www.census.gov/data/developers/about/terms-of-service.html | d949eafff3b7f6db53052671a049b947ec5548b633d3cd7b9e25093885c98ed1 |
+| 5 | Alt-lisans / müşteri yeniden dağıtabilir | Telif yok → alt-lisans gerekmez. Açık Census cümlesi OKUNAMADI. | — | — | — |
+| 6 | Atıf metni ve biçimi | Zorunlu değil, öneri: kaynağı Census olarak göster. API kullanılırsa zorunlu bildirim (biz API kullanmıyoruz): "This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau." Dosya/geo ürünleri için önerilen atıf: Author, "Table or File Name", Vintage, URL, accessed on date. | "Data users who create their own estimates using data from disseminated tables and other data should cite the Census Bureau as the source of the original data only." | https://www.census.gov/about/policies/citation.html | 99c96d5cb66ac9bec1bad03d6ef3ca9dca59a87cb42214e4de42dc68ea7b2016 |
+| 7 | Share-alike / viral | yok | OKUNAMADI/yok (hiçbir sayfada geçmiyor); 17 USC 105 telif tanımıyor. | — | — |
+| 8 | Non-commercial / ASK şart | yok | OKUNAMADI/yok. Census sayfalarında bu veriler için ticari kısıt cümlesi bulunmadı. | — | — |
+| 9 | Üçüncü taraf IP istisnaları | OKUNAMADI (codes2020 dosya dizininde istisna beyanı yok; census.gov genel politika sayfalarında üçüncü taraf telif istisnası aranıp bulunamadı). Dizin listesi `cou/`, `cousub/`, national_*.txt içeriyor. | — | https://www2.census.gov/geo/docs/reference/codes2020/ | 7a7604334895c49a476426d94efbb722c58b3c2ef12bc03a66d3f10d607cc0f4 |
+| 10 | Marka/logo, onay izlenimi | Census adı kaynağı belirtmek için kullanılabilir; onay izlenimi yasak (API ToS). | "You may not use the Census Bureau name, or the like to imply endorsement of any product, service, or entity, not-for-profit, commercial or otherwise." | https://www.census.gov/data/developers/about/terms-of-service.html | d949eaff... |
+| 11 | ToS: otomatik indirme/hız limiti/kimlik doğrulama | FTP/www2 dosyaları için ToS bulunamadı (OKUNAMADI); dosyalar anahtarsız HTTP GET (curl 200 doğrulandı). API için: "Your use of the API may be subject to certain limitations on access, calls, or use". | "Your use of the API may be subject to certain limitations on access, calls, or use as set forth within this Agreement or otherwise provided by the Census Bureau." | https://www.census.gov/data/developers/about/terms-of-service.html | d949eaff... |
+| 12 | Veritabanı hakkı / ülke özgü | ABD: veritabanı için sui generis hak yok (metinden değil, yalnızca 17 USC 105 okundu) → OKUNAMADI. AB'de müşterilere sunulduğunda yerel kural kontrolü gerekir. | — | — | — |
+| 13 | Kişisel veri | Yok: kod/ad/işlevsel durum. Census, kişiyi tanımlamayı yasaklayan 13 USC 8-9 kuralını anıyor (API ToS), bu dosyalar tanımlayıcı içermez. | "users will not use these data, alone or in combination with any other Census or non-Census data, to identify any individual person, household, business or other entity" | https://www.census.gov/data/developers/about/terms-of-service.html | d949eaff... |
+| 14 | Garanti reddi | API için var; dosyalar için ayrı metin OKUNAMADI | "The API is provided "as is" and on an "as-available" basis." | https://www.census.gov/data/developers/about/terms-of-service.html | d949eaff... |
+| 15 | Şart değişikliği hakkı / sürüm | API ToS değişebilir; 17 USC 105 sabit. | "The Census Bureau reserves the right, at its sole discretion, to modify or replace this Agreement, in whole or in part." | https://www.census.gov/data/developers/about/terms-of-service.html | d949eaff... |
+| 16 | Yaptırım/ihracat kısıtı | OKUNAMADI | — | — | — |
+
+Not: İstenen `privacy-policy.html#copyright` bölümü okundu: sayfada "copyright" kelimesi YOK (privacy policy sayfası sha 03786ac71601d7f3a4123f71f04dd667896576ac4219f2f08051bfc3bedf4a99; yeniden indirmede sha değişti 708dc475..., sayfa dinamik). Ayrıca https://www.census.gov/about/policies.html okundu, telif cümlesi bulunmadı (sha 36eba09f1f68be11e0efdbf4212281398ca7e90125817eb510900254a70899fc).
+
+## Güncelleme (refresh) bilgisi
+- **Yayın sıklığı:** codes2020 dizini sabit vintage (2020); dosya tarihleri 2023-02/05 (örn. national_county2020.txt Last-Modified 13 Feb 2023). Yeni vintage'lar için ayrı dizinler (ör. codes2020 → sonraki) olabilir — OKUNAMADI. **Sürüm adlandırması:** yıl (2020). **Değişim bildirimi:** OKUNAMADI. **Kararlı URL:** evet (www2.census.gov/geo/docs/reference/codes2020/…).
+
+## Karar
+- **🟡 şartlı** — gerekçe: ABD federal hükümet eseri; 17 U.S.C. § 105 telif korumasını dışlıyor, dolayısıyla ticari kullanım/dağıtım/türev telif açısından serbest. Ancak census.gov'da bu dosyalar için açık bir "ticari kullanım serbest" lisans cümlesi okunamadı (yalnızca API ToS ve genel Open Data sayfası), bu yüzden 🟢 verilmedi.
+- Açık sorular / yayıncıya yazılacak teyit: census.gov üzerinde FTP dosyaları için telif/kullanım beyanı (ör. Geography "Data Use / Citing" sayfası) var mı; üçüncü taraf kaynaklı alanlar (GNIS adları → USGS) için ayrı şart var mı? Atıf önerisi: "Source: U.S. Census Bureau, ANSI/FIPS codes (2020 vintage), accessed <date>. Not endorsed by the Census Bureau."
+- Okuyan: Claude (otomatik araştırma) Bağımsız ikinci geçiş yapıldı mı: hayır (2026-10-04)

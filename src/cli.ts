@@ -123,7 +123,10 @@ async function main() {
       break;
     }
     case 'export':
-      console.log(await exportSnapshot(pool, config.exportDir, process.argv[3] ? Number(process.argv[3]) : undefined));
+      {
+      const idArg = process.argv.slice(3).find((a) => /^\d+$/.test(a));
+      console.log(await exportSnapshot(pool, config.exportDir, idArg ? Number(idArg) : undefined, { commercialOnly: process.argv.includes('--commercial') }));
+    }
       break;
     case 'deliver':
       console.log('attempted:', await processDeliveries(pool));
@@ -137,7 +140,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

@@ -33,7 +33,17 @@ async function sha256(path: string): Promise<{ sha256: string; bytes: number }> 
  *   holidays.ndjson / holidays.csv   all holiday occurrences
  *   delta.ndjson                     change log of this snapshot (empty for the first import = all inserts)
  */
-export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?: number): Promise<ManifestEntry> {
+export interface ExportOptions {
+  /**
+   * Leave out every record whose source is not cleared for commercial use (license verdict other than
+   * green/amber, including unknown). Use this profile for anything that is sold or redistributed.
+   */
+  commercialOnly?: boolean;
+}
+
+export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?: number, opts: ExportOptions = {}): Promise<ManifestEntry> {
+  const cleared = opts.commercialOnly ? "AND source_id IN (SELECT id FROM sources WHERE license_verdict IN ('green','amber'))" : '';
+  const clearedSnap = opts.commercialOnly ? "AND snapshot_id IN (SELECT s.id FROM snapshots s JOIN sources o ON o.id = s.source WHERE o.license_verdict IN ('green','amber'))" : '';
   const snap = (
     await pool.query(
       snapshotId
@@ -50,7 +60,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
 
   // Export the data as of the current head. Snapshots are cumulative, so files
   // for an old snapshot id reflect the database now; deltas are what is per-snapshot.
-  const countries = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'country' ORDER BY code`)).rows;
+  const countries = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'country' ${cleared} ORDER BY code`)).rows;
   await writeFile(join(dir, 'countries.json'), JSON.stringify(countries, null, 1));
   const header = ['code', 'iso3', 'numeric', 'name', 'capital', 'continent', 'un_status', 'currency_code', 'phone_code', 'languages', 'tld', 'population', 'area_km2'];
   await writeFile(
@@ -61,7 +71,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
 
   await writeFile(join(dir, 'regions.ndjson'), '');
   for (let after = ''; ; ) {
-    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind NOT IN ('country', 'holiday') AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
+    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind NOT IN ('country', 'holiday') ${cleared} AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
     if (rows.length === 0) break;
     await appendFile(join(dir, 'regions.ndjson'), rows.map((r) => JSON.stringify(r) + '\n').join(''));
     after = rows[rows.length - 1].id;
@@ -71,7 +81,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
   const hcsv = join(dir, 'holidays.csv');
   await writeFile(hcsv, csvRow(['date', 'country', 'rule_id', 'name', 'type', 'region', 'verification', 'source']));
   for (let after = ''; ; ) {
-    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'holiday' AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
+    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'holiday' ${cleared} AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
     if (rows.length === 0) break;
     await appendFile(join(dir, 'holidays.ndjson'), rows.map((r) => JSON.stringify(r) + '\n').join(''));
     await appendFile(hcsv, rows.map((r) => csvRow([r.data.date, r.country_code, r.data.rule_id, r.name, r.data.type, r.data.region, r.data.verification, r.data.source?.citation])).join(''));
@@ -82,7 +92,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
   for (let after = Number(snap.from_seq); ; ) {
     const rows = (
       await pool.query(
-        `SELECT seq, entity_id, kind, country_code::text AS country_code, op, changed_fields, before, after FROM changes WHERE snapshot_id = $1 AND seq > $2 ORDER BY seq LIMIT 5000`,
+        `SELECT seq, entity_id, kind, country_code::text AS country_code, op, changed_fields, before, after FROM changes WHERE snapshot_id = $1 ${clearedSnap} AND seq > $2 ORDER BY seq LIMIT 5000`,
         [snap.id, after],
       )
     ).rows;
@@ -91,7 +101,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
     after = Number(rows[rows.length - 1].seq);
   }
 
-  const sources = (await pool.query('SELECT id, authority, url, license, version, attribution FROM sources ORDER BY id')).rows;
+  const sources = (await pool.query(`SELECT id, authority, url, license, version, attribution FROM sources ${opts.commercialOnly ? "WHERE license_verdict IN ('green','amber')" : ''} ORDER BY id`)).rows;
   await writeFile(
     join(dir, 'ATTRIBUTION.md'),
     '# Data sources and attribution\n\nIf you redistribute this data, keep the credit lines below.\n\n' +

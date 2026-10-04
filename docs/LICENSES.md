@@ -1,13 +1,16 @@
 # Kaynak lisansları ve satış değerlendirmesi
 
+> **DÜZELTME (2026-10-04):** Bu belgenin önceki sürümü Eurostat NUTS/LAU için "ticari satış engeli görmedim" diyordu. Bu, okunamayan bir metnin bulunamaması yüzünden verilmiş yanlış bir güvenceydi: LAU indirme sayfası *"There are specific download rules for the datasets… which must be complied with. Permission to download and use these data is subject to these rules being accepted"* diyor ve kuralların metni okunamadı. **LAU 🔴 (satılmaz)**, NUTS 🟡. Ayrıntı: `docs/licenses/gisco-lau.md`, `gisco-nuts.md`.
+
 > Bu belge hukuki görüş değildir. Aşağıdaki "okundu" ifadeleri 2026-10-04'te ilgili sayfaların metninin okunduğu anlamına gelir; ticari lansmandan önce bir avukatla teyit edin.
 
 ## Kaynak bazında
 
 | Kaynak | Ne alıyoruz | Ne okundu | Ticari satış? | Yükümlülük |
 |---|---|---|---|---|
-| **GeoNames** (`geonames`) | ülke nitelikleri, admin1/admin2 | geonames.org/export: "cc-by licence… commercial usage is allowed 'as is'" | **Evet** | Bağlantılı atıf (GeoNames'e kredi). Veri "olduğu gibi", doğruluk garantisi yok. Sürüm (3.0/4.0) sayfada belirtilmemiş → dump README'sinden teyit edin. |
-| **Eurostat GISCO – NUTS, LAU** (`gisco-nuts`, `gisco-lau`) | yalnızca **öznitelik CSV'leri** (kod, ad, nüfus, alan); **geometri/sınır almıyoruz** | Eurostat telif sayfası: "reuse… for commercial or non-commercial purposes is authorised provided the source is acknowledged… no special procedure or written licence"; NUTS/LAU sayfalarında ek ticari kısıt bulunmadı | **Evet (okunan metne göre)** | Kaynak gösterimi: "Source: Eurostat / GISCO …". Eurostat "başka kaynaklara ait veri" için istisna koyar; LAU nüfus/alan değerleri ulusal istatistik kurumlarından derleniyor olabilir → teyit edin. |
+| **GeoNames** (`geonames`) | ülke nitelikleri, admin1/admin2, şehirler | geonames.org/export: "cc-by licence… commercial usage is allowed 'as is'"; dump readme CC BY 4.0 | **Evet (🟡)** | GeoNames 100+ üst kaynaktan derleme yapar, birçoğunun lisansı listede yok (`docs/licenses/geonames.md`); | Bağlantılı atıf (GeoNames'e kredi). Veri "olduğu gibi", doğruluk garantisi yok. Sürüm (3.0/4.0) sayfada belirtilmemiş → dump README'sinden teyit edin. |
+| **Eurostat GISCO – NUTS** (`gisco-nuts`) | yalnızca öznitelik CSV'si (kod, ad); geometri yok | Eurostat genel politikası: ticari/ticari olmayan yeniden kullanım, kaynak gösterimi şartıyla. NUTS sayfasında kendi lisans cümlesi yok; geometri EuroBoundaryMap kökenli | **Büyük olasılıkla evet (🟡)**; yazılı teyit istenecek | Kaynak gösterimi. |
+| **Eurostat GISCO – LAU** (`gisco-lau`) | öznitelik CSV'si (kod, ad, nüfus, alan) | LAU sayfası: "specific download rules… must be complied with"; kural metni JS penceresinde, okunamadı. Aynı GISCO ailesinde communes/countries/postal codes için "the data will not be used for commercial purposes… contact EuroGeographics" | **HAYIR / belirsiz (🔴)** | **Eurostat ve EuroGeographics'ten yazılı izin gelene kadar satılmaz.** Commercial export profili LAU'yu dışarıda bırakır; `DISABLE_SOURCES=gisco-lau` ile yenilemesi durdurulabilir. |
 | GISCO **"administrative units"** (communes, countries, postal codes) | **Kullanmıyoruz** | Sayfada "the data will not be used for commercial purposes"; ticari kullanım için EuroGeographics lisansı | **Hayır** | Bu veri setlerini eklemeyin. Sınır/geometri (NUTS dahil) eklenecekse © EuroGeographics koşulları yeniden okunmalı. |
 | **U.S. Census Bureau** (`nat-us`) | state/county ANSI-FIPS kodları | open-data politika sayfası okundu; açık "public domain" ifadesi bulunamadı | **Evet** (ABD federal eseri, 17 U.S.C. § 105) | Atıf önerilir. `licenseStatus: partial`. |
 | **INSEE COG / geo.api.gouv.fr** (`nat-fr`) | bölge, département, komün adları/kodları/nüfus | api.gouv.fr sayfası: "Toutes les données… sous licences Open Data"; INSEE lisans metni bulunamadı | **Büyük olasılıkla evet (Licence Ouverte)**, metin teyit edilmeli | Atıf. API OpenStreetMap ortaklığı da listeliyor; **geometri/OSM verisi alınmıyor**. `licenseStatus: partial`. |
@@ -33,3 +36,9 @@
 - `GET /v1/sources`: kaynak, lisans ve gösterilecek atıf metni.
 - Dışa aktarımda `ATTRIBUTION.md` (her snapshot ve `latest/`).
 - Lisansı belirsiz veya ticari kısıtlı kaynak eklenmez; `docs/sources/*.md` erişim/okuma durumunu tutar.
+
+## Ek bulgular (2026-10-04, dossier araştırması + bağımsız ikinci geçiş)
+- **BM / UNSD M49 (`un-m49`, henüz kullanılmıyor): 🔴.** BM Terms of Use (kendi okumam): *"…for the User's personal, non-commercial use, without any right to resell or redistribute them or to compile or create derivative works therefrom"*; telif sayfası yazılı izin ister. **M49 verisi izin olmadan ticari ürüne alınmaz.** Faz 3 Dalga 4'teki "UN M49 ile GeoNames niteliklerini değiştirme" fikri bu şartla askıdadır; yazılı izin veya başka kaynak gerekir.
+- **IANA TLD (`iana-tld`) 🟡:** IANA'nın CC0 beyanı yalnızca "Protocol Registries" için; TLD listesi/Root Zone DB bu tanıma girmiyor, dosyada lisans satırı yok. Veri olgusal; iletişim alanları alınmaz. Yazılı teyit istenecek.
+- **U.S. Census (`nat-us`) 🟡:** federal eser (17 U.S.C. § 105); FTP dosyaları için ayrı ticari kullanım cümlesi yok.
+- **Satış kuralı (proje):** `license_verdict` ∈ {green, amber} olmayan kaynak **ticari pakette yer almaz** (`npm run export -- --commercial`). `amber` = şartlı/teyit bekliyor; satıştan önce `docs/licenses/OUTREACH.md` yanıtları ve avukat onayı gerekir.

@@ -162,6 +162,36 @@ d('database', () => {
     await app.close();
   });
 
+  it('commercial export profile leaves out sources that are not cleared', async () => {
+    await ingest(pool, SRC, [E('country:TR', 'country', 'TR', 'Turkey', null), E('gn:1', 'admin1', 'TR', 'Istanbul', 'country:TR')], { kinds: KINDS });
+    const red = { id: 'red-src', authority: 'r' };
+    const green = { id: 'green-src', authority: 'g' };
+    await ingest(pool, red, [E('lau:TR1', 'lau', 'TR', 'RestrictedPlace', 'country:TR')], { kinds: ['lau'] });
+    await ingest(pool, green, [E('nuts:TR1', 'nuts1', 'TR', 'OpenRegion', 'country:TR')], { kinds: ['nuts1'] });
+    await pool.query("UPDATE sources SET license_verdict = 'amber' WHERE id = 't'");
+    await pool.query("UPDATE sources SET license_verdict = 'red' WHERE id = 'red-src'");
+    await pool.query("UPDATE sources SET license_verdict = 'green' WHERE id = 'green-src'");
+    const lines = async (out: string, f: string) => (await readFile(join(out, 'latest', f), 'utf8')).trim().split('\n').filter(Boolean);
+    const all = await mkdtemp(join(tmpdir(), 'ex-'));
+    await exportSnapshot(pool, all);
+    expect((await lines(all, 'regions.ndjson')).length).toBe(3);
+    const commercial = await mkdtemp(join(tmpdir(), 'ex-'));
+    await exportSnapshot(pool, commercial, undefined, { commercialOnly: true });
+    const regions = (await lines(commercial, 'regions.ndjson')).map((l) => JSON.parse(l).id).sort();
+    expect(regions).toEqual(['gn:1', 'nuts:TR1']); // lau:TR1 (red) is gone
+    expect(await readFile(join(commercial, 'latest/ATTRIBUTION.md'), 'utf8')).not.toContain('red-src');
+    // snapshot ids: 1 = t, 2 = red-src, 3 = green-src; the delta file follows the same rule
+    const d3 = await mkdtemp(join(tmpdir(), 'ex-'));
+    await exportSnapshot(pool, d3, 3, { commercialOnly: true });
+    expect((await lines(d3, 'delta.ndjson')).map((l) => JSON.parse(l).entity_id)).toEqual(['nuts:TR1']);
+    const d2 = await mkdtemp(join(tmpdir(), 'ex-'));
+    await exportSnapshot(pool, d2, 2, { commercialOnly: true });
+    expect(await lines(d2, 'delta.ndjson')).toEqual([]);
+    const d2all = await mkdtemp(join(tmpdir(), 'ex-'));
+    await exportSnapshot(pool, d2all, 2);
+    expect((await lines(d2all, 'delta.ndjson')).map((l) => JSON.parse(l).entity_id)).toEqual(['lau:TR1']);
+  });
+
   it('is atomic: a bad source leaves nothing behind', async () => {
     await expect(ingest(pool, SRC, [E('gn:9', 'admin1', 'TR', 'Orphan', 'country:NOPE')], { kinds: KINDS })).rejects.toThrow();
     expect((await pool.query('SELECT count(*)::int n FROM snapshots')).rows[0].n).toBe(0);

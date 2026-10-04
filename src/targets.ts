@@ -45,22 +45,26 @@ const nationalTargets = (): RefreshTarget[] => {
 };
 
 export function allTargets(): RefreshTarget[] {
+  return everyTarget().filter((t) => !config.disabledSources.includes(t.meta.id));
+}
+
+function everyTarget(): RefreshTarget[] {
   const geoKinds = ['country', 'admin1', ...(config.ingestAdmin2 ? ['admin2'] : []), ...(config.ingestCities ? ['city'] : [])];
   return [
     {
       meta: GEONAMES, cadence: 'weekly', expectedRows: [60_000, 200_000], scope: { kinds: geoKinds },
       load: (dir) => loadGeoNames(dir, { admin2: config.ingestAdmin2, cities: config.ingestCities }),
-      licenseUrls: ['https://www.geonames.org/export/'], licenseVerdict: 'green', commercialUse: 'CC BY, commercial use allowed, credit required',
+      licenseUrls: ['https://www.geonames.org/export/'], licenseVerdict: 'amber', commercialUse: 'CC BY 4.0 per dump readme, commercial use allowed; GeoNames aggregates 100+ upstream sources, many without a stated licence (see docs/licenses/geonames.md)',
     },
     {
       meta: GISCO_NUTS, cadence: 'annual', expectedRows: [1500, 1800], scope: { kinds: ['nuts1', 'nuts2', 'nuts3'], countries: NUTS_COUNTRIES },
       load: (dir) => loadNuts(dir, new Set(NUTS_COUNTRIES)),
-      licenseUrls: ['https://ec.europa.eu/eurostat/web/main/help/copyright-notice'], licenseVerdict: 'amber', commercialUse: 'Eurostat general policy: commercial reuse authorised with source acknowledged; GISCO statistical-units pages show no extra restriction',
+      licenseUrls: ['https://ec.europa.eu/eurostat/web/main/help/copyright-notice'], licenseVerdict: 'amber', commercialUse: 'Eurostat general policy authorises commercial reuse with attribution; NUTS page has no licence sentence of its own and geometry derives from EuroBoundaryMap (docs/licenses/gisco-nuts.md); confirm in writing',
     },
     {
       meta: GISCO_LAU, cadence: 'annual', expectedRows: [85_000, 110_000], scope: { kinds: ['lau'], countries: [...EU27] },
       load: (dir) => loadLau(dir, new Set(EU27)),
-      licenseUrls: ['https://ec.europa.eu/eurostat/web/main/help/copyright-notice'], licenseVerdict: 'amber', commercialUse: 'as NUTS; population/area may originate from national institutes (third-party exception)',
+      licenseUrls: ['https://ec.europa.eu/eurostat/web/main/help/copyright-notice'], licenseVerdict: 'red', commercialUse: 'NOT cleared: LAU download page requires accepting "specific download rules" whose text could not be read; geometry derives from EuroBoundaryMap and the sibling communes dataset is non-commercial (docs/licenses/gisco-lau.md). Do not sell until Eurostat/EuroGeographics confirm in writing.',
     },
     ...nationalTargets(),
     {
