@@ -101,3 +101,5 @@ Yeni: `migrations/004_refresh.sql`, `src/refresh.ts`, `src/license-watch.ts`, `d
 - Yıllık sürüm geçişleri ve idari birleşmeler büyük delta üretir; müşteri etkisi için "release" sınıfı ve ardıl ilişkisi şart.
 - Hacim: sokak/bina seviyesi depolama ve KVKK/GDPR kararı verilmeden Dalga 5 başlamaz.
 - Kurum siteleri bu konteynerden kararsız erişiliyor (WAF, proxy); her kaynakta curl yedeği ve yeniden deneme kullanılır, yine de bazıları kullanıcı ağı gerektirir.
+
+> Devamı (Faz 4–6, 2026-10-05 durumu ve kalan işler): `docs/ROADMAP.md` → "Faz 6".

@@ -1,6 +1,6 @@
 # Yol haritası ve kalan işler (sonraki oturumlar için)
 
-Son güncelleme: 2026-10-05. Dal: `claude/country-info-mvp` (PR açılmadı). Her maddeyi bitirince burayı güncelleyin.
+Son güncelleme: 2026-10-05 (Faz 6 planı en altta). Dal: `claude/country-info-mvp` (PR açılmadı). Her maddeyi bitirince burayı güncelleyin.
 
 ## Tamamlandı
 - MVP: GeoNames ülke/admin1/admin2 ingest, snapshot/delta/webhook, dosya dışa aktarım.
@@ -54,3 +54,65 @@ Hedef: her ülkenin kendi resmi verisinden tüm idari seviyeler (şehir, il, il�
 - Testler: `TEST_DATABASE_URL=postgres://postgres@localhost:5432/countryinfo_test npm test`.
 - NUTS: tek dosya `NUTS_AT_2024.csv` 39 ülkeyi içerir (TR dahil); Eurostat `EL`=Yunanistan (ISO `GR`).
 - Kurum siteleri bu konteynerden erişim açısından kararsız; her oturumda yeniden deneyin.
+
+## Faz 6 — Kalan eksikler için plan (2026-10-05 durumundan)
+
+## Kaydedilen ilerleme (commit 7a15898, `claude/country-info-mvp`, push'lu, PR yok; 98 test + tsc yeşil)
+- Resmi adaptörler: US, FR, IT, NL, NO, SE, CZ, DE, AT, CA, CH, AU + **GB (374), ES (8.203), PT (3.345, yalnız kıta), JP (1.965)**.
+- Wikidata (CC0, topluluk, sayı kapılı): DK 103, FI 327, BE 577, BR 5.599, IN 36, BG 265; QID/çok dilli ad zenginleştirme; CLDR ülke adları + para birimi.
+- Model: `source_class`, `?official_only=true`, ülke ve bölge yanıtında `names`/`xrefs`.
+
+## Eksik envanteri
+| Alan | Durum | Engel |
+|---|---|---|
+| LAU yerine AB27 | 13/27 kapsandı; **eksik 14: CY EE GR HR HU IE LT LU LV MT PL RO SI SK** | Wikidata sınıf/sayı eşleşmedi; ulusal adaptör gerekir |
+| Wikidata katmanı | PL, KR, TR(ilçe), SI, SK, GR, HR, RO yüklenemedi | sayı kapısı |
+| PT Açores/Madeira | 30 belediye yok | yalnız gpkg |
+| FI/DK/PL/BE/IN/KR/BR resmi kaynak | Wikidata ile geçici | lisans/erişim |
+| TR | il/ilçe GeoNames+İBBS; mahalle/sokak yok | NVİ/TÜİK kapalı |
+| Tatiller | BG RO FR NL CY dosyası yok; çoğu `unverified` | resmi metin okunmalı |
+| Model | `source_priority`/`canonical`, `replaced_by` ardıllık, ETag/ham arşiv | kod |
+| Ürün | OpenAPI, API anahtarı, hız sınırı, SDK, webhook `kinds` | kod |
+| Hukuk | avukat onayı, ES/PT/JP/GB `partial` açık sorular | lansman öncesi zorunlu |
+| Altyapı | Postgres konteyner yeniden başlayınca ölüyor; Wikidata aylık refresh yok | operasyon |
+
+## Sıra (izinsiz; her adım: lisansı oku → dossier → kod → test → `refresh` x2 → docs → commit/push)
+**6-A. Dokümantasyonu kaydet** (2026-10-05 yapıldı: bu bölüm ROADMAP'te); sonraki: `docs/licenses/README.md` ve `NATIONAL.md` tutarlılık kontrolü (nat-es/gb/jp/pt satırları).
+
+**6-B. AB27 LAU boşluğu (14 ülke), kolaydan zora**
+1. Önce kamu API'si/CSV'si olan ve lisansı açık olanlar: **PL** (GUS TERYT/TERC; lisans sayfasını oku; 16/380/2.477), **HU** (KSH helységnévtár), **RO** (INS/SIRUTA), **HR** (DZS/ DGU), **SI** (SURS/GURS), **SK** (ŠÚ SR), **GR** (ELSTAT/Kallikratis), **IE** (CSO/OSi). Her biri için `src/sources/national/<cc>.ts` + dossier; ulusal adaptör yoksa Wikidata sınıfını **veriyle** bul (GeoNames xref P31 dağılımı: `.scratch/d.mts` yöntemi) ve resmi sayı bandı koy.
+2. Küçük ülkeler (CY, EE, LV, LT, LU, MT): resmi sayı küçük (≤80, CY 615 topluluk) → ulusal istatistik sitesinin lisansı okunur; yoksa Wikidata sınıfı + band.
+3. Çıkış ölçütü: AB27'nin 27'si kapsanır → `gisco-lau` için `DISABLE_SOURCES` + bilinçli toplu silme (`maxDeleteRatio`) ve `export --commercial` farkı raporu; `entity_links` ile NUTS3 bağları.
+
+**6-C. Model ve kalite**
+- `src/sources/priority.ts`: resmi > Wikidata > GeoNames; `canonical` bayrağı `entity_links`/QID üzerinden (kayıt silinmez); API `?canonical=true`.
+- `replaced_by`/`split_from` ardıllığı: yıllık vintage farklarından (IT Sardinya, FR COG) otomatik öneri → `review_items`.
+- ETag/If-Modified-Since + ham içerik arşivi (`.cache/raw/<sha256>`).
+- Wikidata enrich'i `refresh --due` zincirine (aylık) ekle; Wikidata katmanlarında yetim/atlanan öğe raporu.
+- Kalite panosu: kaynak başına sayı vs resmi (altın sayı testleri), yetim kayıt kontrolü; `/v1/status` içine.
+
+**6-D. Kapsam derinleştirme**
+- PT Açores/Madeira (gpkg okuyucu veya DGT CSV/INE kod tablosu), KR (KOSTAT/MOIS lisansı okunur; Wikidata 17'lik yapı için sınıf eşlemesi), IN ilçe (resmi sayı kaynağı bulunursa), PL powiat/gmina, TR (yalnız lisansı net kaynak; TÜİK/NVİ kapalıysa boş).
+- Posta kodları ve mahalle/sokak (Faz 3-C Dalga 5): ayrı kapı — hacim, KVKK/GDPR, posta kodu lisansları; OSM ODbL kararı verilmeden başlamaz.
+
+**6-E. Tatiller**
+- BG, RO, FR, NL, CY dosyaları (resmi mevzuat metni **okunarak**); `unverified` → `verified` (BE, LU, FI, GR, LT, MT, SI, DE eyalet, IT, DK, PT, SK, TR); motor: koşullu kural (IE), hafta sonu devri, yarım gün, hicri liste. Nager.Date yalnız alarm. Yıllık Eylül döngüsü.
+
+**6-F. Ürün ve operasyon**
+- OpenAPI şeması (Fastify schema'dan), API anahtarı + hız sınırı, SDK (TS/Python), webhook `kinds`/`source_ids`/`vintage`, abonelik filtreleri.
+- Konteyner dayanıklılığı: Postgres otomatik başlatma betiği (`scripts/pg-start.sh`, `/usr/lib/postgresql/16/bin/pg_ctl` yolu) ve CI'da Postgres servisi (var), `ingest:all`.
+- Lisans: bağımsız ikinci geçiş betiği (`/tmp/xlic.py`'yi `scripts/`e al), `check:licenses` baseline'ları tüm yeni kaynaklar için.
+
+**6-G. Ticari kapı (kodlamadan bağımsız)**
+- Avukat onayı: `partial` kaynaklar (ES REL adları, PT/JP/GB API lisans cümlesi), CLDR/Wikidata atıf, CC BY-IGO; ToS/DPA/SLA şablonları; fiyat/segment görüşmeleri.
+
+## Kritik dosyalar
+`docs/ROADMAP.md`, `docs/PLAN-FAZ3.md`, `docs/sources/NATIONAL.md`, `docs/licenses/*`, `src/sources/national/*` (+`index.ts`), `src/sources/wikidata-countries.ts` + `wikidata-divisions.ts`, `src/targets.ts`, `src/api.ts`, `src/linking.ts`, `src/ingest.ts`, `src/export.ts`; yeniden kullanılacak: `parseCsv` (`src/sources/csv.ts`), `readXlsx` (`src/sources/xlsx.ts`), `fetchText/fetchBytes` (`src/sources/fetch.ts`), `division()` (`src/sources/national/types.ts`), `loadWikidataDivisions`.
+
+## Doğrulama
+`TEST_DATABASE_URL=postgres://postgres@localhost:5432/countryinfo_test npx vitest run`, `npx tsc --noEmit -p .`; her yeni kaynak `npm run refresh -- --source <id> --force` sonra bir kez daha ("unchanged"); birim sayıları resmi rakamlarla; `export --commercial` 🔴 kaynakları dışlar; her adım sonrası commit + push (PR yalnız istenirse). Postgres ölürse: `rm -f /tmp/pgdata/postmaster.pid; su postgres -c "/usr/lib/postgresql/16/bin/pg_ctl -D /tmp/pgdata -l /tmp/pg.log -o '-p 5432 -k /tmp' start"`.
+
+## Riskler
+- Wikidata topluluk verisi: sayı kapısı olmadan yüklenmez; hafızadan QID kullanılmaz (Q2039348 örneği yanlış çıktı).
+- Resmi siteler konteynerden kararsız (WAF); curl yedeği var, bazıları okunamazsa kaynak alınmaz.
+- Ticari lansman avukat onayı olmadan yapılmaz.
