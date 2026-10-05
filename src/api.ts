@@ -309,10 +309,23 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
         `SELECT id, status, next_due_at, last_checked_at, (next_due_at IS NOT NULL AND next_due_at < now() - interval '2 days') AS stale FROM sources ORDER BY id`,
       )
     ).rows;
-    const attention = rows.filter((r) => r.status !== 'ok' || r.stale).map((r) => ({ id: r.id, status: r.status, stale: r.stale }));
+    // Rows per source against the band the refresh runner enforces (src/targets.ts). (Missing parents cannot exist: entities.parent_id is a foreign key.)
+    const detail = (
+      await pool.query(
+        `SELECT s.id, s.expected_min, s.expected_max, coalesce(c.rows, 0)::int AS rows
+         FROM sources s
+         LEFT JOIN (SELECT source_id, count(*) AS rows FROM entities GROUP BY 1) c ON c.source_id = s.id
+         WHERE c.rows IS NOT NULL OR s.expected_max > 0 ORDER BY s.id`,
+      )
+    ).rows.map((r) => ({ id: r.id as string, rows: r.rows as number, expected: r.expected_max > 0 ? [r.expected_min as number, r.expected_max as number] : null, in_band: r.expected_max > 0 ? r.rows >= r.expected_min && r.rows <= r.expected_max : null }));
+    const attention: { id: string; status: string; stale?: boolean; rows?: number; expected?: number[] }[] = rows.filter((r) => r.status !== 'ok' || r.stale).map((r) => ({ id: r.id, status: r.status, stale: r.stale }));
+    for (const d of detail) {
+      if (d.in_band === false && d.rows > 0) attention.push({ id: d.id, status: 'out_of_band', rows: d.rows, expected: d.expected! }); // a source that never loaded shows up through its status
+
+    }
     const lastRun = (await pool.query('SELECT source_id, status, finished_at FROM source_runs ORDER BY id DESC LIMIT 1')).rows[0] ?? null;
     const review = (await pool.query("SELECT count(*)::int AS n, count(*) FILTER (WHERE field LIKE 'successor:%')::int AS successors FROM review_items WHERE status = 'open'")).rows[0];
-    return { ok: attention.length === 0, sources: rows.length, attention, last_run: lastRun, open_review_items: review.n, open_successor_suggestions: review.successors };
+    return { ok: attention.length === 0, sources: rows.length, attention, sources_detail: detail, last_run: lastRun, open_review_items: review.n, open_successor_suggestions: review.successors };
   });
 
   // ---- snapshots & deltas ---------------------------------------------

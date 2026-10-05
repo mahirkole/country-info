@@ -64,7 +64,7 @@ export const OPERATIONS: Op[] = [
   { method: 'get', path: '/v1/scope-profiles', tag: 'scopes', res: 'ScopeProfileList', summary: 'List your scope profiles (admin: all)' },
   { method: 'delete', path: '/v1/scope-profiles/{id}', tag: 'scopes', summary: 'Remove a scope profile' },
   { method: 'get', path: '/v1/sources', tag: 'provenance', summary: 'Sources with license, attribution, freshness and class' },
-  { method: 'get', path: '/v1/status', tag: 'provenance', summary: 'Health of the data pipeline (stale or failing sources)' },
+  { method: 'get', path: '/v1/status', tag: 'provenance', summary: 'Health of the data pipeline: stale or failing sources, row counts per source against the expected band (sources_detail, out_of_band), open review items' },
   { method: 'get', path: '/v1/snapshots', tag: 'changes', summary: 'Published snapshots' },
   { method: 'get', path: '/v1/changes', tag: 'changes', summary: 'Change feed after a cursor (insert/update/delete with before/after)', query: [{ name: 'since', description: 'Cursor (seq), 0 = from the start' }, { name: 'until', description: 'Upper bound (seq)' }, { name: 'country', description: 'Comma-separated ISO alpha-2' }, { name: 'kind', description: 'Entity kind' }, { name: 'limit', description: 'Page size' }] },
   { method: 'post', path: '/v1/api-keys', tag: 'admin', summary: 'Create an API key (the key is returned once; optional per-key rate_per_min)', admin: true },
