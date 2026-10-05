@@ -286,3 +286,18 @@ describe('GB adapter', () => {
     expect(() => mapOns({ countries: [], regions: [], ladRegion: [], ladCtyua: [], lads: [] })).toThrow();
   });
 });
+
+import { mapIne } from '../src/sources/national/es.js';
+describe('ES adapter', () => {
+  it('builds community > province > municipality with parents from the Tempus hierarchy', () => {
+    const ccaa = [{ Id: 16473, Nombre: 'Total Nacional', Codigo: '00' }, { Id: 9012, Nombre: 'País Vasco', Codigo: '16' }, { Id: 1, Nombre: 'Extranjero', Codigo: '' }];
+    const prov = [{ Id: 2, Nombre: 'Araba/Álava', Codigo: '01', FK_JerarquiaPadres: [9012] }, ...Array.from({ length: 8 }, (_, i) => ({ Id: 100 + i, Nombre: `P${i + 2}`, Codigo: `0${i + 2}`, FK_JerarquiaPadres: [9012] })), { Id: 16473, Nombre: 'Total Nacional', Codigo: '00' }];
+    const dict = [['Relación…'], ['CODAUTO', 'CPRO', 'CMUN', 'DC', 'NOMBRE'], ...Array.from({ length: 8001 }, (_, i) => ['16', '0' + (Math.floor(i / 999) + 1), String((i % 999) + 1).padStart(3, '0'), '3', `M${i}`])];
+    const e = mapIne(ccaa, prov, dict);
+    const par = (id: string) => e.find((x) => x.id === `div:ES:${id}`)?.parent_id;
+    expect([par('ca-16'), par('prov-01'), par('mun-01001')]).toEqual(['country:ES', 'div:ES:ca-16', 'div:ES:prov-01']);
+    expect(e).toHaveLength(8011);
+    expect(() => mapIne(ccaa, [{ Id: 9, Nombre: 'X', Codigo: '02' }], dict)).toThrow(/no community parent/);
+    expect(() => mapIne(ccaa, prov, [['a']])).toThrow(/layout changed/);
+  });
+});
