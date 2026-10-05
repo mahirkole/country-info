@@ -7,7 +7,15 @@ export type When =
   | { easter: { offset: number; calendar?: 'gregorian' | 'orthodox' } }
   | { nth_weekday: { month: number; weekday: number; n: number } } // weekday 0=Sun..6=Sat; n=-1 means last
   | { on_or_after: { month: number; day: number; weekday: number } } // first `weekday` on or after month/day (e.g. Saturday on or after 20 June)
-  | { listed: Record<string, string | { date: string; verification: Verification }> }; // year -> date
+  | { listed: Record<string, string | { date: string; verification: Verification }> } // year -> date
+  /** Conditional date: evaluate `when`; if it falls on `weekday` (0=Sun..6=Sat) use `then`, otherwise `else` (e.g. Ireland's St Brigid's Day: 1 Feb if a Friday, else the first Monday of February). */
+  | { if_weekday: { when: When; weekday: number; then: When; else: When } };
+
+/** Where a holiday that falls on a weekend is observed (the day off), when the law moves it; the holiday itself keeps its date. */
+export interface Substitute {
+  sat?: 'previous_friday' | 'next_monday';
+  sun?: 'previous_friday' | 'next_monday';
+}
 
 export interface HolidayRule {
   id: string;
@@ -19,6 +27,10 @@ export interface HolidayRule {
   verification?: Verification;
   /** Entity id of the region (e.g. `nuts:DE2`) this holiday is limited to; omit for nationwide. */
   region?: string;
+  /** Substitute day off when the date falls on a Saturday/Sunday; emitted as `data.observed` (only when it differs from `date`). */
+  substitute?: Substitute;
+  /** Opening hours of a half day, `HH:MM` (e.g. `{ to: "12:00" }` = free from noon; `{ from: "13:00" }` = off until 13:00). */
+  hours?: { from?: string; to?: string };
   from_year?: number;
   to_year?: number;
 }
@@ -68,10 +80,25 @@ export function nthWeekday(year: number, month: number, weekday: number, n: numb
   return addDays(last, -delta);
 }
 
-/** Dates (and per-date verification overrides) a rule yields for `year`. */
-export function datesFor(rule: HolidayRule, year: number): { date: string; verification?: Verification }[] {
+export interface RuleDate { date: string; verification?: Verification; observed?: string }
+
+/** Dates (and per-date verification overrides, substitute days) a rule yields for `year`. */
+export function datesFor(rule: HolidayRule, year: number): RuleDate[] {
   if ((rule.from_year && year < rule.from_year) || (rule.to_year && year > rule.to_year)) return [];
-  const w = rule.when;
+  const dates = whenDates(rule, rule.when, year);
+  const sub = rule.substitute;
+  if (!sub) return dates;
+  return dates.map((d) => {
+    const dt = utc(+d.date.slice(0, 4), +d.date.slice(5, 7), +d.date.slice(8, 10));
+    const rule_ = dt.getUTCDay() === 6 ? sub.sat : dt.getUTCDay() === 0 ? sub.sun : undefined;
+    if (!rule_) return d;
+    const back = dt.getUTCDay() === 6 ? 1 : 2; // Saturday -> Friday, Sunday -> Friday
+    const fwd = dt.getUTCDay() === 6 ? 2 : 1; // Saturday -> Monday, Sunday -> Monday
+    return { ...d, observed: fmt(addDays(dt, rule_ === 'previous_friday' ? -back : fwd)) };
+  });
+}
+
+function whenDates(rule: HolidayRule, w: When, year: number): RuleDate[] {
   if ('fixed' in w) {
     const dt = utc(year, w.fixed.month, w.fixed.day);
     if (dt.getUTCMonth() + 1 !== w.fixed.month) throw new Error(`rule ${rule.id}: invalid fixed date`);
@@ -82,6 +109,13 @@ export function datesFor(rule: HolidayRule, year: number): { date: string; verif
   if ('on_or_after' in w) {
     const start = utc(year, w.on_or_after.month, w.on_or_after.day);
     return [{ date: fmt(addDays(start, (w.on_or_after.weekday - start.getUTCDay() + 7) % 7)) }];
+  }
+  if ('if_weekday' in w) {
+    const c = w.if_weekday;
+    const probe = whenDates(rule, c.when, year)[0];
+    if (!probe) return [];
+    const wd = utc(+probe.date.slice(0, 4), +probe.date.slice(5, 7), +probe.date.slice(8, 10)).getUTCDay();
+    return whenDates(rule, wd === c.weekday ? c.then : c.else, year);
   }
   const v = w.listed[String(year)];
   if (v === undefined) return [];
@@ -101,8 +135,10 @@ export function compileHolidays(file: HolidayFile, fromYear: number, toYear: num
     if (!rule.source?.citation) throw new Error(`${cc}/${rule.id}: source.citation is required`);
     const name = rule.names[file.default_language] ?? rule.names['en'] ?? Object.values(rule.names)[0];
     if (!name) throw new Error(`${cc}/${rule.id}: no name`);
+    for (const t of [rule.hours?.from, rule.hours?.to]) if (t !== undefined && !/^([01]\d|2[0-3]):[0-5]\d$/.test(t)) throw new Error(`${cc}/${rule.id}: hours must be HH:MM`);
+    if (rule.hours && rule.type !== 'half_day') throw new Error(`${cc}/${rule.id}: hours only apply to half_day rules`);
     for (let y = fromYear; y <= toYear; y++) {
-      for (const { date, verification } of datesFor(rule, y)) {
+      for (const { date, verification, observed } of datesFor(rule, y)) {
         out.push({
           id: `hol:${cc}:${date}:${rule.id}`,
           kind: 'holiday',
@@ -121,6 +157,8 @@ export function compileHolidays(file: HolidayFile, fromYear: number, toYear: num
             source: { authority: file.authority, ...rule.source },
             verification: verification ?? rule.verification ?? 'unverified',
             ...(rule.region ? { region: rule.region } : {}),
+            ...(observed ? { observed } : {}),
+            ...(rule.hours ? { hours: rule.hours } : {}),
           },
         });
       }

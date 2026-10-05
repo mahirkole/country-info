@@ -39,6 +39,40 @@ describe('rule engine', () => {
   });
 });
 
+describe('rule engine: substitute days, conditions, half-day hours', () => {
+  const rule = (r: Partial<HolidayRule> & Pick<HolidayRule, 'id' | 'when'>): HolidayRule => ({ names: { en: r.id }, type: 'public', source: src, ...r });
+  const file = (rules: HolidayRule[]): HolidayFile => ({ country: 'XX', authority: 'a', default_language: 'en', rules });
+
+  it('moves a weekend holiday to an observed day without changing its date', () => {
+    const ny = rule({ id: 'ny', when: { fixed: { month: 1, day: 1 } }, substitute: { sat: 'next_monday', sun: 'next_monday' } });
+    // 2022-01-01 Sat, 2023-01-01 Sun, 2024-01-01 Mon, 2026-01-01 Thu
+    expect([2022, 2023, 2024, 2026].map((y) => datesFor(ny, y)[0])).toEqual([
+      { date: '2022-01-01', observed: '2022-01-03' }, { date: '2023-01-01', observed: '2023-01-02' }, { date: '2024-01-01' }, { date: '2026-01-01' },
+    ]);
+    const xmas = rule({ id: 'x', when: { fixed: { month: 12, day: 25 } }, substitute: { sat: 'previous_friday', sun: 'next_monday' } });
+    // 2021-12-25 Sat -> Fri 24; 2022-12-25 Sun -> Mon 26
+    expect([2021, 2022].map((y) => datesFor(xmas, y)[0]!.observed)).toEqual(['2021-12-24', '2022-12-26']);
+    expect(datesFor(rule({ id: 'sat-only', when: { fixed: { month: 12, day: 25 } }, substitute: { sat: 'next_monday' } }), 2022)[0]).toEqual({ date: '2022-12-25' }); // Sunday not covered
+    const [h] = compileHolidays(file([ny]), 2022, 2022);
+    expect(h).toMatchObject({ id: 'hol:XX:2022-01-01:ny', data: { date: '2022-01-01', observed: '2022-01-03' } });
+    expect(compileHolidays(file([ny]), 2024, 2024)[0]!.data).not.toHaveProperty('observed');
+  });
+
+  it("evaluates a conditional rule (Ireland's St Brigid's Day: 1 Feb if a Friday, else the first Monday of February)", () => {
+    const brigid = rule({ id: 'brigid', when: { if_weekday: { when: { fixed: { month: 2, day: 1 } }, weekday: 5, then: { fixed: { month: 2, day: 1 } }, else: { nth_weekday: { month: 2, weekday: 1, n: 1 } } } }, from_year: 2023 });
+    // 2023-02-01 Wed -> Mon 6 Feb; 2025-02-01 Sat -> Mon 3 Feb; 2030-02-01 Fri -> 1 Feb; 2022 is before from_year
+    expect([2023, 2025, 2030].map((y) => datesFor(brigid, y)[0]!.date)).toEqual(['2023-02-06', '2025-02-03', '2030-02-01']);
+    expect(datesFor(brigid, 2022)).toEqual([]);
+  });
+
+  it('carries half-day hours and rejects malformed or misplaced ones', () => {
+    const eve = rule({ id: 'eve', type: 'half_day', when: { fixed: { month: 12, day: 24 } }, hours: { to: '12:00' } });
+    expect(compileHolidays(file([eve]), 2026, 2026)[0]!.data).toMatchObject({ type: 'half_day', hours: { to: '12:00' } });
+    expect(() => compileHolidays(file([{ ...eve, hours: { to: '25:00' } }]), 2026, 2026)).toThrow(/HH:MM/);
+    expect(() => compileHolidays(file([{ ...eve, type: 'public' }]), 2026, 2026)).toThrow(/half_day/);
+  });
+});
+
 describe('TR data file', () => {
   it('compiles 2026 with expected dates, half days and provenance', async () => {
     const tr = (await loadHolidayFiles()).find((f) => f.country === 'TR')!;
