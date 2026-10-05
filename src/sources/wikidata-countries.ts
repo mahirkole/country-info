@@ -37,6 +37,10 @@ export const WD_COUNTRIES: WdCountry[] = [
     ],
   },
   {
+    cc: 'BG', country: 'Q219', langs: ['bg'],
+    levels: [{ key: 'obshtina', classes: ['Q1906268'], level: 1, type: 'municipality', typeLocal: 'община', expected: [265, 265] }],
+  },
+  {
     // Districts are not loaded: no official count that Wikidata (798) can be checked against without the closed LGD list.
     cc: 'IN', country: 'Q668', langs: ['en'],
     levels: [{ key: 'state / union territory', classes: ['Q12443800', 'Q467745'], level: 1, type: 'state', typeLocal: 'state / union territory', expected: [36, 36] }],
