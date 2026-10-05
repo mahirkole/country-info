@@ -162,7 +162,9 @@ async function main() {
     case 'enrich-cldr': {
       // enrich-cldr: localized country names and current currencies from Unicode CLDR (Unicode License v3).
       await migrate(pool);
-      console.log(await enrichCldr(pool, config.cacheDir));
+      const r = await enrichCldr(pool, config.cacheDir);
+      console.log(r);
+      if (r.newer_release) console.warn(`CLDR ${r.newer_release} is out; data is pinned to ${r.pinned} (raise CLDR_VERSION after reading the release notes).`);
       break;
     }
     case 'export':

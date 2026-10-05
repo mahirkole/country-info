@@ -15,7 +15,7 @@ const sel: Param[] = [
   { name: 'scopes', description: 'Comma-separated scope ids from /v1/scopes (default: default)' },
   { name: 'mode', description: 'union (default): all data; intersect: only fields every requested country has' },
   { name: 'locale', description: 'CLDR locale for the datetime/numbers patterns (default: the country\'s primary locale)' },
-  { name: 'level', description: 'divisions scope: 1 or 2 to list that level' }, { name: 'year', description: 'holidays scope: year' }, { name: 'region', description: 'holidays scope: region id' },
+  { name: 'level', description: 'divisions scope: 1 or 2 to list that level' }, { name: 'limit', description: 'divisions/cities scope: max items per country' }, { name: 'year', description: 'holidays scope: year' }, { name: 'region', description: 'holidays scope: region id' },
   { name: 'profile', description: 'Name of a saved scope profile (own, or the key\'s default); explicit parameters override it' },
 ];
 

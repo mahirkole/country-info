@@ -2,7 +2,21 @@ import type pg from 'pg';
 import { fetchText } from './fetch.js';
 import { enrichCldrAttributes } from './cldr-attrs.js';
 
-export const CLDR_BASE = 'https://raw.githubusercontent.com/unicode-org/cldr-json/main/cldr-json';
+/** CLDR release the data is read from (cldr-json tag). Pinned so a new release never changes the data silently; raise it (or set CLDR_VERSION) after reading the release notes. */
+export const CLDR_VERSION = process.env.CLDR_VERSION || '48.2.0';
+export const CLDR_BASE = `https://raw.githubusercontent.com/unicode-org/cldr-json/${CLDR_VERSION}/cldr-json`;
+const CLDR_MAIN = 'https://raw.githubusercontent.com/unicode-org/cldr-json/main/cldr-json';
+/** Release number on cldr-json's default branch (`48.2` style), or null when it cannot be read; compared with the pinned one to report a newer release. */
+export async function cldrLatest(cacheDir: string): Promise<string | null> {
+  try {
+    const v = (JSON.parse(await fetchText(`${CLDR_MAIN}/cldr-core/supplemental/weekData.json`, 'cldr_main_week.json', cacheDir)) as { supplemental?: { version?: { _cldrVersion?: string } } }).supplemental?.version?._cldrVersion;
+    return v ?? null;
+  } catch {
+    return null;
+  }
+}
+/** True when `latest` (e.g. `49`) is a higher major release than the pinned tag. */
+export const newerThanPinned = (latest: string | null, pinned = CLDR_VERSION): boolean => !!latest && parseInt(latest, 10) > parseInt(pinned, 10);
 export const CLDR_LANGS = ['en', 'tr', 'de', 'fr', 'es', 'it', 'pt', 'ru', 'ar', 'zh', 'ja', 'ko', 'nl', 'pl', 'sv', 'da', 'fi', 'nb', 'cs', 'el', 'hu', 'ro', 'uk', 'he', 'fa', 'hi', 'id', 'th', 'vi'];
 
 export const CLDR_SOURCE = {
@@ -50,7 +64,7 @@ export function parseUnMembers(json: unknown): Set<string> {
 }
 
 /** Write localized country names (`entity_names`, source cldr) and the current currency (`entity_xrefs` scheme `currency`) and the UN status (scheme `un_status`: `member` or `other`) for country entities. */
-export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_LANGS): Promise<{ names: number; currencies: number; un_members: number; attributes: number; locales: number }> {
+export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_LANGS): Promise<{ names: number; currencies: number; un_members: number; attributes: number; locales: number; pinned: string; newer_release: string | null }> {
   const get = async (path: string, name: string) => JSON.parse(await fetchText(`${CLDR_BASE}/${path}`, name, cacheDir)) as unknown;
   const names = new Map<string, Map<string, string>>();
   for (const l of langs) names.set(l, parseTerritories(await get(`cldr-localenames-full/main/${l}/territories.json`, `cldr_terr_${l}.json`), l));
@@ -95,5 +109,6 @@ export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_L
     client.release();
   }
   const attrs = await enrichCldrAttributes(pool, cacheDir, currencies, langs);
-  return { names: n, currencies: c, un_members: um, attributes: attrs.attributes, locales: attrs.locales };
+  const latest = await cldrLatest(cacheDir);
+  return { names: n, currencies: c, un_members: um, attributes: attrs.attributes, locales: attrs.locales, pinned: CLDR_VERSION, newer_release: newerThanPinned(latest) ? latest : null };
 }

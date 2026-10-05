@@ -1,9 +1,16 @@
 import { describe, expect, it } from 'vitest';
+import { CLDR_BASE, newerThanPinned } from '../src/sources/cldr.js';
 import { parseCalendars, parseFractions, parseLikely, parseLocaleFormats, parseMeasurement, parseTime, parseUnits, parseWeek } from '../src/sources/cldr-attrs.js';
 
 const S = (k: string, v: unknown) => ({ supplemental: { version: { _cldrVersion: '48' }, [k]: v } });
 
 describe('cldr attributes', () => {
+  it('reads a pinned release tag, never the moving branch, and reports a newer major release', () => {
+    expect(CLDR_BASE).toMatch(/cldr-json\/\d+\.\d+\.\d+\/cldr-json$/);
+    expect(newerThanPinned('49', '48.2.0')).toBe(true);
+    expect(newerThanPinned('48', '48.2.0')).toBe(false);
+    expect(newerThanPinned(null)).toBe(false);
+  });
   it('week falls back to the world default', () => {
     const w = parseWeek(S('weekData', { minDays: { '001': '1', DE: '4' }, firstDay: { '001': 'mon', US: 'sun' }, weekendStart: { '001': 'sat', AF: 'thu' }, weekendEnd: { '001': 'sun', AF: 'fri' } }));
     expect(w('DE')).toEqual({ first_day: 'mon', weekend_start: 'sat', weekend_end: 'sun', min_days: 4 });

@@ -42,8 +42,15 @@ export const CATALOG: ScopeDef[] = [
     ],
   },
   {
-    id: 'divisions', title: 'Administrative divisions', description: 'Levels present and the list of first/second-level units (`level` option).', applies_to: ['country', 'admin1', 'admin2'], default: false, availability: { country: 'full', admin1: 'full', admin2: 'partial', locality: 'none' },
+    id: 'divisions', title: 'Administrative divisions', description: 'Levels present and the list of first/second-level units (`level` option).', applies_to: ['country', 'admin1', 'admin2'], default: false, availability: { country: 'full', admin1: 'full', admin2: 'partial' },
     fields: [f('levels', 'object', 'Number of units per level (admin1, admin2)', 'entities'), f('units', 'array', 'Units of the requested level (id, code, name, type)', 'entities')],
+  },
+  {
+    id: 'cities', title: 'Cities', description: 'Cities with at least 15,000 inhabitants (GeoNames, community data), largest first, and the time zones they lie in.', applies_to: ['locality'], default: false, availability: { locality: 'partial' },
+    fields: [
+      f('count', 'number', 'Number of cities in the data set for the country', 'geonames'), f('timezones', 'array', 'IANA time zones of those cities (a country may have more zones than cities ≥15,000 reveal)', 'geonames'),
+      f('items', 'array', 'Cities: id, name, population, lat, lon, timezone, admin1_code, feature_code (`limit`, default 100)', 'geonames'),
+    ],
   },
   {
     id: 'holidays', title: 'Public holidays', description: 'Holidays of a year (`year`, optional `region`).', applies_to: ['country', 'admin1'], default: false, availability: { country: 'partial', admin1: 'partial', locality: 'none' },

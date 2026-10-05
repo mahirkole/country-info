@@ -90,7 +90,12 @@ let coverageCache: { at: number; value: unknown } | null = null;
 export async function globalSchema(pool: pg.Pool, now = Date.now()): Promise<unknown> {
   if (coverageCache && now - coverageCache.at < 600_000) return coverageCache.value;
   const all = (await pool.query(`SELECT code FROM entities WHERE kind = 'country' ORDER BY code`)).rows.map((r) => r.code as string);
-  const cheap = CATALOG.filter((s) => !['divisions', 'holidays'].includes(s.id)).map((s) => s.id);
+  const AGG: Record<string, string> = {
+    divisions: `SELECT count(DISTINCT country_code)::int AS n FROM entities WHERE kind IN ('admin1','admin2')`,
+    cities: `SELECT count(DISTINCT country_code)::int AS n FROM entities WHERE kind = 'city'`,
+    holidays: `SELECT count(DISTINCT country_code)::int AS n FROM entities WHERE kind = 'holiday'`,
+  };
+  const cheap = CATALOG.filter((s) => !(s.id in AGG)).map((s) => s.id);
   const resolved = await resolveScopes(pool, all, cheap);
   const src = await sourceInfo(pool);
   const doc = (await catalogDocument(pool)) as { scopes: Record<string, any> };
@@ -101,7 +106,7 @@ export async function globalSchema(pool: pg.Pool, now = Date.now()): Promise<unk
       const all_ = s.fields.map((fd) => { const p = kept.find((k) => k.path === fd.path); return p ?? { ...fd, present_in: [] as string[], coverage: 0 }; });
       scopes[s.id] = { ...doc.scopes[s.id], 'x-countries-with-data': known.filter((c) => Object.values(resolved.data[c]![s.id] ?? {}).length).length, properties: toProperties(all_, src) };
     } else {
-      const n = (await pool.query(s.id === 'divisions' ? `SELECT count(DISTINCT country_code)::int AS n FROM entities WHERE kind IN ('admin1','admin2')` : `SELECT count(DISTINCT country_code)::int AS n FROM entities WHERE kind = 'holiday'`)).rows[0].n;
+      const n = (await pool.query(AGG[s.id]!)).rows[0].n;
       scopes[s.id] = { ...doc.scopes[s.id], 'x-countries-with-data': n };
     }
   }

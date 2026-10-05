@@ -60,6 +60,13 @@ export const RESOLVERS: Record<string, Resolver> = {
     }
     return out;
   },
+  cities: async (c, cc) => {
+    const limit = Math.min(c.opts.limit ?? 100, 1000);
+    const total = (await c.pool.query(`SELECT count(*)::int AS n, array_agg(DISTINCT data->>'timezone') FILTER (WHERE data->>'timezone' IS NOT NULL) AS tz FROM entities WHERE country_code = $1 AND kind = 'city'`, [cc])).rows[0];
+    if (!total.n) return null;
+    const items = (await c.pool.query(`SELECT id, name, lat, lon, (data->>'population')::bigint AS population, data->>'timezone' AS timezone, data->>'admin1_code' AS admin1_code, data->>'feature_code' AS feature_code FROM entities WHERE country_code = $1 AND kind = 'city' ORDER BY (data->>'population')::bigint DESC NULLS LAST, id LIMIT $2`, [cc, limit])).rows;
+    return { count: total.n, timezones: (total.tz ?? []).sort(), items };
+  },
   holidays: async (c, cc) => {
     const year = c.opts.year ?? new Date().getUTCFullYear();
     const items = (

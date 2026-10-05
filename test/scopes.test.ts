@@ -106,6 +106,21 @@ describe.skipIf(!url)('scopes, metadata and profiles', () => {
     expect(x.omitted[0].reason).toMatch(/xx/);
   });
 
+  it('cities scope: largest first, limit, time zones; countries without cities get null', async () => {
+    const city = (id: string, name: string, pop: number, tz: string) => pool.query(`INSERT INTO entities (id, kind, country_code, code, name, data, content_hash, updated_seq, source_id) VALUES ($1, 'city', 'TR', $1, $2, $3, 'h', 0, 'geonames')`, [id, name, JSON.stringify({ population: pop, timezone: tz, admin1_code: '34' })]);
+    await city('gn:1', 'Istanbul', 15000000, 'Europe/Istanbul');
+    await city('gn:2', 'Ankara', 3500000, 'Europe/Istanbul');
+    await city('gn:3', 'Edirne', 170000, 'Europe/Athens');
+    const r = (await get('/v1/profile?countries=TR,DE&scopes=cities&limit=2')).json();
+    expect(r.data.TR.cities).toMatchObject({ count: 3, timezones: ['Europe/Athens', 'Europe/Istanbul'] });
+    expect(r.data.TR.cities.items.map((c: { name: string }) => c.name)).toEqual(['Istanbul', 'Ankara']);
+    expect(r.data.DE.cities).toBeNull();
+    const i = (await get('/v1/profile?countries=TR,DE&scopes=cities&mode=intersect')).json();
+    expect(i.data.TR.cities).toBeNull(); // DE has none → nothing in common
+    resetSchemaCache();
+    expect((await get('/v1/schema')).json().scopes.cities['x-countries-with-data']).toBe(1);
+  });
+
   it('global metadata carries coverage', async () => {
     const g = (await get('/v1/schema')).json();
     expect(g.countries_total).toBe(3);

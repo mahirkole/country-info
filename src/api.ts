@@ -532,9 +532,9 @@ ${entries}
   // requested country has, `union` (default) everything. A named profile (own, per API key) stores such a selection.
   const MAX_PROFILE_COUNTRIES = 50;
   const csv = (v?: string): string[] => (v ? v.split(',').map((x) => x.trim()).filter(Boolean) : []);
-  type SelQuery = { countries?: string; scopes?: string; mode?: string; locale?: string; level?: string; year?: string; region?: string; profile?: string };
+  type SelQuery = { limit?: string; countries?: string; scopes?: string; mode?: string; locale?: string; level?: string; year?: string; region?: string; profile?: string };
   /** Selection from the query, completed by the named profile (explicit query parameters win), or an error message. */
-  const selection = async (q: SelQuery, w: ReturnType<typeof who>, keyId: string | undefined, pathCountry?: string): Promise<{ countries: string[]; scopes: string[]; mode: Mode; locale?: string; level?: 1 | 2; year?: number; region?: string } | { error: string }> => {
+  const selection = async (q: SelQuery, w: ReturnType<typeof who>, keyId: string | undefined, pathCountry?: string): Promise<{ countries: string[]; scopes: string[]; mode: Mode; locale?: string; level?: 1 | 2; year?: number; region?: string; limit?: number } | { error: string }> => {
     let prof: { scopes: string[]; countries: string[] | null; mode: Mode; locale: string | null } | undefined;
     const name = q.profile ?? (keyId?.startsWith('dbkey:') ? (await pool.query('SELECT default_profile FROM api_keys WHERE id = $1', [keyId.slice(6)])).rows[0]?.default_profile : undefined);
     if (name) {
@@ -553,9 +553,9 @@ ${entries}
     if (q.level && q.level !== '1' && q.level !== '2') return { error: 'level must be 1 or 2' };
     const year = q.year ? Number(q.year) : undefined;
     if (year !== undefined && (!Number.isInteger(year) || year < 1900 || year > 2200)) return { error: 'invalid year' };
-    return { countries, scopes, mode, locale: q.locale ?? prof?.locale ?? undefined, level: q.level ? (Number(q.level) as 1 | 2) : undefined, year, region: q.region };
+    return { countries, scopes, mode, locale: q.locale ?? prof?.locale ?? undefined, level: q.level ? (Number(q.level) as 1 | 2) : undefined, year, region: q.region, limit: q.limit && /^\d+$/.test(q.limit) ? Number(q.limit) : undefined };
   };
-  const optsOf = (s: { locale?: string; level?: 1 | 2; year?: number; region?: string }) => ({ locale: s.locale, level: s.level, year: s.year, region: s.region });
+  const optsOf = (s: { locale?: string; level?: 1 | 2; year?: number; region?: string; limit?: number }) => ({ locale: s.locale, level: s.level, year: s.year, region: s.region, limit: s.limit });
 
   app.get('/v1/scopes', async () => ({ schema_version: SCHEMA_VERSION, default_scopes: DEFAULT_SCOPES, data: CATALOG.map((s) => ({ id: s.id, title: s.title, description: s.description, applies_to: s.applies_to, default: s.default, availability: s.availability, fields: s.fields.map((f) => f.path) })) }));
   app.get<{ Params: { id: string } }>('/v1/scopes/:id', async (req, reply) => {
