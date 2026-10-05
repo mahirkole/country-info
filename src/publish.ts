@@ -119,16 +119,49 @@ export async function rollback(store: ObjectStore, profile: Profile, toSnapshot:
   return retracted;
 }
 
-/** What a customer sees: the latest full bundle and the recent delta files, with short-lived download links. */
-export async function exportLinks(store: ObjectStore, profile: Profile, ttlSec = 900, recent = 30) {
+export interface LinkOptions {
+  ttlSec?: number;
+  /** How many recent snapshots to list. */
+  recent?: number;
+  /** Countries the key is licensed for; null = all (and the global files). */
+  allowed?: string[] | null;
+  /** Countries asked for (`?country=`); limited to `allowed` when that is set. */
+  countries?: string[];
+}
+
+/**
+ * What a customer sees: the latest full bundle and recent delta files with short-lived download links. A key licensed for
+ * all countries gets the global files; a key restricted to some countries (or a request naming countries) gets the
+ * `by_country` file sets instead, so the response stays small and nothing outside the license is linked.
+ */
+export async function exportLinks(store: ObjectStore, profile: Profile, o: LinkOptions = {}) {
+  const [ttlSec, recent] = [o.ttlSec ?? 900, o.recent ?? 30];
   const m = await readManifest(store, `${profile}/manifest.json`);
   if (!m) return null;
   const latest = m.snapshots.find((s) => s.snapshot_id === m.latest);
   if (!latest) return null;
   const link = async (path: string, f: { sha256: string; bytes: number }) => ({ url: await store.presign(`${profile}/${path}`, ttlSec), sha256: f.sha256, bytes: f.bytes });
+
+  const asked = o.countries?.map((c) => c.toUpperCase());
+  const selection = o.allowed ? (asked ? asked.filter((c) => o.allowed!.includes(c)) : o.allowed) : asked;
+  const global = !selection; // no restriction and no request for specific countries
   const files: Record<string, unknown> = {};
-  for (const [name, f] of Object.entries(latest.files)) files[name] = await link(f.path, f);
+  if (global) for (const [name, f] of Object.entries(latest.files)) if (!name.startsWith('by-country/')) files[name] = await link(f.path, f);
+  const by_country: Record<string, { files: Record<string, unknown>; deltas: unknown[] }> = {};
+  for (const cc of selection ?? []) {
+    const own: Record<string, unknown> = {};
+    for (const [name, f] of Object.entries(latest.files)) if (name.startsWith(`by-country/${cc}/`)) own[name.split('/').pop()!] = await link(f.path, f);
+    const deltas = [];
+    for (const s of m.snapshots.slice(-recent)) {
+      const d = s.files[`by-country/${cc}/delta.ndjson`];
+      if (d) deltas.push({ snapshot_id: s.snapshot_id, from_seq: s.from_seq, to_seq: s.to_seq, delta: await link(d.path, d) });
+    }
+    by_country[cc] = { files: own, deltas };
+  }
   const snapshots = [];
-  for (const s of m.snapshots.slice(-recent)) snapshots.push({ snapshot_id: s.snapshot_id, from_seq: s.from_seq, to_seq: s.to_seq, created_at: s.created_at, delta_only: !!s.delta_only, delta: await link(s.files['delta.ndjson']!.path, s.files['delta.ndjson']!) });
-  return { profile, snapshot_id: latest.snapshot_id, from_seq: latest.from_seq, to_seq: latest.to_seq, created_at: latest.created_at, expires_in_seconds: ttlSec, files, snapshots, retracted: m.retracted ?? [] };
+  for (const s of m.snapshots.slice(-recent)) {
+    const d = s.files['delta.ndjson']!;
+    snapshots.push({ snapshot_id: s.snapshot_id, from_seq: s.from_seq, to_seq: s.to_seq, created_at: s.created_at, delta_only: !!s.delta_only, ...(global ? { delta: await link(d.path, d) } : {}) });
+  }
+  return { profile, snapshot_id: latest.snapshot_id, from_seq: latest.from_seq, to_seq: latest.to_seq, created_at: latest.created_at, expires_in_seconds: ttlSec, files, by_country, snapshots, retracted: m.retracted ?? [] };
 }

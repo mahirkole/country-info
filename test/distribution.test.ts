@@ -339,6 +339,47 @@ d('distribution', () => {
       await expect(rollback(store, 'commercial', 999)).rejects.toThrow(/not a published full snapshot/);
     });
 
+    it('serves per-country file sets to keys licensed for some countries only', async () => {
+      const store = new FsStore(join(work, 'store3'), 'https://api.test', 'secret');
+      const wd = join(work, 'work3');
+      await setVerdict('geonames', 'green');
+      const both = (n: number) => [...divs('g', 'DE', n), ...divs('g', 'FR', n)];
+      await ingest(pool, GREEN, both(3), { kinds: ['division'], countries: ['DE', 'FR'] });
+      await setVerdict('src-green', 'green');
+      await publish(pool, store, wd, { profiles: ['commercial'] });
+      const fr = await ingest(pool, GREEN, [...divs('g', 'DE', 3), ...divs('g', 'FR', 5)], { kinds: ['division'], countries: ['DE', 'FR'] }); // only FR changes
+      await publish(pool, store, wd, { profiles: ['commercial'] });
+
+      const app = await buildApp(pool, { adminToken: 'tok', exportDir: await mkdtemp(join(tmpdir(), 'ci-')), requireApiKey: true, store });
+      const mk = async (payload: object) => (await app.inject({ method: 'POST', url: '/v1/api-keys', headers: { authorization: 'Bearer tok' }, payload })).json() as { key: string; export_countries: string[] | null };
+      expect((await app.inject({ method: 'POST', url: '/v1/api-keys', headers: { authorization: 'Bearer tok' }, payload: { name: 'bad', export_countries: ['Germany'] } })).statusCode).toBe(400);
+      const de = await mk({ name: 'de-only', export_countries: ['de'] });
+      expect(de.export_countries).toEqual(['DE']);
+      const get = async (key: string, q = '') => (await app.inject({ url: `/v1/exports/latest${q}`, headers: { 'x-api-key': key } })).json() as { files: Record<string, unknown>; by_country: Record<string, { files: Record<string, { url: string; sha256: string }>; deltas: { snapshot_id: number }[] }>; snapshots: { delta?: unknown }[] };
+
+      const r = await get(de.key);
+      expect(r.files).toEqual({}); // restricted key: no global files
+      expect(Object.keys(r.by_country)).toEqual(['DE']);
+      expect(Object.keys(r.by_country.DE!.files).sort()).toEqual(['country.json', 'holidays.ndjson', 'regions.ndjson']);
+      expect(r.snapshots.every((x) => x.delta === undefined)).toBe(true);
+      expect(r.by_country.DE!.deltas.map((x) => x.snapshot_id)).not.toContain(fr.snapshotId); // nothing changed in DE in that snapshot
+      const dl = await app.inject({ url: new URL(r.by_country.DE!.files['regions.ndjson']!.url).pathname + new URL(r.by_country.DE!.files['regions.ndjson']!.url).search });
+      const lines = dl.body.trim().split('\n').map((l) => JSON.parse(l));
+      expect(lines).toHaveLength(3);
+      expect(new Set(lines.map((l) => l.country_code))).toEqual(new Set(['DE']));
+      expect(Object.keys((await get(de.key, '?country=FR')).by_country)).toEqual([]); // outside the license
+      expect(Object.keys((await get(de.key, '?country=de,fr')).by_country)).toEqual(['DE']);
+
+      const all = await mk({ name: 'all' });
+      const g = await get(all.key);
+      expect(Object.keys(g.files)).toContain('regions.ndjson');
+      expect(g.by_country).toEqual({}); // no country selection: global files only
+      const f = await get(all.key, '?country=FR');
+      expect(f.files).toEqual({});
+      expect(f.by_country.FR!.deltas.map((x) => x.snapshot_id)).toContain(fr.snapshotId); // FR changed in that snapshot
+      await app.close();
+    });
+
     it('keeps a source out of the commercial profile while its license page change is unreviewed', async () => {
       const store = new FsStore(join(work, 'store2'), 'https://api.test', 'secret');
       await ingest(pool, GREEN, divs('g', 'DE', 4), { kinds: ['division'], countries: ['DE'] });

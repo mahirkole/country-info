@@ -334,19 +334,21 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   });
 
   // ---- API keys (admin) ------------------------------------------------
-  app.post<{ Body: { name?: string; rate_per_min?: number; export_profile?: string } }>('/v1/api-keys', { preHandler: requireAdmin }, async (req, reply) => {
+  app.post<{ Body: { name?: string; rate_per_min?: number; export_profile?: string; export_countries?: string[] } }>('/v1/api-keys', { preHandler: requireAdmin }, async (req, reply) => {
     const name = req.body?.name?.trim();
     if (!name) return reply.code(400).send({ error: 'name is required' });
     const rate = req.body.rate_per_min;
     if (rate !== undefined && (!Number.isInteger(rate) || rate < 0)) return reply.code(400).send({ error: 'rate_per_min must be a non-negative integer (0 = unlimited)' });
     const profile = req.body.export_profile ?? 'commercial';
     if (!PROFILES.includes(profile as Profile)) return reply.code(400).send({ error: `export_profile must be one of ${PROFILES.join(', ')}` });
+    const ec = req.body.export_countries?.map((c) => String(c).toUpperCase()) ?? null;
+    if (ec && (ec.length === 0 || ec.some((c) => !/^[A-Z]{2}$/.test(c)))) return reply.code(400).send({ error: 'export_countries must be a non-empty list of ISO alpha-2 codes' });
     const key = `ci_${randomBytes(24).toString('hex')}`;
-    const row = (await pool.query('INSERT INTO api_keys (name, key_hash, rate_per_min, export_profile) VALUES ($1, $2, $3, $4) RETURNING id, name, rate_per_min, export_profile, created_at', [name, sha(key), rate ?? null, profile])).rows[0];
+    const row = (await pool.query('INSERT INTO api_keys (name, key_hash, rate_per_min, export_profile, export_countries) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, rate_per_min, export_profile, export_countries, created_at', [name, sha(key), rate ?? null, profile, ec])).rows[0];
     return reply.code(201).send({ ...row, id: Number(row.id), key }); // the key is shown only here
   });
   app.get('/v1/api-keys', { preHandler: requireAdmin }, async () => ({
-    data: (await pool.query('SELECT id, name, rate_per_min, export_profile, active, created_at, last_used_at FROM api_keys ORDER BY id')).rows,
+    data: (await pool.query('SELECT id, name, rate_per_min, export_profile, export_countries, active, created_at, last_used_at FROM api_keys ORDER BY id')).rows,
   }));
   app.get<{ Querystring: { from?: string; to?: string } }>('/v1/api-keys/usage', { preHandler: requireAdmin }, async (req) => {
     await flushUsage();
@@ -491,13 +493,17 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   // ---- published file bundles ------------------------------------------
   const store = opts.store === undefined ? createStore() : opts.store;
   /** Latest bundle of the caller's profile (a database key's `export_profile`; env keys and admin get `commercial`, admin may ask `?profile=full`). */
-  app.get<{ Querystring: { profile?: string } }>('/v1/exports/latest', async (req, reply) => {
+  app.get<{ Querystring: { profile?: string; country?: string } }>('/v1/exports/latest', async (req, reply) => {
     if (!store) return reply.code(503).send({ error: 'exports_not_configured' });
     const w = who(req);
     let profile: Profile = 'commercial';
-    if (req.apiKeyId?.startsWith('dbkey:') && !w?.admin) profile = ((await pool.query('SELECT export_profile FROM api_keys WHERE id = $1', [req.apiKeyId.slice(6)])).rows[0]?.export_profile ?? 'commercial') as Profile;
-    else if (w?.admin && req.query.profile && PROFILES.includes(req.query.profile as Profile)) profile = req.query.profile as Profile;
-    const links = await exportLinks(store, profile);
+    let allowed: string[] | null = null;
+    if (req.apiKeyId?.startsWith('dbkey:') && !w?.admin) {
+      const k = (await pool.query('SELECT export_profile, export_countries FROM api_keys WHERE id = $1', [req.apiKeyId.slice(6)])).rows[0];
+      profile = (k?.export_profile ?? 'commercial') as Profile;
+      allowed = k?.export_countries ?? null;
+    } else if (w?.admin && req.query.profile && PROFILES.includes(req.query.profile as Profile)) profile = req.query.profile as Profile;
+    const links = await exportLinks(store, profile, { allowed, countries: req.query.country?.split(',').map((c) => c.trim()).filter(Boolean) });
     return links ?? reply.code(404).send({ error: 'nothing_published' });
   });
   // Signed, expiring downloads of the fs store (no API key: the signature is the credential). S3 stores presign their own URLs.

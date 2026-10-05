@@ -41,7 +41,7 @@ export const OPERATIONS: Op[] = [
   { method: 'post', path: '/v1/webhooks/{id}/test', tag: 'webhooks', summary: 'Queue a webhook.test event to check the endpoint and signature' },
   { method: 'get', path: '/v1/releases', tag: 'releases', summary: 'Release notes of applied updates (customer-visible sources only), newest first', query: [{ name: 'limit', description: 'Page size' }, { name: 'before', description: 'Cursor: id of the last item of the previous page' }] },
   { method: 'get', path: '/v1/releases/{id}', tag: 'releases', summary: 'One release note (Markdown body, totals, countries)' },
-  { method: 'get', path: '/v1/exports/latest', tag: 'exports', summary: 'Latest file bundle for your key profile: manifest entry and short-lived signed download links' },
+  { method: 'get', path: '/v1/exports/latest', tag: 'exports', summary: 'Latest file bundle for your key profile with short-lived signed download links. Keys licensed for all countries get the global files; restricted keys (or ?country=DE,FR) get per-country file sets under by_country', query: [{ name: 'country', description: 'Comma-separated ISO alpha-2 codes; limited to the countries of your key' }] },
   { method: 'post', path: '/v1/release-subscribers', tag: 'admin', summary: 'Subscribe an e-mail address to release digests (instant or weekly)', admin: true },
   { method: 'get', path: '/v1/release-subscribers', tag: 'admin', summary: 'List release-digest subscribers', admin: true },
   { method: 'delete', path: '/v1/release-subscribers/{id}', tag: 'admin', summary: 'Remove a release-digest subscriber', admin: true },

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile, appendFile, cp, rm } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, appendFile, cp, rm, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import type pg from 'pg';
 
@@ -27,6 +27,16 @@ export interface Manifest {
   snapshots: ManifestEntry[];
   /** Snapshot ids withdrawn by a rollback; a publish run does not export them again. */
   retracted?: number[];
+}
+
+/** Append rows to `<dir>/by-country/<CC>/<file>` (one file set per country, for customers licensed for a few countries). */
+async function appendByCountry(dir: string, file: string, rows: { country_code: string | null }[]): Promise<void> {
+  const groups = new Map<string, string>();
+  for (const r of rows) if (r.country_code) groups.set(r.country_code, (groups.get(r.country_code) ?? '') + JSON.stringify(r) + '\n');
+  for (const [cc, text] of groups) {
+    await mkdir(join(dir, 'by-country', cc), { recursive: true });
+    await appendFile(join(dir, 'by-country', cc, file), text);
+  }
 }
 
 async function sha256(path: string): Promise<{ sha256: string; bytes: number }> {
@@ -76,6 +86,13 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
   if (!opts.deltaOnly) {
     const countries = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'country' ${cleared} ORDER BY code`)).rows;
     await writeFile(join(dir, 'countries.json'), JSON.stringify(countries, null, 1));
+    for (const c of countries) {
+      await mkdir(join(dir, 'by-country', c.code), { recursive: true });
+      await writeFile(join(dir, 'by-country', c.code, 'country.json'), JSON.stringify(c, null, 1));
+      // Every country has the same file set (empty when it has no regions/holidays), so a client never has to guess.
+      await writeFile(join(dir, 'by-country', c.code, 'regions.ndjson'), '');
+      await writeFile(join(dir, 'by-country', c.code, 'holidays.ndjson'), '');
+    }
     const header = ['code', 'iso3', 'numeric', 'name', 'capital', 'continent', 'un_status', 'currency_code', 'phone_code', 'languages', 'tld', 'population', 'area_km2'];
     await writeFile(
       join(dir, 'countries.csv'),
@@ -88,6 +105,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
       const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind NOT IN ('country', 'holiday') ${cleared} AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
       if (rows.length === 0) break;
       await appendFile(join(dir, 'regions.ndjson'), rows.map((r) => JSON.stringify(r) + '\n').join(''));
+      await appendByCountry(dir, 'regions.ndjson', rows);
       after = rows[rows.length - 1].id;
     }
 
@@ -98,6 +116,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
       const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'holiday' ${cleared} AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
       if (rows.length === 0) break;
       await appendFile(join(dir, 'holidays.ndjson'), rows.map((r) => JSON.stringify(r) + '\n').join(''));
+      await appendByCountry(dir, 'holidays.ndjson', rows);
       await appendFile(hcsv, rows.map((r) => csvRow([r.data.date, r.country_code, r.data.rule_id, r.name, r.data.type, r.data.region, r.data.verification, r.data.source?.citation])).join(''));
       after = rows[rows.length - 1].id;
     }
@@ -113,6 +132,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
     ).rows;
     if (rows.length === 0) break;
     await appendFile(join(dir, 'delta.ndjson'), rows.map((r) => JSON.stringify(r) + '\n').join(''));
+    await appendByCountry(dir, 'delta.ndjson', rows);
     after = Number(rows[rows.length - 1].seq);
   }
 
@@ -126,6 +146,10 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
   const files: ManifestEntry['files'] = {};
   for (const f of opts.deltaOnly ? ['ATTRIBUTION.md', 'delta.ndjson'] : ['countries.json', 'countries.csv', 'regions.ndjson', 'holidays.ndjson', 'holidays.csv', 'ATTRIBUTION.md', 'delta.ndjson']) {
     files[f] = { path: `snapshots/${snap.id}/${f}`, ...(await sha256(join(dir, f))) };
+  }
+  // Per-country files (only those that exist: a delta file only for countries with changes in this snapshot).
+  for (const cc of await readdir(join(dir, 'by-country')).catch(() => [] as string[])) {
+    for (const f of await readdir(join(dir, 'by-country', cc))) files[`by-country/${cc}/${f}`] = { path: `snapshots/${snap.id}/by-country/${cc}/${f}`, ...(await sha256(join(dir, 'by-country', cc, f))) };
   }
   const entry: ManifestEntry = { snapshot_id: Number(snap.id), from_seq: Number(snap.from_seq), to_seq: Number(snap.to_seq), created_at: new Date(snap.finished_at ?? Date.now()).toISOString(), files, ...(opts.deltaOnly ? { delta_only: true } : {}) };
 
