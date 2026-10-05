@@ -14,6 +14,9 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 | IT | ISTAT Elenco dei comuni italiani (**xlsx**, güncel; CSV bayat) | region, province/UTS, comune (+ NUTS 2024) | ✅ | **read** (CC BY 4.0) | **Yüklü: 8.024** (20 / 110 / 7.894; 21.02.2026 durumu, Sardinya yeniden yapılanması delta olarak yakalandı) |
 | JP | MIC/Soumu 全国地方公共団体コード (xlsx) | prefecture, municipality | ✅ | okunmadı | Sırada (xlsx ayrıştırıcı gerekir) |
 | PL | GUS Bank Danych Lokalnych API (`data/by-variable/72305` ile güncel birimler) | województwo, powiat, gmina | ✅ | **read** 🟢 (GUS BDL sayfası: CC BY 4.0) | **Yüklü: 2.875** (16 / 380 / 2.479). `/units` listesi 1995'ten beri tarihsel birimleri de içerir (2.692 gmina) — kullanılmaz. Anonim kota 100 çağrı/15 dk (≈45 çağrı/çalıştırma; 429'da bekler) |
+| LV | CSP ATVK 2021 (data.gov.lv CKAN, en yeni `ATVK_2021_<tarih>` CSV) | pašvaldība (42: 35 novads + 7 valstspilsēta), pilsēta/pagasts (586) | ✅ | **read** 🟢 (CSP politikası: CC BY 4.0; metaveri CC0) | **Yüklü: 628** (42 / 75 / 511) |
+| SI | SURS SiStat PxWeb 2640010S (`OBČINE` değişkeni) | občina (212; üst bölge yok) | ✅ | **read** 🟢 (SURS telif sayfası: ticari dahil serbest, atıf) | **Yüklü: 212** |
+| HU | KSH Helységnévtár xlsx (tarayıcı benzeri başlıklar gerekir) | vármegye (19), település (3.155), Budapeşte kerületleri (23) | ✅ | **read** 🟢 (KSH: CC BY 4.0) | **Yüklü: 3.197** (19+1 / 3.155 / 23; dosya 2025-01-01 durumunda) |
 | NL | CBS StatLine 86247NED "Gebieden in Nederland 2026" | landsdeel, provincie, gemeente | ✅ (Node istemcisi 406 alıyor, curl yedeği kullanılıyor) | partial (CBS web sitesi CC BY 4.0; OData tablosuna ayrı lisans metni bulunamadı) | **Yüklü: 358 birim** (4 / 12 / 342) |
 | NO | Kartverket kommuneinfo (api.kartverket.no) | fylke, kommune | ✅ | **read** (CC BY 4.0 veri seti kayıtları; API kaydı "Arkivert") | **Yüklü: 372** (15 / 357) |
 | SE | SCB PxWebApi v2 (yıllık tablo otomatik keşfedilir) | län, kommun | ✅ | **read** (CC0) | **Yüklü: 311** (21 / 290), `TAB6646` |
@@ -48,6 +51,18 @@ Motor: `src/sources/wikidata-divisions.ts`, ülke yapılandırması `src/sources
 | IN | state / union territory (28+8 = 36); ilçeler yüklenmez (Wikidata 798, doğrulayacak açık resmi sayı yok) | 36 |
 | BG | obshtina (265) | 265 |
 Yüklenmeyenler (2026-10-05 keşif: sınıf bulundu ama sayı resmiyle uymuyor / sınıf bulunamadı): SI (203≠212), SK (2.902 vs ≈2.927), GR (333 vs 332), HR (432 belediye + şehirler ayrı sınıf), RO (108), CY (43), MT (18 yerel konsey), LT (43 ilçe belediyesi, hepsi değil); EE, HU, IE, LU, LV, PL: sınıf bulunamadı. PL (voivodeship 16 ✓; powiat Wikidata'da 320+67 ≠ resmi 380; gmina sınıfı doğrulanmadı), KR (üst birimler 6 sınıfa dağılmış; 17'lik resmi yapı için sınıf eşlemesi gerekir), TR (il 81 ✓ ama GeoNames zaten kapsıyor; ilçe 1.052≠973).
+
+## AB27 LAU boşluğu — araştırma sonuçları (2026-10-05, alt-ajan raporları + üretici doğrulaması)
+- **Yüklendi:** LV, SI, HU (yukarıdaki tablo), PL.
+- **EE:** Statistikaamet EHAK sınıflandırması (78 belediye + 15 maakond, `klassifikaatorid.stat.ee` CSV) kullanılabilir ama yayıncı beyanı **CC BY-SA 4.0** (ShareAlike) → satış paketine uygunluğu hukuki karar; yüklenmedi.
+- **LU:** ACT "limites administratives" CSV (100 komün, `data.public.lu`) — yalnız portal meta verisi CC0, yayıncı sayfasında lisans metni bulunamadı → yüklenmedi.
+- **IE:** CSO PxStat (31 yerel yönetim, CC BY 4.0 yayıncı beyanı) ama resmi kısa kod/üst birim yok → yüklenmedi.
+- **CY:** CYSTAT LAU2 listesi 615 kayıt, 2024 reformu öncesi; lisans yalnız portal meta verisi → yüklenmedi.
+- **LT, MT:** konteynerden erişilemedi (Cloudflare/WAF) → doğrulanmadı.
+- **GR:** ELSTAT "Μητρώο Οικισμών" (xls/BIFF; 332 belediye + Agion Oros; Περιφέρειες > Περιφερειακές Ενότητες > Δήμοι tam hiyerarşi); ELSTAT yeniden kullanım politikası (PDF) ticari dahil serbest, kaynak belirtme şart. **Engel:** eski `.xls` (BIFF) — `readXlsx` yalnızca xlsx okur, xls okuyucu gerekir; indirme URL'si portlet kimlikli (sayfadan `documentID=583882` kazınmalı). Sıradaki aday.
+- **SK:** ŠÚ SR data.statistics.sk JSON-stat API, CC BY 4.0 (yayıncı sayfası); **engeller:** DATAcube 15 Eylül 2026'da kapatılmış (yeni STATdata uçları bulunamadı), resmî sayı (2.890) veriyle uzlaşmıyor (2.885 belediye + 39 şehir parçası + 4 askerî bölge) → yüklenmedi.
+- **HR:** MPUDT listesi (428 općina + 127 grad + Zagreb, 20 županija; "yeniden kullanım atıfla serbest") **resmî kod içermiyor**, dosya 2013 tarihli xls → yüklenmedi (sentetik kimlik istemiyoruz).
+- **RO:** insse.ro/data.gov.ro konteynerden erişilemedi → doğrulanmadı, `unread` kalır.
 
 ## Tasarım notları
 - GeoNames (`geonames`) hâlâ dünya geneli taban katman; ulusal kaynaklar `division` olarak **yanına** eklenir, GeoNames'i silmez. "Yalnızca resmi" mod için bkz. `docs/ROADMAP.md`.
