@@ -119,9 +119,13 @@
    "source": {
     "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
     "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
-    "checked_on": "2026-10-04"
+    "checked_on": "2026-10-05"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "substitute": {
+    "sat": "next_monday",
+    "sun": "next_monday"
+   }
   },
   {
    "id": "whit-sunday",
@@ -199,9 +203,13 @@
    "source": {
     "citation": "Likums 'Par svētku, atceres un atzīmējamām dienām', 1. pants",
     "url": "https://likumi.lv/ta/id/72608-svetku-atceres-un-atzimejamo-dienu-likums",
-    "checked_on": "2026-10-04"
+    "checked_on": "2026-10-05"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "substitute": {
+    "sat": "next_monday",
+    "sun": "next_monday"
+   }
   },
   {
    "id": "christmas-eve",

@@ -216,3 +216,15 @@ describe('EU holiday files (merged from official-source reading)', () => {
     expect(r).toBeDefined();
   });
 });
+
+describe('LV: 4 May and 18 November move to the next working day on a weekend', () => {
+  // The Latvian holidays act (likumi.lv/ta/id/72608, read 2026-10-05): "Ja svētku dienas — 4.maijs, ... un 18.novembris — iekrīt sestdienā vai svētdienā, nākamo darbdienu nosaka par brīvdienu."
+  it('emits data.observed only when the date is a Saturday or Sunday', async () => {
+    const lv = (await loadHolidayFiles()).find((f) => f.country === 'LV')!;
+    const rule = (id: string) => lv.rules.find((r) => r.id === id)!;
+    expect(datesFor(rule('proclamation-day'), 2023)).toEqual([expect.objectContaining({ date: '2023-11-18', observed: '2023-11-20' })]); // Saturday
+    expect(datesFor(rule('restoration-of-independence'), 2025)).toEqual([expect.objectContaining({ date: '2025-05-04', observed: '2025-05-05' })]); // Sunday
+    expect(datesFor(rule('restoration-of-independence'), 2026)[0]!.observed).toBeUndefined(); // Monday
+    expect(datesFor(rule('labour-day'), 2026)[0]!.observed).toBeUndefined(); // 1 May carries no such rule in the act's sentence
+  });
+});
