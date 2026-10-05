@@ -29,7 +29,8 @@ if [ "$(date -u +%d)" = "01" ] || [ -n "${FORCE_MONTHLY:-}" ]; then
   # Incremental; a failure here is reported but does not stop publishing.
   step enrich-wikidata npm run -s enrich:wikidata
   step enrich-cldr     npm run -s enrich:cldr
-  step link            npm run -s link  # skip all three with SKIP_STEPS="enrich-wikidata enrich-cldr link"
+  step enrich-attributes npm run -s enrich:attributes
+  step link            npm run -s link  # skip with SKIP_STEPS="enrich-wikidata enrich-cldr enrich-attributes link"
 fi
 step publish        npm run -s publish
 step digest         npm run -s digest

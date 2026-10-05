@@ -27,6 +27,7 @@
     "deliver": "tsx src/cli.ts deliver",
     "serve": "tsx src/cli.ts serve",
     "test": "vitest run",
+    "enrich:attributes": "tsx src/cli.ts enrich-attributes",
     "enrich:cldr": "tsx src/cli.ts enrich-cldr"
   },
   "engines": {

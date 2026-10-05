@@ -18,6 +18,7 @@ import { exportSnapshot } from './export.js';
 import { processDeliveries } from './webhooks.js';
 import { buildApp } from './api.js';
 import { CLDR_VERSION, checkCldrContract, enrichCldr } from './sources/cldr.js';
+import { checkExternalContract, enrichExternalAttributes } from './sources/attributes.js';
 import { join } from 'node:path';
 import { pruneArchive } from './sources/fetch.js';
 import { prune } from './prune.js';
@@ -112,13 +113,19 @@ async function main() {
         results.push(r);
         if (r.status === 'failed' || r.status === 'needs_review') bad++;
       }
-      if (flag('--dry-run') || (flag('--source') && (srcArg ?? '').split(',').includes('cldr'))) {
+      if (flag('--dry-run') || (flag('--source') && (srcArg ?? '').split(',').some((x) => ['cldr', 'iana-tz', 'libphonenumber', 'wikidata-driving'].includes(x)))) {
         // The enrichment sources have no refresh target; their contract (files reachable, layout as expected) is checked here.
         try {
           const c = await checkCldrContract(config.cacheDir);
           console.log(`contract     cldr                 ok ${c.version}, ${c.files} files (pinned ${CLDR_VERSION})`);
         } catch (e) {
           console.log(`failed       cldr                 ${(e as Error).message}`);
+          bad++;
+        }
+        try {
+          console.log(`contract     attributes           ok ${await checkExternalContract(config.cacheDir)}`);
+        } catch (e) {
+          console.log(`failed       attributes           ${(e as Error).message}`);
           bad++;
         }
       }
@@ -167,6 +174,12 @@ async function main() {
       console.log('layer QIDs registered:', await syncLayerQids(pool));
       console.log('linked by QID:', await linkByQid(pool));
       console.log('iso 3166-2:', await enrichIso3166_2(pool));
+      break;
+    }
+    case 'enrich-attributes': {
+      // enrich-attributes: time zones (IANA tzdb), telephony (libphonenumber), driving side (Wikidata) as country attributes.
+      await migrate(pool);
+      console.log(JSON.stringify(await enrichExternalAttributes(pool, config.cacheDir), null, 1));
       break;
     }
     case 'enrich-cldr': {
@@ -243,7 +256,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | prune | notify [text] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | enrich-attributes | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | prune | notify [text] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

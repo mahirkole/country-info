@@ -83,6 +83,18 @@ export const CATALOG: ScopeDef[] = [
     fields: [f('system', 'string', 'metric | US | UK', 'cldr'), f('paper_size', 'string', 'A4 | US-Letter', 'cldr'), f('temperature', 'string', 'Temperature system', 'cldr'), f('units', 'object', 'Preferred units: quantity → usage → ordered unit list', 'cldr')],
   },
   {
+    id: 'timezones', title: 'Time zones', description: 'IANA time zones in use in the country (tz database, public domain).', applies_to: ['country'], default: false, availability: { country: 'full' },
+    fields: [f('count', 'number', 'Number of zones', 'iana-tz'), f('ids', 'array', 'IANA zone ids (e.g. Europe/Istanbul)', 'iana-tz'), f('zones', 'array', 'Zones with the tz database comment on the area they cover', 'iana-tz')],
+  },
+  {
+    id: 'telephony', title: 'Telephony', description: 'Calling code and dialling prefixes (Google libphonenumber metadata, Apache-2.0).', applies_to: ['country'], default: false, availability: { country: 'full' },
+    fields: [f('calling_code', 'string', 'International calling code without +', 'libphonenumber'), f('international_prefix', 'string', 'International dialling prefix (regex as given by the metadata)', 'libphonenumber'), f('national_prefix', 'string', 'National (trunk) prefix', 'libphonenumber'), f('main_country_for_code', 'boolean', 'The main country of a shared calling code (e.g. US for +1)', 'libphonenumber')],
+  },
+  {
+    id: 'traffic', title: 'Road traffic', description: 'Driving side (Wikidata, CC0, community data).', applies_to: ['country'], default: false, availability: { country: 'partial' },
+    fields: [f('driving_side', 'string', 'left | right', 'wikidata-driving')],
+  },
+  {
     id: 'locale', title: 'Locale', description: 'Primary locale (language and script) from CLDR likely subtags.', applies_to: ['country'], default: false, availability: { country: 'full' },
     fields: [f('default', 'string', 'Default locale', 'cldr'), f('language', 'string', 'Language', 'cldr'), f('script', 'string', 'Script', 'cldr'), f('available', 'array', 'CLDR locales of this territory (e.g. de-CH, fr-CH, it-CH); any of them can be passed as `locale`', 'cldr')],
   },
