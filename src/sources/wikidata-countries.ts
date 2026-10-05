@@ -37,6 +37,29 @@ export const WD_COUNTRIES: WdCountry[] = [
     ],
   },
   {
+    // Official: 8 kraje and 2,890 municipalities (ŠÚ SR table om7023rr, read 2026-10-05); districts (Wikidata 82 vs 79) are not loaded.
+    cc: 'SK', country: 'Q214', langs: ['sk'],
+    levels: [
+      { key: 'kraj', classes: ['Q15057583'], level: 1, type: 'region', typeLocal: 'kraj', expected: [8, 8] },
+      { key: 'obec', classes: ['Q6784672'], level: 2, type: 'municipality', typeLocal: 'obec', expected: [2880, 2895] },
+    ],
+  },
+  {
+    // INS (insse.ro) is unreachable from the build environment; the band is the Eurostat LAU count for RO (3,181 = 2,862 communes + 215 towns + 104 municipalities in Wikidata).
+    cc: 'RO', country: 'Q218', langs: ['ro'],
+    levels: [
+      { key: 'județ', classes: ['Q1776764'], level: 1, type: 'county', typeLocal: 'județ', expected: [41, 41] },
+      { key: 'UAT', classes: ['Q659103', 'Q16858213', 'Q640364'], level: 2, type: 'municipality', typeLocal: 'comună / oraș / municipiu', expected: [3170, 3190] },
+    ],
+  },
+  {
+    cc: 'LU', country: 'Q32', langs: ['lb', 'fr', 'de'],
+    levels: [
+      { key: 'canton', classes: ['Q1146429'], level: 1, type: 'canton', typeLocal: 'kanton / canton', expected: [12, 12] },
+      { key: 'commune', classes: ['Q2919801'], level: 2, type: 'commune', typeLocal: 'gemeng / commune', expected: [100, 100] },
+    ],
+  },
+  {
     cc: 'BG', country: 'Q219', langs: ['bg'],
     levels: [{ key: 'obshtina', classes: ['Q1906268'], level: 1, type: 'municipality', typeLocal: 'община', expected: [265, 265] }],
   },

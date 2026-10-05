@@ -51,19 +51,24 @@ Motor: `src/sources/wikidata-divisions.ts`, ülke yapılandırması `src/sources
 | BR | unidade federativa (27), município (5.572; band 5.565–5.575, resmi 5.570 + DF) | 5.599 |
 | IN | state / union territory (28+8 = 36); ilçeler yüklenmez (Wikidata 798, doğrulayacak açık resmi sayı yok) | 36 |
 | BG | obshtina (265) | 265 |
+| SK | kraj (8), obec (Wikidata 2.888; resmî 2.890, ŠÚ SR om7023rr; band 2.880–2.895; okresy yüklenmez: Wikidata 82 ≠ 79) | 2.896 |
+| LU | canton (12), commune (100) | 112 |
+| RO | județ (41), comună/oraș/municipiu (3.178; band 3.170–3.190 = Eurostat LAU sayısı 3.181 — INS erişilemedi, resmî sayı okunamadı; București atlandı: il üst birimi yok) | 3.219 |
 Yüklenmeyenler (2026-10-05 keşif: sınıf bulundu ama sayı resmiyle uymuyor / sınıf bulunamadı): SI (203≠212), SK (2.902 vs ≈2.927), GR (333 vs 332), HR (432 belediye + şehirler ayrı sınıf), RO (108), CY (43), MT (18 yerel konsey), LT (43 ilçe belediyesi, hepsi değil); EE, HU, IE, LU, LV, PL: sınıf bulunamadı. PL (voivodeship 16 ✓; powiat Wikidata'da 320+67 ≠ resmi 380; gmina sınıfı doğrulanmadı), KR (üst birimler 6 sınıfa dağılmış; 17'lik resmi yapı için sınıf eşlemesi gerekir), TR (il 81 ✓ ama GeoNames zaten kapsıyor; ilçe 1.052≠973).
 
 ## AB27 LAU boşluğu — araştırma sonuçları (2026-10-05, alt-ajan raporları + üretici doğrulaması)
 - **Yüklendi:** LV, SI, HU, GR (yukarıdaki tablo), PL.
 - **EE:** Statistikaamet EHAK sınıflandırması (78 belediye + 15 maakond, `klassifikaatorid.stat.ee` CSV) kullanılabilir ama yayıncı beyanı **CC BY-SA 4.0** (ShareAlike) → satış paketine uygunluğu hukuki karar; yüklenmedi.
-- **LU:** ACT "limites administratives" CSV (100 komün, `data.public.lu`) — yalnız portal meta verisi CC0, yayıncı sayfasında lisans metni bulunamadı → yüklenmedi.
+- **LU:** ACT CSV'si yayıncı lisansı okunamadığı için alınmadı; bunun yerine Wikidata katmanı (12 kanton + 100 komün, resmî 100) yüklendi.
 - **IE:** CSO PxStat (31 yerel yönetim, CC BY 4.0 yayıncı beyanı) ama resmi kısa kod/üst birim yok → yüklenmedi.
 - **CY:** CYSTAT LAU2 listesi 615 kayıt, 2024 reformu öncesi; lisans yalnız portal meta verisi → yüklenmedi.
 - **LT, MT:** konteynerden erişilemedi (Cloudflare/WAF) → doğrulanmadı.
 - **GR: yüklendi (yukarıda)** — xls okuyucu (`cfb` + BIFF8) yazıldı.
 - **SK:** ŠÚ SR data.statistics.sk JSON-stat API, CC BY 4.0 (yayıncı sayfası); **engeller:** DATAcube 15 Eylül 2026'da kapatılmış (yeni STATdata uçları bulunamadı), resmî sayı (2.890) veriyle uzlaşmıyor (2.885 belediye + 39 şehir parçası + 4 askerî bölge) → yüklenmedi.
 - **HR:** MPUDT listesi (428 općina + 127 grad + Zagreb, 20 županija; "yeniden kullanım atıfla serbest") **resmî kod içermiyor**, dosya 2013 tarihli xls → yüklenmedi (sentetik kimlik istemiyoruz).
-- **RO:** insse.ro/data.gov.ro konteynerden erişilemedi → doğrulanmadı, `unread` kalır.
+- **RO:** insse.ro/data.gov.ro erişilemedi (resmî kaynak `unread`); Wikidata katmanı yüklendi (topluluk, band Eurostat sayısına göre).
+- **SK:** resmî API kapandığı için Wikidata katmanı (kraj + obec) yüklendi.
+- Wikidata'dan geçmeyenler (2026-10-05 sınıf/sayı keşfi): SI (202+12 city = 214 ≠ 212), HR (432 općina + 244 şehir sınıfı ≠ 555), CY (8 ≠ 6 ilçe), IE (31 county sınıfı, 26+5 yerel yönetim; LAU eşleniği yok), EE (kırsal belediye sınıfı 64, eski), LT (43+10 ≠ 60), MT (sınıf dağınık).
 
 ## Tasarım notları
 - GeoNames (`geonames`) hâlâ dünya geneli taban katman; ulusal kaynaklar `division` olarak **yanına** eklenir, GeoNames'i silmez. "Yalnızca resmi" mod için bkz. `docs/ROADMAP.md`.
