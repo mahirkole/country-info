@@ -2,6 +2,7 @@ import type pg from 'pg';
 import type { EntityInput } from './model.js';
 import { ChangeGuardError, DeleteGuardError, ingest } from './ingest.js';
 import { fetchPolicy, recordFetches } from './sources/fetch.js';
+import { join } from 'node:path';
 import { recordSuccessors } from './successors.js';
 import { syncTargetMetadata, type Cadence, type RefreshTarget } from './targets.js';
 
@@ -73,7 +74,9 @@ async function run(pool: pg.Pool, t: RefreshTarget, o: RefreshOptions): Promise<
 
   const stop = recordFetches();
   const prevMaxAge = fetchPolicy.maxAgeMs;
-  fetchPolicy.maxAgeMs = 0; // always look at the publisher's current data
+  const prevArchive = fetchPolicy.archiveDir;
+  fetchPolicy.maxAgeMs = 0; // always look at the publisher's current data (a conditional GET makes that cheap)
+  fetchPolicy.archiveDir = join(o.cacheDir, 'raw'); // content-addressed copy of every body this run read
   let input: EntityInput[];
   let raw: string;
   try {
@@ -84,6 +87,7 @@ async function run(pool: pg.Pool, t: RefreshTarget, o: RefreshOptions): Promise<
     return record({ source: id, status: 'failed', detail: (e as Error).message });
   } finally {
     fetchPolicy.maxAgeMs = prevMaxAge;
+    fetchPolicy.archiveDir = prevArchive;
   }
   raw = stop();
 

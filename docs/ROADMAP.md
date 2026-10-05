@@ -87,7 +87,7 @@ Hedef: her ülkenin kendi resmi verisinden tüm idari seviyeler (şehir, il, il�
 **6-C. Model ve kalite** (2026-10-05: kaynak önceliği + `?canonical=true` yapıldı — `sources.priority` (migration 006, `src/sources/priority.ts`); kalanlar aşağıda; aylık enrich zinciri `refresh.yml`'e eklendi)
 - `src/sources/priority.ts`: resmi > Wikidata > GeoNames; `canonical` bayrağı `entity_links`/QID üzerinden (kayıt silinmez); API `?canonical=true`.
 - `replaced_by`/`merged_into` ardıllık önerileri YAPILDI (2026-10-05, `src/successors.ts`, refresh sonrası `review_items`; yalnızca öneri). Kalan: önerileri onaylayınca `entity_links` benzeri kalıcı ardıl ilişkisi (silinen kayıt `entities`'te olmadığından ayrı tablo gerekir) ve API'de `/v1/regions/:id/successors`.
-- ETag/If-Modified-Since + ham içerik arşivi (`.cache/raw/<sha256>`).
+- ETag/If-Modified-Since + ham içerik arşivi YAPILDI (2026-10-05; `src/sources/fetch.ts`, `.cache/raw/<sha256>`, `RAW_ARCHIVE_MAX_MB`). Not: curl yedeği yolu koşullu değil; ham arşiv adaptörlerin `logBody` ile kaydettiği gövdeleri saklar (Wikidata SPARQL yanıtları dahil).
 - Wikidata enrich'i `refresh --due` zincirine (aylık) ekle; Wikidata katmanlarında yetim/atlanan öğe raporu.
 - Kalite panosu: kaynak başına sayı vs resmi (altın sayı testleri), yetim kayıt kontrolü; `/v1/status` içine.
 

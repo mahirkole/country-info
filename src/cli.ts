@@ -18,6 +18,8 @@ import { exportSnapshot } from './export.js';
 import { processDeliveries } from './webhooks.js';
 import { buildApp } from './api.js';
 import { enrichCldr } from './sources/cldr.js';
+import { join } from 'node:path';
+import { pruneArchive } from './sources/fetch.js';
 
 const cmd = process.argv[2];
 /** `ALLOW_BULK_DELETE=1` disables the ingest delete guard for an intentional large removal. */
@@ -104,6 +106,8 @@ async function main() {
         console.log(`${r.status.padEnd(12)} ${r.source.padEnd(20)} rows=${r.rows ?? '-'} +${r.inserted ?? 0} ~${r.updated ?? 0} -${r.deleted ?? 0} ${r.detail ?? ''}`);
         if (r.status === 'failed' || r.status === 'needs_review') bad++;
       }
+      const pruned = await pruneArchive(join(config.cacheDir, 'raw'), config.rawArchiveMaxMb * 1024 * 1024);
+      if (pruned) console.log(`raw archive: pruned ${pruned} oldest file(s)`);
       if (bad) process.exitCode = 1;
       break;
     }

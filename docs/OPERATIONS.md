@@ -32,6 +32,8 @@ npm run enrich:cldr                      # CLDR (Unicode License v3): ülke adla
 
 **Wikidata zenginleştirme:** `enrich:wikidata` `entity_xrefs` (QID; `value` NULL = arandı, tekil eşleşme yok) ve `entity_names` (çok dilli ad) tablolarını doldurur; ≤1 istek/sn, 429'da `Retry-After`. Aylık çalıştırılır. Wikidata topluluk verisidir (`source_class=community`, CC0); resmi kaynağın alanlarını ezmez, ayrı tabloda tutulur. Ardından `link` QID üzerinden GeoNames↔NUTS↔ulusal bağları ekler.
 
+**İndirme önbelleği ve ham arşiv:** `refresh` her çalıştırmada yayıncıdan güncel veriyi ister ama koşullu GET kullanır (`If-None-Match` / `If-Modified-Since`; `.cache/<ad>.meta.json`): değişmeyen dosya 304 ile önbellekten gelir. Her çalıştırmanın okuduğu gövdeler içerik-adresli olarak `.cache/raw/<sha256>` altında saklanır (yeniden üretilebilirlik: `source_runs.raw_sha256` aynı gövdelerin birleşik özetidir); refresh sonunda en eski dosyalar `RAW_ARCHIVE_MAX_MB` (varsayılan 2048) sınırına kadar silinir.
+
 ## Zamanlama
 `.github/workflows/refresh.yml` günlük çalışır: önce `check:licenses`, sonra `refresh --due`. Gerekli sır: `DATABASE_URL`. `ci.yml` her push'ta `tsc` + testler. Elle tetikleme: Actions → refresh → *Run workflow* (örn. `--source nat-it --force`).
 
