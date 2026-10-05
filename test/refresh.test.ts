@@ -9,7 +9,7 @@ import { buildApp } from '../src/api.js';
 import { orphanParents, runRefresh, dueSourceIds } from '../src/refresh.js';
 import { ackLicense, checkLicenses, licenseExcerpt } from '../src/license-watch.js';
 import { logBody } from '../src/sources/fetch.js';
-import type { RefreshTarget } from '../src/targets.js';
+import { sourceClassOf, syncTargetMetadata, type RefreshTarget } from '../src/targets.js';
 import type { EntityInput } from '../src/model.js';
 
 const url = process.env.TEST_DATABASE_URL;
@@ -173,5 +173,12 @@ d('license watch (db)', () => {
     await ackLicense(pool, t, cache);
     expect((await checkLicenses(pool, [t], cache))[0]!.status).toBe('unchanged');
     expect(await runRefresh(pool, t, { cacheDir: cache, force: true })).toMatchObject({ status: 'success' });
+  });
+
+  it('classifies sources: national/GISCO/holidays are official, everything else community', async () => {
+    expect(['nat-jp', 'gisco-nuts', 'official-holidays'].map(sourceClassOf)).toEqual(['official', 'official', 'official']);
+    expect(['geonames', 'wikidata', 'wd-dk'].map(sourceClassOf)).toEqual(['community', 'community', 'community']);
+    await syncTargetMetadata(pool, [target({ body: 'x', rows: [] })]);
+    expect((await pool.query("SELECT source_class FROM sources WHERE id = 'nat-fake'")).rows[0].source_class).toBe('official');
   });
 });

@@ -91,14 +91,19 @@ function everyTarget(): RefreshTarget[] {
   ];
 }
 
+/** official = state/intergovernmental publisher (nat-*, gisco-*, official-holidays); community = GeoNames, Wikidata and other crowd-sourced layers (wd-*). */
+export function sourceClassOf(id: string): 'official' | 'community' {
+  return id.startsWith('nat-') || id.startsWith('gisco-') || id === 'official-holidays' ? 'official' : 'community';
+}
+
 /** Store the static per-source metadata (cadence, bands, verdict) so the API can show it before the first run. */
 export async function syncTargetMetadata(pool: pg.Pool, targets: RefreshTarget[]): Promise<void> {
   for (const t of targets) {
     await pool.query(
-      `INSERT INTO sources (id, authority, url, license, version, attribution, cadence, expected_min, expected_max, license_verdict, commercial_use)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       ON CONFLICT (id) DO UPDATE SET cadence = $7, expected_min = $8, expected_max = $9, license_verdict = $10, commercial_use = $11`,
-      [t.meta.id, t.meta.authority, t.meta.url ?? null, t.meta.license ?? null, null, t.meta.attribution ?? null, t.cadence, t.expectedRows[0], t.expectedRows[1], t.licenseVerdict, t.commercialUse],
+      `INSERT INTO sources (id, authority, url, license, version, attribution, cadence, expected_min, expected_max, license_verdict, commercial_use, source_class)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+       ON CONFLICT (id) DO UPDATE SET cadence = $7, expected_min = $8, expected_max = $9, license_verdict = $10, commercial_use = $11, source_class = $12`,
+      [t.meta.id, t.meta.authority, t.meta.url ?? null, t.meta.license ?? null, null, t.meta.attribution ?? null, t.cadence, t.expectedRows[0], t.expectedRows[1], t.licenseVerdict, t.commercialUse, sourceClassOf(t.meta.id)],
     );
   }
 }
