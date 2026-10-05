@@ -375,3 +375,35 @@ describe('LV adapter', () => {
     expect(() => mapAtvk([row('1', 'A', 'MISSING')])).toThrow(/unknown parent/);
   });
 });
+
+import { mapSurs } from '../src/sources/national/si.js';
+describe('SI adapter', () => {
+  it('keeps municipality codes and bilingual names, drops the country row, and checks the count', () => {
+    const values = ['0', ...Array.from({ length: 212 }, (_, i) => String(i + 1).padStart(3, '0'))];
+    const valueTexts = ['SLOVENIA', ...values.slice(1).map((c) => (c === '213' ? 'x' : `Občina ${c}`))];
+    valueTexts[values.indexOf('002')] = 'Koper/Capodistria';
+    const e = mapSurs([{ code: 'OBČINE', text: 'MUNICIPALITIES', values, valueTexts }]);
+    expect(e).toHaveLength(212);
+    expect(e.find((x) => x.id === 'div:SI:002')).toMatchObject({ name: 'Koper/Capodistria', parent_id: 'country:SI' });
+    expect(() => mapSurs([])).toThrow(/layout changed/);
+    expect(() => mapSurs([{ code: 'OBČINE', text: '', values: ['0', '001'], valueTexts: ['S', 'A'] }])).toThrow(/official count/);
+  });
+});
+
+import { parseHnt, findHntFile } from '../src/sources/national/hu.js';
+describe('HU adapter', () => {
+  it('finds the newest workbook and builds county > settlement with Budapest districts', () => {
+    expect(findHntFile('<a href="/docs/helysegnevtar/hnt_letoltes_2024.xlsx"></a><a href="x/hnt_letoltes_2025.xlsx">')).toMatch(/hnt_letoltes_2025\.xlsx$/);
+    expect(() => findHntFile('<html>')).toThrow(/layout changed/);
+    const H = ['Helység megnevezése', 'Helység KSH kódja', 'Helység jogállása', 'Vármegye megnevezése', 'Járás kódja', 'Járás neve'];
+    const counties = Array.from({ length: 19 }, (_, i) => `Megye${i}`);
+    const rows: string[][] = [['title'], H];
+    for (let i = 0; i < 3150; i++) rows.push([`Falu${i}`, String(10000 + i), i % 7 ? 'község' : 'város', counties[i % 19]!, '085 0', 'Járás']);
+    rows.push(['Budapest', '13578', 'főváros ', '', '', ''], ['Budapest 01. ker.', '09566', 'fővárosi kerület', 'főváros', '001 1', 'Budapest 01. ker.'], ['Összesen', '', '', '', '', '']);
+    const e = parseHnt([{ name: 'Helységek 2025.01.01.', rows }]);
+    expect(e.find((x) => x.id === 'div:HU:09566')).toMatchObject({ parent_id: 'div:HU:13578', data: { type: 'borough' } });
+    expect(e.find((x) => x.id === 'div:HU:10001')).toMatchObject({ parent_id: 'div:HU:vm-megye1', data: { jaras_code: '0850' } });
+    expect(e.filter((x) => x.data.type === 'county')).toHaveLength(19);
+    expect(() => parseHnt([{ name: 'Helységek', rows: [['x']] }])).toThrow(/header not found/);
+  });
+});

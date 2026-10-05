@@ -50,7 +50,7 @@ export async function fetchText(url: string, name: string, cacheDir: string, max
 }
 
 /** GET `url` as bytes, caching in `cacheDir/name` for `maxAgeMs`. */
-export async function fetchBytes(url: string, name: string, cacheDir: string, maxAgeMs = fetchPolicy.maxAgeMs): Promise<Uint8Array> {
+export async function fetchBytes(url: string, name: string, cacheDir: string, maxAgeMs = fetchPolicy.maxAgeMs, headers: Record<string, string> = {}): Promise<Uint8Array> {
   await mkdir(cacheDir, { recursive: true });
   const path = join(cacheDir, name);
   try {
@@ -62,7 +62,7 @@ export async function fetchBytes(url: string, name: string, cacheDir: string, ma
   } catch {
     /* not cached */
   }
-  const res = await fetch(url, { headers: { 'user-agent': USER_AGENT } });
+  const res = await fetch(url, { headers: { 'user-agent': USER_AGENT, ...headers } });
   if (!res.ok) throw new Error(`GET ${url}: ${res.status}`);
   const buf = new Uint8Array(await res.arrayBuffer());
   await writeFile(path, buf);
