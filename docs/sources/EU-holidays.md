@@ -21,7 +21,7 @@ Sayılar 2026 yılı için kural sayısı (doğrulanmış/toplam).
 | PT | 13/17 | Diário da República, Lei 8/2016 (art. 234 n.º 1). 2013 öncesi 4 kural `unverified`. |
 | DE | 1/9 | Yalnızca Einigungsvertrag Art. 2(2) (3 Ekim) okundu; diğerleri eyalet yasaları. **Bölgesel tatiller eksik.** |
 | IT | 6/11 | DPR 792/1985 art. 1 (dini günler) okundu; Legge 260/1949 metni sayfadan çıkarılamadı. 4 Ekim durumu doğrulanmadı. |
-| TR | 0/17 | mevzuat.gov.tr ve Diyanet erişilemedi (bkz. `TR.md`). |
+| TR | 17/17 (2024–2026; 2027–2028 dini bayramlar tentative) | 2026-10-05: 2429 sayılı Kanun (mevzuat.gov.tr) ve Diyanet Dini Günler tabloları okundu (bkz. `TR.md`). |
 | BE | 0/10 | ejustice.just.fgov.be WAF engeli; hafızadan. |
 | LU | 0/11 | legilux JS-only; hafızadan. |
 | FI | 0/13 | Kirkkolaki (652/2023) kilise bayramlarını sayıyor; sivil tatil dayanağı okunmadı. |

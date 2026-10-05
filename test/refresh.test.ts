@@ -83,6 +83,13 @@ d('refresh', () => {
     expect(await runRefresh(pool, target({ body: 'o', rows }), { cacheDir: cache })).toMatchObject({ status: 'needs_review' });
   });
 
+  it("accepts parents that exist in the database (another source's units), still refuses ones that exist nowhere", async () => {
+    await pool.query("INSERT INTO entities (id, kind, country_code, name, content_hash, updated_seq, source_id) VALUES ('div:TR:other','division','TR','Other','h',0,'geonames')");
+    const ok = [...many(149), E('div:TR:x', 'X', 'div:TR:other')];
+    expect(await runRefresh(pool, target({ body: 'p1', rows: ok }), { cacheDir: cache })).toMatchObject({ status: 'success' });
+    expect(await runRefresh(pool, target({ body: 'p2', rows: [...ok, E('div:TR:y', 'Y', 'div:TR:nowhere')] }), { cacheDir: cache })).toMatchObject({ status: 'needs_review' });
+  });
+
   it('a truncated download is held for review instead of deleting the dataset', async () => {
     const st = { body: 'full', rows: many(200), band: [10, 400] as [number, number] };
     await runRefresh(pool, target(st), { cacheDir: cache });

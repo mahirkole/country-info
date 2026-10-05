@@ -37,6 +37,17 @@ export function orphanParents(input: EntityInput[]): string[] {
   return [...new Set(input.filter((e) => e.parent_id && !e.parent_id.startsWith('country:') && !ids.has(e.parent_id)).map((e) => e.parent_id!))];
 }
 
+/**
+ * `orphanParents` minus parents that already exist in the database. A source may legitimately hang records under another source's
+ * units (regional holidays under `div:FR:dep-57` of nat-fr); only a parent that exists nowhere means the hierarchy is broken.
+ */
+export async function missingParents(pool: pg.Pool, input: EntityInput[]): Promise<string[]> {
+  const orphans = orphanParents(input);
+  if (orphans.length === 0) return [];
+  const known = new Set((await pool.query('SELECT id FROM entities WHERE id = ANY($1)', [orphans])).rows.map((r) => r.id as string));
+  return orphans.filter((id) => !known.has(id));
+}
+
 export async function runRefresh(pool: pg.Pool, t: RefreshTarget, o: RefreshOptions): Promise<RunResult> {
   const id = t.meta.id;
   await syncTargetMetadata(pool, [t]);
@@ -100,7 +111,7 @@ async function run(pool: pg.Pool, t: RefreshTarget, o: RefreshOptions): Promise<
   }
 
   const [min, max] = t.expectedRows;
-  const orphans = orphanParents(input);
+  const orphans = await missingParents(pool, input);
   const problem =
     input.length < min || input.length > max
       ? `${input.length} records outside the expected band [${min}, ${max}]`

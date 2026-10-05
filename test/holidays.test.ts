@@ -82,7 +82,16 @@ describe('TR data file', () => {
     expect(dates('public')).toHaveLength(8 + 3 + 4 - 1); // 7 fixed national days + 3 Ramazan + 4 Kurban
     expect(dates('half_day').sort()).toEqual(['2026-03-19', '2026-05-26', '2026-10-28']);
     for (const x of h) expect((x.data.source as { citation: string }).citation).toBeTruthy();
-    expect(h.every((x) => x.data.verification === 'unverified')).toBe(true);
+    // Read on 2026-10-05: Law 2429 (mevzuat.gov.tr) and Diyanet's Dini Günler tables for 2024–2026.
+    expect(h.every((x) => x.data.verification === 'verified' && (x.data.source as { checked_on?: string; url?: string }).checked_on === '2026-10-05' && !!(x.data.source as { url?: string }).url)).toBe(true);
+  });
+  it('keeps the years Diyanet has not published yet tentative', async () => {
+    const tr = (await loadHolidayFiles()).find((f) => f.country === 'TR')!;
+    const h = compileHolidays(tr, 2027, 2028);
+    const religious = h.filter((x) => /^(ramazan|kurban)/.test(x.code));
+    expect(religious.length).toBeGreaterThan(0);
+    expect(religious.every((x) => x.data.verification === 'tentative')).toBe(true);
+    expect(h.filter((x) => !/^(ramazan|kurban)/.test(x.code)).every((x) => x.data.verification === 'verified')).toBe(true); // fixed days come from the law
   });
   it('does not emit 15 Temmuz before 2017', async () => {
     const tr = (await loadHolidayFiles()).find((f) => f.country === 'TR')!;
@@ -162,7 +171,7 @@ describe('EU holiday files (merged from official-source reading)', () => {
     expect(compileHolidays(f, 2024, 2024).some((x) => x.code === 'great-prayer-day')).toBe(false);
   });
   it('stale or memory-based sources are never marked verified', async () => {
-    for (const cc of ['BE', 'LU', 'FI', 'GR', 'SI', 'MT', 'LT', 'TR']) {
+    for (const cc of ['BE', 'LU', 'FI', 'GR', 'SI', 'MT', 'LT']) {
       expect(compileHolidays(await load(cc), 2026, 2026).every((x) => x.data.verification !== 'verified')).toBe(true);
     }
   });
