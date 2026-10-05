@@ -19,6 +19,8 @@
     "check:licenses": "tsx src/cli.ts check-licenses",
     "license:ack": "tsx src/cli.ts license-ack",
     "ingest:national": "tsx src/cli.ts ingest-national",
+    "check:holiday-law": "tsx src/cli.ts check-holiday-law",
+    "holiday-law:ack": "tsx src/cli.ts holiday-law-ack",
     "check:holidays": "tsx src/cli.ts check-holidays",
     "export": "tsx src/cli.ts export",
     "publish": "tsx src/cli.ts publish",

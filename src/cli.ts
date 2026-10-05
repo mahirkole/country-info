@@ -18,6 +18,7 @@ import { exportSnapshot } from './export.js';
 import { processDeliveries } from './webhooks.js';
 import { buildApp } from './api.js';
 import { CLDR_VERSION, checkCldrContract, enrichCldr } from './sources/cldr.js';
+import { ackHolidayLaw, checkHolidayLaw } from './holidays/watch.js';
 import { checkExternalContract, enrichExternalAttributes } from './sources/attributes.js';
 import { join } from 'node:path';
 import { pruneArchive } from './sources/fetch.js';
@@ -157,6 +158,24 @@ async function main() {
       }
       break;
     }
+    case 'check-holiday-law': {
+      // check-holiday-law: fingerprints of the legal texts cited by verified holiday rules; exit 1 on a confirmed change.
+      await migrate(pool);
+      const res = await checkHolidayLaw(pool, config.cacheDir);
+      for (const r of res) console.log(`${r.status.padEnd(10)} ${r.url} ${r.detail ?? ''}`);
+      const flagged = res.filter((r) => r.status === 'changed' || r.status === 'open');
+      if (flagged.length) {
+        process.exitCode = 1;
+        await notify(config.notifyUrl, ['country-info holiday law watch', ...flagged.map((r) => `📜 ${r.url}: text changed; re-read the cited law and data/holidays rules, then holiday-law-ack`)].join('\n'));
+      }
+      break;
+    }
+    case 'holiday-law-ack': {
+      await migrate(pool);
+      const done = await ackHolidayLaw(pool, config.cacheDir, process.argv[3] ?? '');
+      console.log(done.length ? `acknowledged ${done.length}: ${done.join(', ')}` : 'nothing to acknowledge (usage: holiday-law-ack <url|all>)');
+      break;
+    }
     case 'license-ack': {
       const t = [...allTargets(), ...licenseWatchTargets()].find((x) => x.meta.id === process.argv[3]);
       if (!t) throw new Error('usage: license-ack <source-id>');
@@ -256,7 +275,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | enrich-attributes | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | prune | notify [text] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | check-holiday-law | holiday-law-ack <url|all> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | enrich-attributes | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | prune | notify [text] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

@@ -24,6 +24,7 @@ npm run check:sources                    # = refresh --dry-run: indir, doğrula,
 npm run check:licenses [id]              # lisans sayfası parmak izi (ilk çalıştırma = baseline)
 npm run license:ack -- <id>              # lisans sayfasını okuyup onayladıktan sonra kaynağı serbest bırak
 npm run enrich:wikidata [-- --spec geonames --limit N --langs en,tr]   # Wikidata (CC0): QID, çok dilli adlar; sonra `npm run link`
+npm run check:holiday-law               # `verified` tatil kurallarının atıf yaptığı yasa metinlerinin parmak izi (sayfa metni normalize edilip hash'lenir); aynı yeni parmak izi iki çalıştırmada üst üste görülürse değişiklik sayılır (çıkış kodu 1, bildirim, /v1/status `law_changed`); her çalıştırmada farklı çıkan sayfa `volatile`, erişilemeyen sayfa `error` (alarm değil). Kuralları yeniden okuyup `npm run holiday-law:ack -- <url|all>` ile kabul edin
 npm run enrich:attributes               # ülke öznitelikleri: saat dilimleri (IANA tzdb zone.tab, kamu malı), arama kodu/önekler (libphonenumber, Apache-2.0), sürüş yönü (Wikidata P1622, CC0); değişiklik varsa sürüm notu; `check:sources` üç kaynağın erişim/düzen kontratını, `check:licenses` lisans sayfalarını izler
 npm run enrich:cldr                      # CLDR (Unicode License v3): ülke adları, para birimi, UN üyeliği, tarih/saat/sayı/hafta/ölçü/birim öznitelikleri. Sürüm etiketine sabit (CLDR_VERSION, varsayılan 48.2.0); yeni ana sürüm çıkınca uyarı verir, sürüm notları okunup CLDR_VERSION yükseltilir. `check:sources` dosya/düzen kontratını, `check:licenses` Unicode lisans sayfasını izler
 ```
@@ -40,7 +41,7 @@ npm run enrich:cldr                      # CLDR (Unicode License v3): ülke adla
 ## Zamanlama (üretim)
 Zamanlanmış çalıştırma **üretim ortamında, API'nin yanında** yapılır (veritabanı internete açılmaz; GitHub Actions'ın 6 saat sınırı yok — PL kotası ve Wikidata uzun sürebilir). Tek giriş: `scripts/cron/run-cycle.sh`:
 
-`migrate` → `check:licenses` → `refresh --due` → (ayın 1'i) `enrich:wikidata`, `enrich:cldr`, `enrich:attributes`, `link` → `publish` → `digest` → `prune` (eski teslimat/kullanım/çalıştırma kayıtları: 90 gün / 2 yıl / 1 yıl; bekleyen teslimatlar ve her kaynağın son 20 çalıştırması silinmez). Adımlar birbirini durdurmaz; her adımın çıkış kodu toplanır, başarısız adım `NOTIFY_WEBHOOK_URL`'e bildirilir. `flock` ile aynı anda tek döngü. Webhook teslimatını çalışan `serve` süreci yapar (15 sn'de bir; birden çok örnekte bile bir teslimat bir kez gider).
+`migrate` → `check:licenses` → `check:holiday-law` → `refresh --due` → (ayın 1'i) `enrich:wikidata`, `enrich:cldr`, `enrich:attributes`, `link` → `publish` → `digest` → `prune` (eski teslimat/kullanım/çalıştırma kayıtları: 90 gün / 2 yıl / 1 yıl; bekleyen teslimatlar ve her kaynağın son 20 çalıştırması silinmez). Adımlar birbirini durdurmaz; her adımın çıkış kodu toplanır, başarısız adım `NOTIFY_WEBHOOK_URL`'e bildirilir. `flock` ile aynı anda tek döngü. Webhook teslimatını çalışan `serve` süreci yapar (15 sn'de bir; birden çok örnekte bile bir teslimat bir kez gider).
 
 ```
 # /etc/cron.d/country-info  (günlük 03:17 UTC; ortam değişkenleri /etc/country-info.env)

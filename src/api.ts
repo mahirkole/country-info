@@ -318,7 +318,9 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
          WHERE c.rows IS NOT NULL OR s.expected_max > 0 ORDER BY s.id`,
       )
     ).rows.map((r) => ({ id: r.id as string, rows: r.rows as number, expected: r.expected_max > 0 ? [r.expected_min as number, r.expected_max as number] : null, in_band: r.expected_max > 0 ? r.rows >= r.expected_min && r.rows <= r.expected_max : null }));
-    const attention: { id: string; status: string; stale?: boolean; rows?: number; expected?: number[] }[] = rows.filter((r) => r.status !== 'ok' || r.stale).map((r) => ({ id: r.id, status: r.status, stale: r.stale }));
+    const attention: { id: string; status: string; stale?: boolean; rows?: number; expected?: number[]; urls?: string[] }[] = rows.filter((r) => r.status !== 'ok' || r.stale).map((r) => ({ id: r.id, status: r.status, stale: r.stale }));
+    const law = (await pool.query(`SELECT url, countries FROM holiday_law_watch WHERE status = 'changed' ORDER BY url`)).rows as { url: string; countries: string[] }[];
+    if (law.length) attention.push({ id: 'official-holidays', status: 'law_changed', urls: law.map((l) => l.url) });
     for (const d of detail) {
       if (d.in_band === false && d.rows > 0) attention.push({ id: d.id, status: 'out_of_band', rows: d.rows, expected: d.expected! }); // a source that never loaded shows up through its status
 

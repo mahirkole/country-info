@@ -24,6 +24,7 @@ step() { # step <name> <command...>: run, remember failure, keep going
 
 step migrate        npm run -s migrate
 step check-licenses npm run -s check:licenses
+step check-holiday-law npm run -s check:holiday-law
 step refresh        npm run -s refresh -- ${REFRESH_ARGS:---due}
 if [ "$(date -u +%d)" = "01" ] || [ -n "${FORCE_MONTHLY:-}" ]; then
   # Incremental; a failure here is reported but does not stop publishing.

@@ -25,7 +25,7 @@ d('scripts/cron/run-cycle.sh', () => {
   let server: http.Server;
   let hook = '';
   let tmp: string;
-  const base = () => ({ DATABASE_URL: url!, PUBLISH_DIR: join(tmp, 'pub'), CACHE_DIR: join(tmp, 'cache'), CYCLE_LOCK: join(tmp, 'lock'), NOTIFY_WEBHOOK_URL: hook, REFRESH_ARGS: '--source none-such', SKIP_STEPS: 'check-licenses' });
+  const base = () => ({ DATABASE_URL: url!, PUBLISH_DIR: join(tmp, 'pub'), CACHE_DIR: join(tmp, 'cache'), CYCLE_LOCK: join(tmp, 'lock'), NOTIFY_WEBHOOK_URL: hook, REFRESH_ARGS: '--source none-such', SKIP_STEPS: 'check-licenses check-holiday-law' });
   beforeAll(async () => {
     tmp = await mkdtemp(join(tmpdir(), 'cyc-'));
     const pool = new pg.Pool({ connectionString: url });
