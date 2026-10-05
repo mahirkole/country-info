@@ -4,3 +4,5 @@ dist
 out
 .env
 .scratch/
+__pycache__/
+*.pyc
