@@ -58,6 +58,10 @@ GET  /openapi.json              (OpenAPI 3 açıklaması; her /v1 rotası test i
 
 Erişim: `API_KEYS=k1,k2` ayarlanırsa `/v1/*` için `x-api-key` (veya `Authorization: Bearer <anahtar>`) gerekir; boşsa API açıktır. `RATE_LIMIT_PER_MIN` (varsayılan 600, 0 = sınırsız) anahtar (yoksa IP) başına dakikalık sınır; yanıtlarda `X-RateLimit-*`, aşımda `429` + `Retry-After`. Sınırlayıcı süreç içidir (çok örnekte önüne paylaşımlı sınırlayıcı koyun). `ADMIN_TOKEN` her zaman geçerli anahtardır.
 
+İstemci (TypeScript, bağımlılıksız): `import { CountryInfo } from './src/sdk'` — `new CountryInfo({ baseUrl, apiKey })`; `for await (const c of client.countries())`, `client.regions('DE')`, `client.divisions('FR', { level: 2 })`, `client.holidays('TR', 2026)`, `client.search('ist')`; değişiklik akışı `for await (const ch of client.changes(sinceSeq))` (üreteç sonunda devam imleci döner); 429'da `Retry-After` kadar bekleyip bir kez yeniden dener, hatalar `ApiError`.
+
+Webhook yükü (`snapshot.completed`): `source`, `source_ids`, `vintage` (kaynağın sürümü), `reason` (sürüm geçişiyse `vintage_change: …`), `from_seq`/`to_seq`, `totals`, `changes_by_country`, `changes_url`.
+
 POST /v1/webhooks   {url, countries?, kinds?}   (Authorization: Bearer $ADMIN_TOKEN; secret yalnızca yanıtta görünür)
 GET/DELETE /v1/webhooks[/:id]
 GET  /files/manifest.json, /files/latest/*, /files/snapshots/<id>/*

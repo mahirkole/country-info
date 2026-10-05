@@ -7,6 +7,7 @@ import { migrate } from '../src/db.js';
 import { ingest, DeleteGuardError } from '../src/ingest.js';
 import { linkRegions } from '../src/linking.js';
 import { buildApp } from '../src/api.js';
+import { ApiError, CountryInfo } from '../src/sdk.js';
 import { processDeliveries, sign } from '../src/webhooks.js';
 import { exportSnapshot } from '../src/export.js';
 import type { EntityInput } from '../src/model.js';
@@ -271,6 +272,7 @@ d('database', () => {
     const last = calls[1]!;
     expect(last.headers['x-countryinfo-signature']).toBe(sign(secret, last.body, last.headers['x-countryinfo-timestamp']!));
     expect(JSON.parse(last.body).changes_by_country).toEqual({ DE: 1 }); // filtered to subscribed country
+    expect(JSON.parse(last.body)).toMatchObject({ source_ids: ['t'], vintage: null, reason: null });
     await app.close();
   });
 
@@ -314,6 +316,28 @@ d('database', () => {
     expect((await app.inject({ url: '/v1/review-items', headers: { authorization: 'Bearer tok' } })).statusCode).toBe(200); // admin token is a valid key and its own bucket
     expect((await app.inject('/healthz')).statusCode).toBe(200);
     expect((await app.inject('/openapi.json')).statusCode).toBe(200);
+    await app.close();
+  });
+
+  it('SDK client follows pagination and the change cursor, sends the key, retries once on 429 and raises ApiError', async () => {
+    await ingest(pool, SRC, v1, { kinds: KINDS });
+    const app = await buildApp(pool, { adminToken: 'tok', apiKeys: ['k1'], rateLimitPerMin: 1000, exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    const via = (async (url: string, init: RequestInit) => {
+      const r = await app.inject({ url: url.replace('http://x', ''), headers: init.headers as Record<string, string> });
+      return new Response(r.body, { status: r.statusCode, headers: { 'content-type': 'application/json', ...(r.headers['retry-after'] ? { 'retry-after': String(r.headers['retry-after']) } : {}) } });
+    }) as unknown as typeof fetch;
+    const c = new CountryInfo({ baseUrl: 'http://x', apiKey: 'k1', fetchFn: via, sleep: async () => undefined });
+    const codes: string[] = [];
+    for await (const e of c.countries({ limit: 1 })) codes.push(e.code); // one item per page
+    expect(codes).toEqual(['DE', 'TR']);
+    expect((await c.country('tr')).name).toBe('Turkey');
+    const feed = c.changes(0, { limit: 2 });
+    const seen: string[] = [];
+    let step = await feed.next();
+    while (!step.done) { seen.push(step.value.entity_id); step = await feed.next(); }
+    expect(seen.sort()).toEqual(['country:DE', 'country:TR', 'gn:1', 'gn:2']);
+    expect(step.value).toBeGreaterThan(0); // resume cursor
+    await expect(new CountryInfo({ baseUrl: 'http://x', apiKey: 'bad', fetchFn: via }).country('TR')).rejects.toBeInstanceOf(ApiError);
     await app.close();
   });
 });

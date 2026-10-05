@@ -13,7 +13,7 @@ export function sign(secret: string, body: string, timestamp: string): string {
  * `GET /v1/changes?since=<from_seq>` so webhook bodies stay small.
  */
 export async function enqueueDeliveries(db: pg.Pool | pg.PoolClient, snapshotId: number): Promise<number> {
-  const snap = (await db.query('SELECT id, source, from_seq, to_seq, inserted, updated, deleted FROM snapshots WHERE id = $1', [snapshotId])).rows[0];
+  const snap = (await db.query('SELECT s.id, s.source, s.from_seq, s.to_seq, s.inserted, s.updated, s.deleted, s.reason, src.version AS vintage FROM snapshots s LEFT JOIN sources src ON src.id = s.source WHERE s.id = $1', [snapshotId])).rows[0];
   const perCountryKind = (
     await db.query('SELECT country_code::text AS cc, kind, count(*)::int AS n FROM changes WHERE snapshot_id = $1 GROUP BY 1, 2', [snapshotId])
   ).rows as { cc: string; kind: string; n: number }[];
@@ -37,6 +37,10 @@ export async function enqueueDeliveries(db: pg.Pool | pg.PoolClient, snapshotId:
       event: 'snapshot.completed',
       snapshot_id: Number(snap.id),
       source: snap.source,
+      source_ids: [snap.source],
+      // Release (vintage) the data belongs to, e.g. "ONS April 2025"; `reason` is set when the run applied a vintage change.
+      vintage: snap.vintage ?? null,
+      reason: snap.reason ?? null,
       from_seq: Number(snap.from_seq),
       to_seq: Number(snap.to_seq),
       totals: { inserted: snap.inserted, updated: snap.updated, deleted: snap.deleted },
