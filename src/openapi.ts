@@ -3,7 +3,7 @@
  * /v1 route is missing here or this file documents a route that does not exist.
  */
 type Param = { name: string; description: string; required?: boolean };
-interface Op { method: 'get' | 'post' | 'delete'; path: string; summary: string; query?: Param[]; admin?: boolean; tag: string }
+interface Op { method: 'get' | 'post' | 'delete'; path: string; summary: string; query?: Param[]; admin?: boolean; tag: string; /** Name of a schema in `SCHEMAS` describing the 200 response. */ res?: keyof typeof SCHEMAS }
 
 const page: Param[] = [{ name: 'limit', description: 'Page size (1–1000, default 100)' }, { name: 'after', description: 'Cursor: id of the last item of the previous page' }];
 const scope: Param[] = [
@@ -19,6 +19,28 @@ const sel: Param[] = [
   { name: 'profile', description: 'Name of a saved scope profile (own, or the key\'s default); explicit parameters override it' },
 ];
 
+const obj = (properties: Record<string, unknown>, required: string[] = []) => ({ type: 'object', properties, ...(required.length ? { required } : {}) });
+const strs = { type: 'array', items: { type: 'string' } };
+/** Response schemas of the scope/metadata endpoints (the older endpoints are described in prose only). */
+export const SCHEMAS = {
+  ScopeCatalog: obj({
+    schema_version: { type: 'integer' }, default_scopes: strs,
+    data: { type: 'array', items: obj({ id: { type: 'string' }, title: { type: 'string' }, description: { type: 'string' }, applies_to: strs, default: { type: 'boolean' }, availability: { type: 'object', additionalProperties: { type: 'string', enum: ['full', 'partial', 'none'] } }, fields: strs }, ['id']) },
+  }, ['schema_version', 'data']),
+  SchemaDocument: obj({
+    $schema: { type: 'string' }, schema_version: { type: 'integer' }, mode: { type: 'string', enum: ['union', 'intersect'] }, countries: strs, unknown_countries: strs, countries_total: { type: 'integer' },
+    scopes: { type: 'object', description: 'Scope id → JSON-Schema object; fields carry x-source, x-source-class, x-license-verdict and, for several countries, x-present-in / x-coverage', additionalProperties: { type: 'object' } },
+  }, ['schema_version', 'scopes']),
+  ProfileResult: obj({
+    schema_version: { type: 'integer' }, mode: { type: 'string', enum: ['union', 'intersect'] }, scopes: strs, countries: strs, unknown_countries: strs,
+    data: { type: 'object', description: 'Country code → scope id → scope data (null when the country has none)', additionalProperties: { type: 'object', additionalProperties: { type: 'object', nullable: true } } },
+    omitted: { type: 'array', items: obj({ country: { type: 'string' }, scope: { type: 'string' }, reason: { type: 'string' } }) },
+  }, ['schema_version', 'data']),
+  ScopeDocument: obj({ schema_version: { type: 'integer' }, id: { type: 'string' }, title: { type: 'string' }, description: { type: 'string' }, type: { type: 'string' }, properties: { type: 'object', additionalProperties: { type: 'object' } } }, ['id', 'properties']),
+  ScopeProfile: obj({ id: { type: 'integer' }, api_key_id: { type: 'integer', nullable: true }, name: { type: 'string' }, scopes: strs, countries: { ...strs, nullable: true }, mode: { type: 'string', enum: ['union', 'intersect'] }, locale: { type: 'string', nullable: true }, created_at: { type: 'string', format: 'date-time' } }, ['id', 'name', 'scopes']),
+  ScopeProfileList: obj({ data: { type: 'array', items: { $ref: '#/components/schemas/ScopeProfile' } } }, ['data']),
+} as const;
+
 export const OPERATIONS: Op[] = [
   { method: 'get', path: '/v1/countries', tag: 'countries', summary: 'List countries', query: [...page, { name: 'un_status', description: 'UN membership: member or other (from CLDR; observer states are not distinguished)' }, { name: 'continent', description: 'Continent code' }] },
   { method: 'get', path: '/v1/countries/{code}', tag: 'countries', summary: 'One country (names in many languages, currency xref); with scopes/profile: the chosen scopes only', query: sel },
@@ -33,13 +55,13 @@ export const OPERATIONS: Op[] = [
   { method: 'get', path: '/v1/regions/{id}/successors', tag: 'regions', summary: 'Confirmed successors and predecessors of a unit across releases (works for ids that no longer exist)' },
   { method: 'post', path: '/v1/review-items/{id}/resolve', tag: 'admin', summary: 'Accept or dismiss a review item (accepting a successor suggestion records the relation)', admin: true },
   { method: 'get', path: '/v1/review-items', tag: 'admin', summary: 'Open source conflicts for review', admin: true, query: [{ name: 'status', description: 'open, accepted_a, accepted_b, dismissed' }, { name: 'limit', description: 'Max results' }] },
-  { method: 'get', path: '/v1/scopes', tag: 'scopes', summary: 'Scope catalog (what each selectable slice of country information contains)' },
-  { method: 'get', path: '/v1/scopes/{id}', tag: 'scopes', summary: 'One scope as a JSON-Schema-style document (fields, sources, license verdicts)' },
-  { method: 'get', path: '/v1/schema', tag: 'scopes', summary: 'Global metadata: catalog with world coverage; with countries=…: metadata of those countries (mode=intersect keeps fields present in all)', query: [{ name: 'countries', description: 'Comma-separated ISO alpha-2 (max 50)' }, ...sel] },
-  { method: 'get', path: '/v1/schema/countries/{code}', tag: 'scopes', summary: 'Country metadata: only the fields that actually carry data for this country', query: sel },
-  { method: 'get', path: '/v1/profile', tag: 'scopes', summary: 'Composed data of several countries for the chosen scopes (union or intersection)', query: [{ name: 'countries', description: 'Comma-separated ISO alpha-2 (max 50), or taken from the profile' }, ...sel] },
-  { method: 'post', path: '/v1/scope-profiles', tag: 'scopes', summary: 'Save a named scope selection (scopes, countries, mode, locale); a database API key owns its profiles, optionally as the key default' },
-  { method: 'get', path: '/v1/scope-profiles', tag: 'scopes', summary: 'List your scope profiles (admin: all)' },
+  { method: 'get', path: '/v1/scopes', tag: 'scopes', res: 'ScopeCatalog', summary: 'Scope catalog (what each selectable slice of country information contains)' },
+  { method: 'get', path: '/v1/scopes/{id}', tag: 'scopes', res: 'ScopeDocument', summary: 'One scope as a JSON-Schema-style document (fields, sources, license verdicts)' },
+  { method: 'get', path: '/v1/schema', tag: 'scopes', res: 'SchemaDocument', summary: 'Global metadata: catalog with world coverage; with countries=…: metadata of those countries (mode=intersect keeps fields present in all)', query: [{ name: 'countries', description: 'Comma-separated ISO alpha-2 (max 50)' }, ...sel] },
+  { method: 'get', path: '/v1/schema/countries/{code}', tag: 'scopes', res: 'SchemaDocument', summary: 'Country metadata: only the fields that actually carry data for this country', query: sel },
+  { method: 'get', path: '/v1/profile', tag: 'scopes', res: 'ProfileResult', summary: 'Composed data of several countries for the chosen scopes (union or intersection)', query: [{ name: 'countries', description: 'Comma-separated ISO alpha-2 (max 50), or taken from the profile' }, ...sel] },
+  { method: 'post', path: '/v1/scope-profiles', tag: 'scopes', res: 'ScopeProfile', summary: 'Save a named scope selection (scopes, countries, mode, locale); a database API key owns its profiles, optionally as the key default' },
+  { method: 'get', path: '/v1/scope-profiles', tag: 'scopes', res: 'ScopeProfileList', summary: 'List your scope profiles (admin: all)' },
   { method: 'delete', path: '/v1/scope-profiles/{id}', tag: 'scopes', summary: 'Remove a scope profile' },
   { method: 'get', path: '/v1/sources', tag: 'provenance', summary: 'Sources with license, attribution, freshness and class' },
   { method: 'get', path: '/v1/status', tag: 'provenance', summary: 'Health of the data pipeline (stale or failing sources)' },
@@ -74,7 +96,7 @@ export function openApiSpec(): Record<string, unknown> {
       summary: op.summary,
       parameters: [...pathParams, ...query],
       security: [op.admin ? { adminToken: [] } : { apiKey: [] }, ...(op.admin ? [] : [{}])],
-      responses: { '200': { description: 'OK' }, '401': { description: 'Missing or invalid key' }, '429': { description: 'Rate limit exceeded (see Retry-After)' } },
+      responses: { '200': { description: 'OK', ...(op.res ? { content: { 'application/json': { schema: { $ref: `#/components/schemas/${op.res}` } } } } : {}) }, '401': { description: 'Missing or invalid key' }, '429': { description: 'Rate limit exceeded (see Retry-After)' } },
     };
   }
   return {
@@ -86,6 +108,7 @@ export function openApiSpec(): Record<string, unknown> {
     },
     paths,
     components: {
+      schemas: SCHEMAS,
       securitySchemes: {
         apiKey: { type: 'apiKey', in: 'header', name: 'x-api-key', description: 'Required when the server is configured with API_KEYS; a Bearer token is accepted too.' },
         adminToken: { type: 'http', scheme: 'bearer', description: 'ADMIN_TOKEN, for review items, API keys and release subscribers; also accepted on webhook endpoints (sees all subscriptions).' },

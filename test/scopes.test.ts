@@ -121,6 +121,36 @@ describe.skipIf(!url)('scopes, metadata and profiles', () => {
     expect((await get('/v1/schema')).json().scopes.cities['x-countries-with-data']).toBe(1);
   });
 
+  it('TypeScript SDK: scopes, schema, profile and own scope profiles', async () => {
+    const mk = (await app.inject({ method: 'POST', url: '/v1/api-keys', headers: { authorization: `Bearer ${ADMIN}` }, payload: { name: 'sdk' } })).json().key as string;
+    const via = (async (u: string, init: RequestInit = {}) => {
+      const r = await app.inject({ method: (init.method ?? 'GET') as 'GET', url: u.replace('http://x', ''), headers: init.headers as Record<string, string>, payload: init.body as string | undefined });
+      return new Response(r.statusCode === 204 ? null : new Uint8Array(r.rawPayload), { status: r.statusCode, headers: { 'content-type': String(r.headers['content-type'] ?? 'application/json') } });
+    }) as unknown as typeof fetch;
+    const c = new CountryInfo({ baseUrl: 'http://x', apiKey: mk, fetchFn: via });
+    expect((await c.scopes()).default_scopes).toEqual(['default']);
+    expect(((await c.scope('measurement')) as { id: string }).id).toBe('measurement');
+    const p = await c.profile({ countries: 'TR,DE', scopes: 'measurement', mode: 'intersect' });
+    expect(p.countries).toEqual(['TR', 'DE']);
+    expect(p.data.TR!.measurement).toMatchObject({ system: 'metric' });
+    expect(Object.keys(((await c.countrySchema('TR', { scopes: 'currency,measurement' })) as { scopes: object }).scopes)).toEqual(['currency', 'measurement']);
+    const sp = await c.createScopeProfile({ name: 'sdk-profile', scopes: ['measurement'], countries: ['TR'], default: true });
+    expect((await c.scopeProfiles()).map((x) => x.name)).toEqual(['sdk-profile']);
+    expect(Object.keys((await c.profile({})).data.TR!)).toEqual(['measurement']); // key default profile
+    await c.deleteScopeProfile(sp.id);
+    expect(await c.scopeProfiles()).toEqual([]);
+  });
+
+  it('OpenAPI: every $ref resolves and the scope endpoints declare response schemas', () => {
+    const spec = openApiSpec() as { paths: Record<string, Record<string, { responses: Record<string, { content?: { 'application/json': { schema: { $ref: string } } } }> }>>; components: { schemas: Record<string, unknown> } };
+    const refs: string[] = [];
+    const walk = (v: unknown) => { if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) k === '$ref' ? refs.push(x as string) : walk(x); };
+    walk(spec);
+    expect(refs.length).toBeGreaterThan(5);
+    for (const r of refs) expect(spec.components.schemas[r.split('/').pop()!], r).toBeDefined();
+    expect(spec.paths['/v1/profile']!.get!.responses['200']!.content!['application/json'].schema.$ref).toBe('#/components/schemas/ProfileResult');
+  });
+
   it('global metadata carries coverage', async () => {
     const g = (await get('/v1/schema')).json();
     expect(g.countries_total).toBe(3);
@@ -163,6 +193,8 @@ describe.skipIf(!url)('scopes, metadata and profiles', () => {
 });
 
 import { exportSnapshot } from '../src/export.js';
+import { CountryInfo } from '../src/sdk.js';
+import { openApiSpec } from '../src/openapi.js';
 import { createAttributeReleaseNote } from '../src/release-notes.js';
 import { diffAttributes } from '../src/sources/cldr-attrs.js';
 import { readFile } from 'node:fs/promises';
