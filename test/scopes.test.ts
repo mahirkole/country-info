@@ -85,6 +85,15 @@ describe.skipIf(!url)('scopes, metadata and profiles', () => {
     expect(un.scopes.measurement.properties.units['x-present-in']).toEqual(['TR']);
   });
 
+  it('intersect also narrows map-like fields (units) to the keys every country has', async () => {
+    await pool.query(`UPDATE entity_attributes SET data = '{"mass":{"person":["kilogram"]},"length":{"road":["kilometer"]}}' WHERE entity_id = 'country:TR' AND grp = 'units'`);
+    const i = (await get('/v1/profile?countries=TR,US&scopes=measurement&mode=intersect')).json();
+    expect(i.data.TR.measurement.units).toEqual({ mass: { person: ['kilogram'] } });
+    expect(i.data.US.measurement.units).toEqual({ mass: { person: ['pound'] } });
+    const u = (await get('/v1/profile?countries=TR,US&scopes=measurement')).json();
+    expect(u.data.TR.measurement.units.length.road).toEqual(['kilometer']);
+  });
+
   it('country metadata lists only populated fields; unknown countries and bad input are reported', async () => {
     const s = (await get('/v1/schema/countries/DE?scopes=measurement,datetime,currency')).json();
     expect(s.scopes.datetime.properties).toEqual({});

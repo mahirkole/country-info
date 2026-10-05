@@ -68,6 +68,9 @@ export async function schemaFor(pool: pg.Pool, countries: string[], scopes: stri
   return { $schema: JSON_SCHEMA, schema_version: SCHEMA_VERSION, countries: ccs.filter((c) => resolved.data[c]), unknown_countries: resolved.unknown_countries, mode, scopes: out };
 }
 
+const leaves = (o: unknown, prefix = ''): string[] =>
+  o && typeof o === 'object' && !Array.isArray(o) ? Object.entries(o as Record<string, unknown>).flatMap(([k, v]) => leaves(v, prefix ? `${prefix}.${k}` : k)) : o === undefined || o === null ? [] : [prefix];
+
 /**
  * Data of the chosen scopes for several countries. `intersect` removes every field that is missing in at least one country, so all
  * countries come back with the same shape; `union` keeps all data (missing scopes are `null` and listed in `omitted`).
@@ -81,6 +84,23 @@ export async function composeProfile(pool: pg.Pool, countries: string[], scopes:
     const def = scopeById(id)!;
     const keep = new Set(presence(resolved, def, ccs, mode).kept.map((f) => f.path));
     for (const c of known) data[c]![id] = mode === 'intersect' ? pruneToPaths(resolved.data[c]![id], keep) ?? null : resolved.data[c]![id];
+    if (mode === 'intersect') {
+      // Map-like fields (`units`, `names`, ...) are kept as a whole above; narrow them to the keys every country has.
+      for (const fd of def.fields.filter((x) => x.type === 'object' && keep.has(x.path))) {
+        const per = known.map((c) => new Set(leaves(getPath(data[c]![id], fd.path), fd.path)));
+        const common = new Set([...per[0] ?? []].filter((l) => per.every((p) => p.has(l))));
+        for (const c of known) {
+          const root = data[c]![id] as Record<string, unknown> | null;
+          if (!root) continue;
+          const narrowed = pruneToPaths(getPath(root, fd.path), common, fd.path) as unknown;
+          const keys = fd.path.split('.');
+          let holder = root as Record<string, unknown>;
+          for (const k of keys.slice(0, -1)) holder = holder[k] as Record<string, unknown>;
+          if (narrowed === undefined) delete holder[keys.at(-1)!];
+          else holder[keys.at(-1)!] = narrowed;
+        }
+      }
+    }
   }
   return { schema_version: SCHEMA_VERSION, mode, scopes, countries: known, unknown_countries: resolved.unknown_countries, data, omitted: resolved.notes };
 }
