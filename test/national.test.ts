@@ -253,3 +253,36 @@ describe('AU adapter', () => {
     expect(() => parseAsgs([['x'], ['y']])).toThrow(/layout changed/);
   });
 });
+
+import { mapOns, pickLatestItem, itemKey } from '../src/sources/national/gb.js';
+describe('GB adapter', () => {
+  it('orders ONS vintages and picks the newest, preferring V2 of the same month', () => {
+    expect(itemKey('Countries (December 2025) Names and Codes in the UK')).toBeGreaterThan(itemKey('Countries (December 2024) Names and Codes in the UK'));
+    const items = [
+      { id: '1', title: 'Local Authority Districts (April 2025) Names and Codes in the UK (V2)', url: 'u2' },
+      { id: '2', title: 'Local Authority Districts (April 2025) Names and Codes in the UK', url: 'u1' },
+      { id: '3', title: 'Local Authority Districts (December 2024) Names and Codes in the UK', url: 'u0' },
+    ];
+    expect(pickLatestItem(items, /^Local Authority Districts/).url).toBe('u2');
+    expect(() => pickLatestItem(items, /^Nope/)).toThrow(/no item/);
+  });
+  it('builds nation > region > district and falls back to the nation for Wales/Scotland/NI', () => {
+    const lads = Array.from({ length: 300 }, (_, i) => ({ LAD25CD: `E07${String(i).padStart(6, '0')}`, LAD25NM: `D${i}` }));
+    lads.push({ LAD25CD: 'W06000001', LAD25NM: 'Isle of Anglesey', LAD25NMW: 'Ynys Môn' } as never, { LAD25CD: 'S12000033', LAD25NM: 'Aberdeen City' });
+    const e = mapOns({
+      countries: [{ CTRY25CD: 'E92000001', CTRY25NM: 'England' }, { CTRY25CD: 'K02000001', CTRY25NM: 'United Kingdom' }, { CTRY25CD: 'W92000004', CTRY25NM: 'Wales' }, { CTRY25CD: 'S92000003', CTRY25NM: 'Scotland' }],
+      regions: [{ RGN25CD: 'E12000001', RGN25NM: 'North East' }],
+      ladRegion: [{ LAD25CD: 'E07000000', RGN25CD: 'E12000001' }],
+      ladCtyua: [{ LAD25CD: 'E07000000', CTYUA25CD: 'E10000001', CTYUA25NM: 'Countyshire' }],
+      lads,
+    });
+    const by = (id: string) => e.find((x) => x.id === `div:GB:${id}`)!;
+    expect(by('K02000001')).toBeUndefined();
+    expect(by('E12000001').parent_id).toBe('div:GB:E92000001');
+    expect(by('E07000000')).toMatchObject({ parent_id: 'div:GB:E12000001', data: { level: 3, county_ua_code: 'E10000001' } });
+    expect(by('E07000001').parent_id).toBe('div:GB:E92000001');
+    expect(by('W06000001')).toMatchObject({ parent_id: 'div:GB:W92000004', data: { name_cy: 'Ynys Môn' } });
+    expect(by('S12000033').parent_id).toBe('div:GB:S92000003');
+    expect(() => mapOns({ countries: [], regions: [], ladRegion: [], ladCtyua: [], lads: [] })).toThrow();
+  });
+});

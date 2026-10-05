@@ -16,7 +16,7 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 | NL | CBS StatLine 86247NED "Gebieden in Nederland 2026" | landsdeel, provincie, gemeente | ✅ (Node istemcisi 406 alıyor, curl yedeği kullanılıyor) | partial (CBS web sitesi CC BY 4.0; OData tablosuna ayrı lisans metni bulunamadı) | **Yüklü: 358 birim** (4 / 12 / 342) |
 | NO | Kartverket kommuneinfo (api.kartverket.no) | fylke, kommune | ✅ | **read** (CC BY 4.0 veri seti kayıtları; API kaydı "Arkivert") | **Yüklü: 372** (15 / 357) |
 | SE | SCB PxWebApi v2 (yıllık tablo otomatik keşfedilir) | län, kommun | ✅ | **read** (CC0) | **Yüklü: 311** (21 / 290), `TAB6646` |
-| GB | ONS Open Geography (ArcGIS REST) | country, region, county, district | ✅ | 🟡 OGL v3 (dossier) | OS/Royal Mail kapsamı teyidinden sonra |
+| GB | ONS Open Geography (ArcGIS REST; en yeni vintage arama ile bulunur) | nation, region (yalnız İngiltere), local authority district (county/UA öznitelik) | ✅ | partial 🟡 OGL v3 (dossier) | **Yüklü: 374** (4 / 9 / 361); posta kodu/UPRN alınmaz; atıf "Source: Office for National Statistics licensed under the Open Government Licence v.3.0" |
 | AU | ABS ASGS | state, SA4…SA1 | ✅ | 🟢 yapılar CC BY 4.0 / 🟡 LGA | Sırada (Edition 4) |
 | DK | DAWA (`api.dataforsyningen.dk`) | region, municipality | ❌ 410 (adres değişmiş) | – | Yeni adres araştırılacak |
 | CA | Statistics Canada | province, census division, subdivision | ❌ 403 | – | Başka erişim yolu |
