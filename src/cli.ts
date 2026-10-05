@@ -11,7 +11,7 @@ import { NATIONAL, nationalSource } from './sources/national/index.js';
 import { allTargets, syncTargetMetadata } from './targets.js';
 import { dueSourceIds, runRefresh, type RunResult } from './refresh.js';
 import { ackLicense, checkLicenses } from './license-watch.js';
-import { loadHolidayFiles, HOLIDAYS_SOURCE } from './holidays/load.js';
+import { loadHolidaysWithFeeds, HOLIDAYS_SOURCE } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { diffHolidays, fetchNager } from './holidays/check.js';
 import { exportSnapshot } from './export.js';
@@ -56,7 +56,7 @@ async function main() {
       await migrate(pool);
       const from = Number(process.argv[3] ?? 2024);
       const to = Number(process.argv[4] ?? new Date().getUTCFullYear() + 2);
-      const files = await loadHolidayFiles();
+      const files = await loadHolidaysWithFeeds(from, to, config.cacheDir);
       const input = files.flatMap((f) => compileHolidays(f, from, to));
       console.log(await ingest(pool, HOLIDAYS_SOURCE, input, { kinds: ['holiday'], countries: files.map((f) => f.country), maxDeleteRatio: deleteRatio() }));
       break;
@@ -70,7 +70,7 @@ async function main() {
     case 'check-holidays': {
       // Alarm only: compare our nationwide public holidays with Nager.Date for the given year (default: current).
       const year = Number(process.argv[3] ?? new Date().getUTCFullYear());
-      for (const f of await loadHolidayFiles()) {
+      for (const f of await loadHolidaysWithFeeds(year, year, config.cacheDir)) {
         const d = diffHolidays(compileHolidays(f, year, year), await fetchNager(f.country, year));
         console.log(f.country, year, d.onlyOurs.length + d.onlyTheirs.length === 0 ? 'ok' : d);
       }

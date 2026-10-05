@@ -6,7 +6,7 @@
 
 | Kapsam | Durum |
 |---|---|
-| Ülkeler / bölgeler (ISO 3166-1, 252 kayıt; `un_status`: member 193, observer 2, other 57) | ✅ |
+| Ülkeler / bölgeler (ISO 3166-1, 252 kayıt; `un_status`: member 193, other 59 — CLDR'den okunur, gözlemci ayrımı yok) | ✅ |
 | Alt bölgeler: admin1 (~3.9k) ve admin2 (~47k) – GeoNames | ✅ |
 | Ülke nitelikleri: para birimi, diller, telefon kodu, posta kodu biçimi, komşular, TLD | ✅ |
 | Snapshot + değişiklik günlüğü (delta), cursor tabanlı API | ✅ |

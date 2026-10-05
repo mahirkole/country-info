@@ -12,7 +12,7 @@ const scope: Param[] = [
 ];
 
 export const OPERATIONS: Op[] = [
-  { method: 'get', path: '/v1/countries', tag: 'countries', summary: 'List countries', query: [...page, { name: 'un_status', description: 'UN membership filter' }, { name: 'continent', description: 'Continent code' }] },
+  { method: 'get', path: '/v1/countries', tag: 'countries', summary: 'List countries', query: [...page, { name: 'un_status', description: 'UN membership: member or other (from CLDR; observer states are not distinguished)' }, { name: 'continent', description: 'Continent code' }] },
   { method: 'get', path: '/v1/countries/{code}', tag: 'countries', summary: 'One country (names in many languages, currency xref)' },
   { method: 'get', path: '/v1/countries/{code}/regions', tag: 'regions', summary: 'First- or second-level regions of a country', query: [...page, ...scope, { name: 'level', description: '1 or 2' }] },
   { method: 'get', path: '/v1/countries/{code}/divisions', tag: 'regions', summary: 'Administrative divisions from national sources', query: [...page, ...scope, { name: 'level', description: 'Level within the source' }, { name: 'type', description: 'Common type: state, province, county, municipality, …' }, { name: 'source', description: 'Source id, e.g. nat-fr' }] },

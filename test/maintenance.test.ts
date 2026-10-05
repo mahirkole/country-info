@@ -44,6 +44,19 @@ d('maintenance', () => {
     await app.close();
   });
 
+  it('serves un_status from the CLDR xref (null before enrichment) and filters on it', async () => {
+    await pool.query("INSERT INTO sources (id, authority) VALUES ('gx','g') ON CONFLICT DO NOTHING");
+    await pool.query("INSERT INTO entities (id, kind, country_code, code, name, content_hash, updated_seq, source_id, data) VALUES ('country:TR','country','TR','TR','Turkey','h',0,'gx','{}'), ('country:TW','country','TW','TW','Taiwan','h',0,'gx','{}'), ('country:XX','country','XX','XX','Nowhere','h',0,'gx','{}')");
+    await pool.query("INSERT INTO entity_xrefs (entity_id, scheme, value, source) VALUES ('country:TR','un_status','member','cldr'), ('country:TW','un_status','other','cldr')");
+    const app = await buildApp(pool, { exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    const all = (await app.inject('/v1/countries')).json().data as { code: string; data: { un_status: string | null } }[];
+    expect(Object.fromEntries(all.map((c) => [c.code, c.data.un_status]))).toEqual({ TR: 'member', TW: 'other', XX: null });
+    expect(((await app.inject('/v1/countries?un_status=member')).json().data as { code: string }[]).map((c) => c.code)).toEqual(['TR']);
+    expect((await app.inject('/v1/countries/tw')).json().data.un_status).toBe('other');
+    await app.close();
+    await pool.query("DELETE FROM entity_xrefs WHERE entity_id LIKE 'country:%'; DELETE FROM entities WHERE id LIKE 'country:%'");
+  });
+
   it('rolls the whole ingest back when queuing a webhook fails: no snapshot, no records, no deliveries', async () => {
     await pool.query("INSERT INTO webhook_subscriptions (url, secret) VALUES ('https://boom.test','s')");
     await pool.query("CREATE FUNCTION boom() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'queue down'; END $$");

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { compileHolidays, datesFor, easter, nthWeekday, type HolidayFile, type HolidayRule } from '../src/holidays/rules.js';
 import { loadHolidayFiles } from '../src/holidays/load.js';
+import { applyFeeds, parseDiyanet } from '../src/holidays/feeds.js';
 
 const d = (dt: Date) => dt.toISOString().slice(0, 10);
 const src = { citation: 'test' };
@@ -73,28 +74,63 @@ describe('rule engine: substitute days, conditions, half-day hours', () => {
   });
 });
 
+/** Rows as Diyanet's «Dini Günler» table prints them (hijri day, hijri month, hijri year, gregorian day, "MONTH-YEAR", weekday, label). */
+const DIYANET_2026: string[][] = [
+  ['29', 'RAMAZAN', '1447', '19', 'MART-2026', 'PERŞEMBE', 'AREFE'],
+  ['01', 'ŞEVVAL', '1447', '20', 'MART-2026', 'CUMA', 'RAMAZAN BAYRAMI (1. Gün)'],
+  ['02', 'ŞEVVAL', '1447', '21', 'MART-2026', 'CUMARTESİ', 'RAMAZAN BAYRAMI (2. Gün)'],
+  ['03', 'ŞEVVAL', '1447', '22', 'MART-2026', 'PAZAR', 'RAMAZAN BAYRAMI (3. Gün)'],
+  ['09', 'ZİLHİCCE', '1447', '26', 'MAYIS-2026', 'SALI', 'AREFE'],
+  ['10', 'ZİLHİCCE', '1447', '27', 'MAYIS -2026', 'ÇARŞAMBA', 'KURBAN BAYRAMI (1. Gün)'],
+  ['11', 'ZİLHİCCE', '1447', '28', 'MAYIS -2026', 'PERŞEMBE', 'KURBAN BAYRAMI (2. Gün)'],
+  ['12', 'ZİLHİCCE', '1447', '29', 'MAYIS -2026', 'CUMA', 'KURBAN BAYRAMI (3. Gün)'],
+  ['13', 'ZİLHİCCE', '1447', '30', 'MAYIS -2026', 'CUMARTESİ', 'KURBAN BAYRAMI (4. Gün)'],
+];
+const page = (rows: string[][]) =>
+  `<html><body><table><tr><th>Hicri</th><th>Ay</th><th>Yıl</th><th>Gün</th><th>Miladi</th><th>Haftanın günü</th><th>Dini gün</th></tr>` +
+  `<tr><td>12</td><td>RECEB</td><td>1447</td><td>01</td><td>OCAK-2026</td><td>PERŞEMBE</td><td>ÜÇ AYLARIN BAŞLANGICI</td></tr>` +
+  rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('') +
+  `</table></body></html>`;
+
+describe('Diyanet feed', () => {
+  it('parses the bayram days of a published year and returns null for an unpublished one', () => {
+    expect(parseDiyanet(page(DIYANET_2026), 2026)).toEqual({
+      'ramazan-arefe': '2026-03-19', 'ramazan-1': '2026-03-20', 'ramazan-2': '2026-03-21', 'ramazan-3': '2026-03-22',
+      'kurban-arefe': '2026-05-26', 'kurban-1': '2026-05-27', 'kurban-2': '2026-05-28', 'kurban-3': '2026-05-29', 'kurban-4': '2026-05-30',
+    });
+    expect(parseDiyanet(page([]), 2027)).toBeNull();
+  });
+  it('refuses a changed layout instead of guessing', () => {
+    expect(() => parseDiyanet(page(DIYANET_2026.slice(0, 7)), 2026)).toThrow(/layout changed/);
+    expect(() => parseDiyanet(page([...DIYANET_2026, ...DIYANET_2026.slice(1, 2)]), 2026)).toThrow(/listed twice/);
+  });
+});
+
 describe('TR data file', () => {
+  const withFeed = async (from: number, to: number) => {
+    const files = await loadHolidayFiles();
+    await applyFeeds(files, from, to, '.cache', async (y) => page(y === 2026 ? DIYANET_2026 : []));
+    return files.find((f) => f.country === 'TR')!;
+  };
   it('compiles 2026 with expected dates, half days and provenance', async () => {
-    const tr = (await loadHolidayFiles()).find((f) => f.country === 'TR')!;
-    const h = compileHolidays(tr, 2026, 2026);
+    const h = compileHolidays(await withFeed(2026, 2026), 2026, 2026);
     const dates = (type: string) => h.filter((x) => x.data.type === type).map((x) => x.data.date);
     expect(dates('public')).toEqual(expect.arrayContaining(['2026-01-01', '2026-03-20', '2026-03-22', '2026-05-27', '2026-05-30', '2026-07-15', '2026-10-29']));
     expect(dates('public')).toHaveLength(8 + 3 + 4 - 1); // 7 fixed national days + 3 Ramazan + 4 Kurban
     expect(dates('half_day').sort()).toEqual(['2026-03-19', '2026-05-26', '2026-10-28']);
-    for (const x of h) expect((x.data.source as { citation: string }).citation).toBeTruthy();
-    // Read on 2026-10-05: Law 2429 (mevzuat.gov.tr) and Diyanet's Dini Günler tables for 2024–2026.
-    expect(h.every((x) => x.data.verification === 'verified' && (x.data.source as { checked_on?: string; url?: string }).checked_on === '2026-10-05' && !!(x.data.source as { url?: string }).url)).toBe(true);
+    // Fixed days: Law 2429 read on 2026-10-05; bayram dates: Diyanet feed read at every refresh.
+    expect(h.every((x) => x.data.verification === 'verified' && !!(x.data.source as { url?: string }).url && !!(x.data.source as { checked_on?: string }).checked_on)).toBe(true);
+    expect(h.filter((x) => (x.data.source as { feed?: string }).feed === 'diyanet')).toHaveLength(9);
   });
-  it('keeps the years Diyanet has not published yet tentative', async () => {
-    const tr = (await loadHolidayFiles()).find((f) => f.country === 'TR')!;
-    const h = compileHolidays(tr, 2027, 2028);
-    const religious = h.filter((x) => /^(ramazan|kurban)/.test(x.code ?? ""));
-    expect(religious.length).toBeGreaterThan(0);
-    expect(religious.every((x) => x.data.verification === 'tentative')).toBe(true);
-    expect(h.filter((x) => !/^(ramazan|kurban)/.test(x.code ?? "")).every((x) => x.data.verification === 'verified')).toBe(true); // fixed days come from the law
+  it('produces no bayram record for a year Diyanet has not published (no manual or guessed dates)', async () => {
+    const tr = await withFeed(2026, 2027);
+    const h = compileHolidays(tr, 2027, 2027);
+    expect(h.filter((x) => /^(ramazan|kurban)/.test(x.code ?? '')).length).toBe(0);
+    expect(h.length).toBeGreaterThan(0); // the fixed national days are there
+    expect(tr.rules.filter((r) => r.feed).every((r) => r.when && 'listed' in r.when)).toBe(true);
   });
   it('does not emit 15 Temmuz before 2017', async () => {
-    const tr = (await loadHolidayFiles()).find((f) => f.country === 'TR')!;
+    const tr = await withFeed(2016, 2016);
     expect(compileHolidays(tr, 2016, 2016).some((x) => x.code === 'demokrasi-ve-milli-birlik-gunu')).toBe(false);
   });
 });

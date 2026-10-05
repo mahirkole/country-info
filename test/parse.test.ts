@@ -1,20 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { parseCountryInfo, parseAdmin1, parseAdmin2, parseCities } from '../src/sources/geonames.js';
-import { UN_MEMBERS, unStatus } from '../src/sources/un.js';
 import { changedFields, hashOf } from '../src/ingest.js';
 import { csvRow } from '../src/export.js';
 
 const COUNTRY = '# comment\nTR\tTUR\t792\tTU\tTurkey\tAnkara\t780580\t82319724\tAS\t.tr\tTRY\tLira\t90\t#####\t^(\\d{5})$\ttr-TR,ku,ar-SY\t298795\tGE,IQ,IR\t\n';
 
 describe('sources', () => {
-  it('has 193 UN members', () => expect(UN_MEMBERS.size).toBe(193));
-  it('classifies un status', () => {
-    expect([unStatus('TR'), unStatus('VA'), unStatus('TW')]).toEqual(['member', 'observer', 'other']);
-  });
   it('parses countryInfo', () => {
     const [c] = parseCountryInfo(COUNTRY);
     expect(c).toMatchObject({ id: 'country:TR', name: 'Turkey', code: 'TR' });
-    expect(c!.data).toMatchObject({ iso3: 'TUR', currency: { code: 'TRY', name: 'Lira' }, phone_code: '90', languages: ['tr-TR', 'ku', 'ar-SY'], neighbours: ['GE', 'IQ', 'IR'], un_status: 'member' });
+    expect(c!.data).toMatchObject({ iso3: 'TUR', currency: { code: 'TRY', name: 'Lira' }, phone_code: '90', languages: ['tr-TR', 'ku', 'ar-SY'], neighbours: ['GE', 'IQ', 'IR'] });
+    expect(c!.data).not.toHaveProperty('un_status'); // read-side, from CLDR (enrich:cldr), not typed into the code
   });
   it('parses admin1 and admin2 hierarchy, dropping orphans', () => {
     const a1 = parseAdmin1('TR.34\tIstanbul\tIstanbul\t745044\n');

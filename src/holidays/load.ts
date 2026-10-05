@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { SourceMeta } from '../model.js';
 import { type HolidayFile } from './rules.js';
+import { applyFeeds } from './feeds.js';
 
 export const HOLIDAYS_SOURCE: SourceMeta = {
   id: 'official-holidays',
@@ -19,4 +20,11 @@ export async function loadHolidayFiles(dir = join(process.cwd(), 'data', 'holida
     out.push(parsed);
   }
   return out;
+}
+
+/** The rule files with every automated feed (Diyanet bayram dates, …) applied for [fromYear, toYear]. A feed that cannot be read fails the load: nothing is half-applied. */
+export async function loadHolidaysWithFeeds(fromYear: number, toYear: number, cacheDir: string, dir?: string): Promise<HolidayFile[]> {
+  const files = await loadHolidayFiles(dir);
+  await applyFeeds(files, fromYear, toYear, cacheDir);
+  return files;
 }

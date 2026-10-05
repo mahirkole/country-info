@@ -171,75 +171,34 @@
    },
    "type": "public",
    "when": {
-    "listed": {
-     "2026": {
-      "date": "2026-04-27",
-      "verification": "verified"
+    "if_weekday": {
+     "when": {
+      "fixed": {
+       "month": 4,
+       "day": 27
+      }
      },
-     "2027": {
-      "date": "2027-04-27",
-      "verification": "verified"
+     "weekday": 0,
+     "then": {
+      "fixed": {
+       "month": 4,
+       "day": 26
+      }
      },
-     "2028": {
-      "date": "2028-04-27",
-      "verification": "tentative"
-     },
-     "2029": {
-      "date": "2029-04-27",
-      "verification": "tentative"
-     },
-     "2030": {
-      "date": "2030-04-27",
-      "verification": "tentative"
-     },
-     "2031": {
-      "date": "2031-04-26",
-      "verification": "tentative"
-     },
-     "2032": {
-      "date": "2032-04-27",
-      "verification": "tentative"
-     },
-     "2033": {
-      "date": "2033-04-27",
-      "verification": "tentative"
-     },
-     "2034": {
-      "date": "2034-04-27",
-      "verification": "tentative"
-     },
-     "2035": {
-      "date": "2035-04-27",
-      "verification": "tentative"
-     },
-     "2036": {
-      "date": "2036-04-26",
-      "verification": "tentative"
-     },
-     "2037": {
-      "date": "2037-04-27",
-      "verification": "tentative"
-     },
-     "2038": {
-      "date": "2038-04-27",
-      "verification": "tentative"
-     },
-     "2039": {
-      "date": "2039-04-27",
-      "verification": "tentative"
-     },
-     "2040": {
-      "date": "2040-04-27",
-      "verification": "tentative"
+     "else": {
+      "fixed": {
+       "month": 4,
+       "day": 27
+      }
      }
     }
    },
    "source": {
-    "citation": "Algemene termijnenwet art. 3 lid 1: « de dag waarop de verjaardag van de Koning wordt gevierd » (datum staat niet in de wet); datum 27 april en zondagsverschuiving: Rijksoverheid, « Is Koningsdag (27 april) een vrije dag? »: « Valt 27 april op een zondag, dan wordt Koningsdag op zaterdag gevierd. »; jaren 2026/2027 expliciet gelezen op « Wanneer zijn de officiële feestdagen in Nederland? »",
+    "citation": "Algemene termijnenwet art. 3 lid 1: « de dag waarop de verjaardag van de Koning wordt gevierd » (datum staat niet in de wet); datum 27 april en zondagsverschuiving: Rijksoverheid, « Is Koningsdag (27 april) een vrije dag? »: « Valt 27 april op een zondag, dan wordt Koningsdag op zaterdag gevierd. »; regel (27 april; zondag → zaterdag 26 april) wordt berekend, geen handmatige jaarlijst; jaren 2026/2027 op « Wanneer zijn de officiële feestdagen in Nederland? » gelezen en door de regel bevestigd",
     "url": "https://www.rijksoverheid.nl/vraag-en-antwoord/arbeidsovereenkomst-en-cao/koningsdag-27-april-vrije-dag",
     "checked_on": "2026-10-05"
    },
-   "verification": "tentative"
+   "verification": "verified"
   }
  ]
 }

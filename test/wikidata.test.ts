@@ -148,7 +148,7 @@ describe('wikidata divisions', () => {
   });
 });
 
-import { parseCurrencies, parseTerritories } from '../src/sources/cldr.js';
+import { parseCurrencies, parseTerritories, parseUnMembers } from '../src/sources/cldr.js';
 describe('cldr', () => {
   it('keeps alpha-2 territory names only', () => {
     const j = { main: { tr: { localeDisplayNames: { territories: { '001': 'Dünya', '419': 'LatAm', TR: 'Türkiye', XA: 'Sahte', 'GB-alt-short': 'x', DE: 'Almanya' } } } } };
@@ -162,5 +162,16 @@ describe('cldr', () => {
     expect(m.get('TR')).toEqual(['TRY']);
     expect(m.has('ZW')).toBe(false);
     expect(() => parseCurrencies({ supplemental: { currencyData: { region: { TR: [] } } } })).toThrow(/layout changed/);
+  });
+});
+
+describe('CLDR UN membership (read from the data, not typed in)', () => {
+  const codes = (n: number) => Array.from({ length: n }, (_, i) => String.fromCharCode(65 + (i % 26)) + String.fromCharCode(65 + Math.floor(i / 26)));
+  const json = (list: string[] | undefined) => ({ supplemental: { territoryContainment: list ? { UN: { _contains: list, _grouping: 'true' } } : {} } });
+  it('reads the UN grouping and rejects a missing or implausible one', () => {
+    const m = parseUnMembers(json([...codes(190), '001']));
+    expect(m.size).toBe(190); // non-alpha-2 entries are ignored
+    expect(() => parseUnMembers(json(undefined))).toThrow(/layout changed/);
+    expect(() => parseUnMembers(json(codes(40)))).toThrow(/layout changed/);
   });
 });

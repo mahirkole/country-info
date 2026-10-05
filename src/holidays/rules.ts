@@ -25,6 +25,8 @@ export interface HolidayRule {
   /** `checked_on` (ISO date) is set only when the cited text was actually read from the official source. */
   source: { citation: string; url?: string; checked_on?: string };
   verification?: Verification;
+  /** Dates come from an automated official feed read at every refresh (see `feeds.ts`), e.g. `diyanet:kurban-1`; `when` is then an empty `listed`. */
+  feed?: string;
   /** Entity id of the region (e.g. `nuts:DE2`) this holiday is limited to; omit for nationwide. */
   region?: string;
   /** Substitute day off when the date falls on a Saturday/Sunday; emitted as `data.observed` (only when it differs from `date`). */

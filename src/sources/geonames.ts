@@ -1,7 +1,6 @@
 import { unzipSync, strFromU8 } from 'fflate';
 import { fetchBytes, fetchText } from './fetch.js';
 import type { EntityInput, SourceMeta } from '../model.js';
-import { unStatus } from './un.js';
 
 export const GEONAMES: SourceMeta = {
   id: 'geonames',
@@ -51,7 +50,6 @@ export function parseCountryInfo(text: string): EntityInput[] {
         languages: list(c[15]),
         neighbours: list(c[17]),
         geonames_id: num(c[16]),
-        un_status: unStatus(iso),
       },
     });
   }

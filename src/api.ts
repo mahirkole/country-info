@@ -9,6 +9,7 @@ import { installAccessControl } from './access.js';
 
 import { openApiSpec } from './openapi.js';
 import { WEBHOOK_EVENTS } from './webhooks.js';
+import { UN_SQL, withUn } from './export.js';
 import { createStore, exportLinks, PROFILES, type Profile } from './publish.js';
 import { contentTypeOf, FsStore, type ObjectStore } from './object-store.js';
 import { createReadStream } from 'node:fs';
@@ -101,18 +102,19 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     const { un_status, continent } = req.query;
     const rows = (
       await pool.query(
-        `SELECT ${COLS} FROM entities WHERE kind = 'country' AND code > $1
-           AND ($2::text IS NULL OR data->>'un_status' = $2) AND ($3::text IS NULL OR data->>'continent' = $3)
+        `SELECT ${COLS}, ${UN_SQL} AS un_x FROM entities WHERE kind = 'country' AND code > $1
+           AND ($2::text IS NULL OR ${UN_SQL} = $2) AND ($3::text IS NULL OR data->>'continent' = $3)
          ORDER BY code LIMIT $4`,
         [after, un_status ?? null, continent ?? null, limit + 1],
       )
-    ).rows;
+    ).rows.map(withUn);
     return paged(rows, limit, 'code');
   });
 
   app.get<{ Params: { code: string } }>('/v1/countries/:code', async (req, reply) => {
-    const r = await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'country' AND code = $1`, [req.params.code.toUpperCase()]);
+    const r = await pool.query(`SELECT ${COLS}, ${UN_SQL} AS un_x FROM entities WHERE kind = 'country' AND code = $1`, [req.params.code.toUpperCase()]);
     if (!r.rows[0]) return reply.code(404).send({ error: 'not_found' });
+    r.rows[0] = withUn(r.rows[0]);
     const names = Object.fromEntries((await pool.query("SELECT lang, name FROM entity_names WHERE entity_id = $1 ORDER BY lang, (source = 'wikidata') DESC, source", [r.rows[0].id])).rows.map((n) => [n.lang, n.name]));
     const xrefs = (await pool.query('SELECT scheme, value, source FROM entity_xrefs WHERE entity_id = $1 AND value IS NOT NULL', [r.rows[0].id])).rows;
     return { ...r.rows[0], names, xrefs };

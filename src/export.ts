@@ -3,6 +3,14 @@ import { mkdir, readFile, writeFile, appendFile, cp, rm, readdir } from 'node:fs
 import { join } from 'node:path';
 import type pg from 'pg';
 
+/** UN status of a country: read from CLDR (xref scheme `un_status`, written by enrich:cldr); null until that has run. */
+export const UN_SQL = "(SELECT x.value FROM entity_xrefs x WHERE x.entity_id = entities.id AND x.scheme = 'un_status' AND x.source = 'cldr' LIMIT 1)";
+/** Put the xref-derived `un_status` (selected as `un_x`) into a country row's `data`. */
+export const withUn = <T extends { data: Record<string, unknown>; un_x?: unknown }>(r: T): Omit<T, 'un_x'> => {
+  const { un_x, ...rest } = r;
+  return { ...rest, data: { ...rest.data, un_status: (un_x as string | null | undefined) ?? null } };
+};
+
 const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data, source_id';
 
 const csvCell = (v: unknown): string => {
@@ -84,7 +92,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
   // Export the data as of the current head. Snapshots are cumulative, so files
   // for an old snapshot id reflect the database now; deltas are what is per-snapshot.
   if (!opts.deltaOnly) {
-    const countries = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'country' ${cleared} ORDER BY code`)).rows;
+    const countries = (await pool.query(`SELECT ${COLS}, ${UN_SQL} AS un_x FROM entities WHERE kind = 'country' ${cleared} ORDER BY code`)).rows.map(withUn);
     await writeFile(join(dir, 'countries.json'), JSON.stringify(countries, null, 1));
     for (const c of countries) {
       await mkdir(join(dir, 'by-country', c.code), { recursive: true });

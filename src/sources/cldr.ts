@@ -8,7 +8,7 @@ export const CLDR_SOURCE = {
   id: 'cldr',
   authority: 'Unicode CLDR (cldr-json) – localized territory names and currency data',
   url: 'https://github.com/unicode-org/cldr-json',
-  license: 'Unicode License v3 (unicode.org/license.txt, read): use, copy, modify, merge, publish, distribute and/or sell. Only territories.json (country names) and currencyData are used; territoryInfo and territoryContainment are not (UN M.49 / third-party origins, docs/licenses/cldr.md).',
+  license: 'Unicode License v3 (unicode.org/license.txt, read): use, copy, modify, merge, publish, distribute and/or sell. territories.json (country names), currencyData and the `UN` grouping of territoryContainment (UN membership) are used; territoryInfo and the rest of territoryContainment are not (UN M.49 / third-party origins, docs/licenses/cldr.md).',
   attribution: 'Copyright © Unicode, Inc. Data from the Unicode Common Locale Data Repository (CLDR), distributed under the Unicode License v3.',
 };
 
@@ -36,12 +36,25 @@ export function parseCurrencies(json: unknown): Map<string, string[]> {
   return out;
 }
 
-/** Write localized country names (`entity_names`, source cldr) and the current currency (`entity_xrefs` scheme `currency`) for country entities. */
-export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_LANGS): Promise<{ names: number; currencies: number }> {
+/**
+ * ISO alpha-2 codes of the UN member states: CLDR's `UN` grouping in territoryContainment. Membership is read from CLDR at every
+ * enrichment run (no list typed into this code); CLDR has no observer status, so non-members are `other`.
+ */
+export function parseUnMembers(json: unknown): Set<string> {
+  const un = (json as { supplemental?: { territoryContainment?: Record<string, { _contains?: string[] }> } }).supplemental?.territoryContainment?.UN?._contains;
+  if (!un) throw new Error("CLDR territoryContainment: no UN grouping — layout changed");
+  const out = new Set(un.filter((c) => /^[A-Z]{2}$/.test(c)));
+  if (out.size < 185 || out.size > 200) throw new Error(`CLDR UN grouping: ${out.size} members — layout changed`);
+  return out;
+}
+
+/** Write localized country names (`entity_names`, source cldr) and the current currency (`entity_xrefs` scheme `currency`) and the UN status (scheme `un_status`: `member` or `other`) for country entities. */
+export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_LANGS): Promise<{ names: number; currencies: number; un_members: number }> {
   const get = async (path: string, name: string) => JSON.parse(await fetchText(`${BASE}/${path}`, name, cacheDir)) as unknown;
   const names = new Map<string, Map<string, string>>();
   for (const l of langs) names.set(l, parseTerritories(await get(`cldr-localenames-full/main/${l}/territories.json`, `cldr_terr_${l}.json`), l));
   const currencies = parseCurrencies(await get('cldr-core/supplemental/currencyData.json', 'cldr_currency.json'));
+  const unMembers = parseUnMembers(await get('cldr-core/supplemental/territoryContainment.json', 'cldr_containment.json'));
   await pool.query(
     `INSERT INTO sources (id, authority, url, license, attribution, cadence, license_verdict, commercial_use, source_class, retrieved_at)
      VALUES ($1, $2, $3, $4, $5, 'annual', 'green', 'Unicode License v3: use, copy, modify, publish, distribute and sell; copyright notice required', 'community', now())
@@ -52,6 +65,7 @@ export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_L
   const client = await pool.connect();
   let n = 0;
   let c = 0;
+  let um = 0;
   try {
     await client.query('BEGIN');
     await client.query(`DELETE FROM entity_names WHERE source = 'cldr'`);
@@ -64,6 +78,8 @@ export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_L
           n++;
         }
       }
+      await client.query(`INSERT INTO entity_xrefs (entity_id, scheme, value, source) VALUES ($1, 'un_status', $2, 'cldr')`, [id, unMembers.has(code) ? 'member' : 'other']);
+      if (unMembers.has(code)) um++;
       const cur = currencies.get(code);
       if (cur) {
         await client.query(`INSERT INTO entity_xrefs (entity_id, scheme, value, source) VALUES ($1, 'currency', $2, 'cldr')`, [id, cur.join(',')]);
@@ -77,5 +93,5 @@ export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_L
   } finally {
     client.release();
   }
-  return { names: n, currencies: c };
+  return { names: n, currencies: c, un_members: um };
 }

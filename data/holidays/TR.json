@@ -172,35 +172,16 @@
    },
    "type": "half_day",
    "when": {
-    "listed": {
-     "2024": {
-      "date": "2024-04-09",
-      "verification": "verified"
-     },
-     "2025": {
-      "date": "2025-03-29",
-      "verification": "verified"
-     },
-     "2026": {
-      "date": "2026-03-19",
-      "verification": "verified"
-     },
-     "2027": {
-      "date": "2027-03-09",
-      "verification": "tentative"
-     },
-     "2028": {
-      "date": "2028-02-26",
-      "verification": "tentative"
-     }
-    }
+    "listed": {}
    },
    "source": {
-    "citation": "2429 sayılı Kanun, Ramazan Bayramı: m.2/B-1 (« Arefe günü saat 13.00'ten itibaren 3,5 gündür ») — süre kanundan; tarihler Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=2024/2025/2026 sayfaları okundu; 2027–2028 için Diyanet henüz yayımlamadı, tarihler tahmindir)",
+    "citation": "2429 sayılı Kanun, Ramazan Bayramı: m.2/B-1 (« Arefe günü saat 13.00'ten itibaren 3,5 gündür ») — süre kanundan (metin 2026-10-05'te okundu); tarihler her yenilemede Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=YYYY) otomatik okunur; Diyanet'in henüz yayımlamadığı yıllar için kayıt üretilmez",
     "url": "https://vakithesaplama.diyanet.gov.tr/dinigunler.php",
-    "checked_on": "2026-10-05"
+    "checked_on": "2026-10-05",
+    "feed": "diyanet"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "feed": "diyanet:ramazan-arefe"
   },
   {
    "id": "ramazan-bayrami-1",
@@ -210,35 +191,16 @@
    },
    "type": "public",
    "when": {
-    "listed": {
-     "2024": {
-      "date": "2024-04-10",
-      "verification": "verified"
-     },
-     "2025": {
-      "date": "2025-03-30",
-      "verification": "verified"
-     },
-     "2026": {
-      "date": "2026-03-20",
-      "verification": "verified"
-     },
-     "2027": {
-      "date": "2027-03-10",
-      "verification": "tentative"
-     },
-     "2028": {
-      "date": "2028-02-27",
-      "verification": "tentative"
-     }
-    }
+    "listed": {}
    },
    "source": {
-    "citation": "2429 sayılı Kanun, Ramazan Bayramı: m.2/B-1 (« Arefe günü saat 13.00'ten itibaren 3,5 gündür ») — süre kanundan; tarihler Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=2024/2025/2026 sayfaları okundu; 2027–2028 için Diyanet henüz yayımlamadı, tarihler tahmindir)",
+    "citation": "2429 sayılı Kanun, Ramazan Bayramı: m.2/B-1 (« Arefe günü saat 13.00'ten itibaren 3,5 gündür ») — süre kanundan (metin 2026-10-05'te okundu); tarihler her yenilemede Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=YYYY) otomatik okunur; Diyanet'in henüz yayımlamadığı yıllar için kayıt üretilmez",
     "url": "https://vakithesaplama.diyanet.gov.tr/dinigunler.php",
-    "checked_on": "2026-10-05"
+    "checked_on": "2026-10-05",
+    "feed": "diyanet"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "feed": "diyanet:ramazan-1"
   },
   {
    "id": "ramazan-bayrami-2",
@@ -248,35 +210,16 @@
    },
    "type": "public",
    "when": {
-    "listed": {
-     "2024": {
-      "date": "2024-04-11",
-      "verification": "verified"
-     },
-     "2025": {
-      "date": "2025-03-31",
-      "verification": "verified"
-     },
-     "2026": {
-      "date": "2026-03-21",
-      "verification": "verified"
-     },
-     "2027": {
-      "date": "2027-03-11",
-      "verification": "tentative"
-     },
-     "2028": {
-      "date": "2028-02-28",
-      "verification": "tentative"
-     }
-    }
+    "listed": {}
    },
    "source": {
-    "citation": "2429 sayılı Kanun, Ramazan Bayramı: m.2/B-1 (« Arefe günü saat 13.00'ten itibaren 3,5 gündür ») — süre kanundan; tarihler Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=2024/2025/2026 sayfaları okundu; 2027–2028 için Diyanet henüz yayımlamadı, tarihler tahmindir)",
+    "citation": "2429 sayılı Kanun, Ramazan Bayramı: m.2/B-1 (« Arefe günü saat 13.00'ten itibaren 3,5 gündür ») — süre kanundan (metin 2026-10-05'te okundu); tarihler her yenilemede Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=YYYY) otomatik okunur; Diyanet'in henüz yayımlamadığı yıllar için kayıt üretilmez",
     "url": "https://vakithesaplama.diyanet.gov.tr/dinigunler.php",
-    "checked_on": "2026-10-05"
+    "checked_on": "2026-10-05",
+    "feed": "diyanet"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "feed": "diyanet:ramazan-2"
   },
   {
    "id": "ramazan-bayrami-3",
@@ -286,35 +229,16 @@
    },
    "type": "public",
    "when": {
-    "listed": {
-     "2024": {
-      "date": "2024-04-12",
-      "verification": "verified"
-     },
-     "2025": {
-      "date": "2025-04-01",
-      "verification": "verified"
-     },
-     "2026": {
-      "date": "2026-03-22",
-      "verification": "verified"
-     },
-     "2027": {
-      "date": "2027-03-12",
-      "verification": "tentative"
-     },
-     "2028": {
-      "date": "2028-02-29",
-      "verification": "tentative"
-     }
-    }
+    "listed": {}
    },
    "source": {
-    "citation": "2429 sayılı Kanun, Ramazan Bayramı: m.2/B-1 (« Arefe günü saat 13.00'ten itibaren 3,5 gündür ») — süre kanundan; tarihler Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=2024/2025/2026 sayfaları okundu; 2027–2028 için Diyanet henüz yayımlamadı, tarihler tahmindir)",
+    "citation": "2429 sayılı Kanun, Ramazan Bayramı: m.2/B-1 (« Arefe günü saat 13.00'ten itibaren 3,5 gündür ») — süre kanundan (metin 2026-10-05'te okundu); tarihler her yenilemede Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=YYYY) otomatik okunur; Diyanet'in henüz yayımlamadığı yıllar için kayıt üretilmez",
     "url": "https://vakithesaplama.diyanet.gov.tr/dinigunler.php",
-    "checked_on": "2026-10-05"
+    "checked_on": "2026-10-05",
+    "feed": "diyanet"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "feed": "diyanet:ramazan-3"
   },
   {
    "id": "kurban-bayrami-arifesi",
@@ -324,35 +248,16 @@
    },
    "type": "half_day",
    "when": {
-    "listed": {
-     "2024": {
-      "date": "2024-06-15",
-      "verification": "verified"
-     },
-     "2025": {
-      "date": "2025-06-05",
-      "verification": "verified"
-     },
-     "2026": {
-      "date": "2026-05-26",
-      "verification": "verified"
-     },
-     "2027": {
-      "date": "2027-05-15",
-      "verification": "tentative"
-     },
-     "2028": {
-      "date": "2028-05-04",
-      "verification": "tentative"
-     }
-    }
+    "listed": {}
    },
    "source": {
-    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan; tarihler Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=2024/2025/2026 sayfaları okundu; 2027–2028 için Diyanet henüz yayımlamadı, tarihler tahmindir)",
+    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan (metin 2026-10-05'te okundu); tarihler her yenilemede Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=YYYY) otomatik okunur; Diyanet'in henüz yayımlamadığı yıllar için kayıt üretilmez",
     "url": "https://vakithesaplama.diyanet.gov.tr/dinigunler.php",
-    "checked_on": "2026-10-05"
+    "checked_on": "2026-10-05",
+    "feed": "diyanet"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "feed": "diyanet:kurban-arefe"
   },
   {
    "id": "kurban-bayrami-1",
@@ -362,35 +267,16 @@
    },
    "type": "public",
    "when": {
-    "listed": {
-     "2024": {
-      "date": "2024-06-16",
-      "verification": "verified"
-     },
-     "2025": {
-      "date": "2025-06-06",
-      "verification": "verified"
-     },
-     "2026": {
-      "date": "2026-05-27",
-      "verification": "verified"
-     },
-     "2027": {
-      "date": "2027-05-16",
-      "verification": "tentative"
-     },
-     "2028": {
-      "date": "2028-05-05",
-      "verification": "tentative"
-     }
-    }
+    "listed": {}
    },
    "source": {
-    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan; tarihler Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=2024/2025/2026 sayfaları okundu; 2027–2028 için Diyanet henüz yayımlamadı, tarihler tahmindir)",
+    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan (metin 2026-10-05'te okundu); tarihler her yenilemede Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=YYYY) otomatik okunur; Diyanet'in henüz yayımlamadığı yıllar için kayıt üretilmez",
     "url": "https://vakithesaplama.diyanet.gov.tr/dinigunler.php",
-    "checked_on": "2026-10-05"
+    "checked_on": "2026-10-05",
+    "feed": "diyanet"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "feed": "diyanet:kurban-1"
   },
   {
    "id": "kurban-bayrami-2",
@@ -400,35 +286,16 @@
    },
    "type": "public",
    "when": {
-    "listed": {
-     "2024": {
-      "date": "2024-06-17",
-      "verification": "verified"
-     },
-     "2025": {
-      "date": "2025-06-07",
-      "verification": "verified"
-     },
-     "2026": {
-      "date": "2026-05-28",
-      "verification": "verified"
-     },
-     "2027": {
-      "date": "2027-05-17",
-      "verification": "tentative"
-     },
-     "2028": {
-      "date": "2028-05-06",
-      "verification": "tentative"
-     }
-    }
+    "listed": {}
    },
    "source": {
-    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan; tarihler Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=2024/2025/2026 sayfaları okundu; 2027–2028 için Diyanet henüz yayımlamadı, tarihler tahmindir)",
+    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan (metin 2026-10-05'te okundu); tarihler her yenilemede Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=YYYY) otomatik okunur; Diyanet'in henüz yayımlamadığı yıllar için kayıt üretilmez",
     "url": "https://vakithesaplama.diyanet.gov.tr/dinigunler.php",
-    "checked_on": "2026-10-05"
+    "checked_on": "2026-10-05",
+    "feed": "diyanet"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "feed": "diyanet:kurban-2"
   },
   {
    "id": "kurban-bayrami-3",
@@ -438,35 +305,16 @@
    },
    "type": "public",
    "when": {
-    "listed": {
-     "2024": {
-      "date": "2024-06-18",
-      "verification": "verified"
-     },
-     "2025": {
-      "date": "2025-06-08",
-      "verification": "verified"
-     },
-     "2026": {
-      "date": "2026-05-29",
-      "verification": "verified"
-     },
-     "2027": {
-      "date": "2027-05-18",
-      "verification": "tentative"
-     },
-     "2028": {
-      "date": "2028-05-07",
-      "verification": "tentative"
-     }
-    }
+    "listed": {}
    },
    "source": {
-    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan; tarihler Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=2024/2025/2026 sayfaları okundu; 2027–2028 için Diyanet henüz yayımlamadı, tarihler tahmindir)",
+    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan (metin 2026-10-05'te okundu); tarihler her yenilemede Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=YYYY) otomatik okunur; Diyanet'in henüz yayımlamadığı yıllar için kayıt üretilmez",
     "url": "https://vakithesaplama.diyanet.gov.tr/dinigunler.php",
-    "checked_on": "2026-10-05"
+    "checked_on": "2026-10-05",
+    "feed": "diyanet"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "feed": "diyanet:kurban-3"
   },
   {
    "id": "kurban-bayrami-4",
@@ -476,35 +324,16 @@
    },
    "type": "public",
    "when": {
-    "listed": {
-     "2024": {
-      "date": "2024-06-19",
-      "verification": "verified"
-     },
-     "2025": {
-      "date": "2025-06-09",
-      "verification": "verified"
-     },
-     "2026": {
-      "date": "2026-05-30",
-      "verification": "verified"
-     },
-     "2027": {
-      "date": "2027-05-19",
-      "verification": "tentative"
-     },
-     "2028": {
-      "date": "2028-05-08",
-      "verification": "tentative"
-     }
-    }
+    "listed": {}
    },
    "source": {
-    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan; tarihler Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=2024/2025/2026 sayfaları okundu; 2027–2028 için Diyanet henüz yayımlamadı, tarihler tahmindir)",
+    "citation": "2429 sayılı Kanun, Kurban Bayramı: m.2/B-2 (« Arefe günü saat 13.00'ten itibaren 4,5 gündür ») — süre kanundan (metin 2026-10-05'te okundu); tarihler her yenilemede Diyanet İşleri Başkanlığı Vakit Hesaplama «Dini Günler» tablosundan (?yil=YYYY) otomatik okunur; Diyanet'in henüz yayımlamadığı yıllar için kayıt üretilmez",
     "url": "https://vakithesaplama.diyanet.gov.tr/dinigunler.php",
-    "checked_on": "2026-10-05"
+    "checked_on": "2026-10-05",
+    "feed": "diyanet"
    },
-   "verification": "verified"
+   "verification": "verified",
+   "feed": "diyanet:kurban-4"
   }
  ]
 }

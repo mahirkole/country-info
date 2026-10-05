@@ -5,6 +5,7 @@
 **Oturuma başlarken önce `docs/PROGRESS.md` (özet) ve `docs/ROADMAP.md` dosyalarını okuyun** (kalan işler ve ağ gerektirenler orada) ve bitirdiğiniz işi oradan güncelleyin.
 
 ## Değişmez kurallar
+- **Otomasyon kuralı:** Yalnızca her `refresh`'te kendiliğinden, makinece okunabilir ve kararlı bir URL/biçimden çekilebilen kaynaktan veri alınır. Elle girilen yıllık liste, depoya konan statik dosya, SPA/PDF'ten elle kopyalanan tablo, **hafızadan yazılan liste** veri kaynağı olamaz. Yıllık değişen tarihler (ör. dini bayramlar) resmî kaynaktan otomatik beslemeyle gelir (`src/holidays/feeds.ts`); yayımlanmamış yıl için kayıt üretilmez, tahmin edilmez. Kanundan türeyen kurallar (sabit gün, Paskalya ofseti, koşullu kural) `data/holidays/` içinde **kural** olarak durabilir; yıllık liste yazmak yasaktır. Otomatikleştirilemeyen kaynak yüklenmez, eksik alan boş kalır ve `docs/PROGRESS.md`'de nedeniyle yazılır.
 - **Veri kaynağı eklemeden önce lisansını kaynak sayfasından okuyun** ve `docs/LICENSES.md`'ye yazın. Lisansı belirsiz/ticari kısıtlı kaynaktan (PTT, NVİ, TÜİK, GISCO "administrative units", OSM şart kontrolü olmadan) veri almayın.
 - Her `Source` için `attribution` doldurun; `/v1/sources` ve `ATTRIBUTION.md` buradan beslenir.
 - Tatil kayıtlarında `verification: verified` **yalnızca** atıf yapılan resmi metin gerçekten okunduysa (`source.checked_on` ve `url` dolu) kullanılır. Nager.Date yalnızca alarmdır, veri kaynağı değildir.

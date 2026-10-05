@@ -8,7 +8,7 @@ import { GISCO_LAU, GISCO_NUTS, loadLau, loadNuts } from './sources/gisco.js';
 import { NATIONAL } from './sources/national/index.js';
 import { sourcePriority } from './sources/priority.js';
 import { WD_COUNTRIES, wikidataLoader, wikidataMeta } from './sources/wikidata-countries.js';
-import { HOLIDAYS_SOURCE, loadHolidayFiles } from './holidays/load.js';
+import { HOLIDAYS_SOURCE, loadHolidaysWithFeeds } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { logBody } from './sources/fetch.js';
 
@@ -95,10 +95,10 @@ function everyTarget(): RefreshTarget[] {
     ...wikidataTargets(),
     {
       meta: HOLIDAYS_SOURCE, cadence: 'monthly', expectedRows: [500, 50_000], scope: { kinds: ['holiday'] },
-      async load() {
-        const files = await loadHolidayFiles();
-        logBody(JSON.stringify(files));
+      async load(cacheDir) {
         const to = new Date().getUTCFullYear() + 2;
+        const files = await loadHolidaysWithFeeds(2024, to, cacheDir); // reads the feeds (logged for the raw hash) and fills their dates
+        logBody(JSON.stringify(files));
         return files.flatMap((f) => compileHolidays(f, 2024, to));
       },
       licenseUrls: [], licenseVerdict: 'amber', commercialUse: 'facts with per-record citation; reuse terms of each statute site to be confirmed',
