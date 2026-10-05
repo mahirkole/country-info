@@ -112,3 +112,19 @@ export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_L
   const latest = await cldrLatest(cacheDir);
   return { names: n, currencies: c, un_members: um, attributes: attrs.attributes, locales: attrs.locales, pinned: CLDR_VERSION, newer_release: newerThanPinned(latest) ? latest : null };
 }
+
+/**
+ * Contract check for `check:sources`: every CLDR file the enrichment reads can be fetched from the pinned release and still has
+ * the layout the parsers expect (they throw "layout changed" otherwise). Writes nothing.
+ */
+export async function checkCldrContract(cacheDir: string): Promise<{ version: string; files: number }> {
+  const a = await import('./cldr-attrs.js');
+  const get = async (path: string, name: string) => JSON.parse(await fetchText(`${CLDR_BASE}/${path}`, name, cacheDir)) as unknown;
+  const raw = Object.fromEntries(await Promise.all(Object.entries(a.ATTR_FILES).map(async ([k, p]) => [k, await get(p, `cldr_${k}.json`)] as const)));
+  a.parseWeek(raw.week); a.parseMeasurement(raw.measurement); a.parseTime(raw.time); a.parseCalendars(raw.calendar); a.parseUnits(raw.units); a.parseFractions(raw.currency); a.parseLikely(raw.likely);
+  parseCurrencies(raw.currency);
+  parseUnMembers(await get('cldr-core/supplemental/territoryContainment.json', 'cldr_containment.json'));
+  parseTerritories(await get('cldr-localenames-full/main/en/territories.json', 'cldr_terr_en.json'), 'en');
+  a.parseLocaleFormats(await get('cldr-dates-full/main/en/ca-gregorian.json', 'cldr_dates_en.json'), await get('cldr-numbers-full/main/en/numbers.json', 'cldr_numbers_en.json'), 'en');
+  return { version: a.cldrVersion(raw.week), files: Object.keys(a.ATTR_FILES).length + 4 };
+}

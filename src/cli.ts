@@ -8,7 +8,7 @@ import { EU27 } from './sources/eu.js';
 import { linkRegions } from './linking.js';
 import { enrichWikidata, linkByQid, syncLayerQids, enrichIso3166_2 } from './enrich.js';
 import { NATIONAL, nationalSource } from './sources/national/index.js';
-import { allTargets, syncTargetMetadata } from './targets.js';
+import { allTargets, licenseWatchTargets, syncTargetMetadata } from './targets.js';
 import { dueSourceIds, runRefresh, type RunResult } from './refresh.js';
 import { ackLicense, checkLicenses } from './license-watch.js';
 import { loadHolidaysWithFeeds, HOLIDAYS_SOURCE } from './holidays/load.js';
@@ -17,7 +17,7 @@ import { diffHolidays, fetchNager } from './holidays/check.js';
 import { exportSnapshot } from './export.js';
 import { processDeliveries } from './webhooks.js';
 import { buildApp } from './api.js';
-import { enrichCldr } from './sources/cldr.js';
+import { CLDR_VERSION, checkCldrContract, enrichCldr } from './sources/cldr.js';
 import { join } from 'node:path';
 import { pruneArchive } from './sources/fetch.js';
 import { prune } from './prune.js';
@@ -112,6 +112,16 @@ async function main() {
         results.push(r);
         if (r.status === 'failed' || r.status === 'needs_review') bad++;
       }
+      if (flag('--dry-run') || (flag('--source') && (srcArg ?? '').split(',').includes('cldr'))) {
+        // The enrichment sources have no refresh target; their contract (files reachable, layout as expected) is checked here.
+        try {
+          const c = await checkCldrContract(config.cacheDir);
+          console.log(`contract     cldr                 ok ${c.version}, ${c.files} files (pinned ${CLDR_VERSION})`);
+        } catch (e) {
+          console.log(`failed       cldr                 ${(e as Error).message}`);
+          bad++;
+        }
+      }
       const pruned = await pruneArchive(join(config.cacheDir, 'raw'), config.rawArchiveMaxMb * 1024 * 1024);
       if (pruned) console.log(`raw archive: pruned ${pruned} oldest file(s)`);
       if (!flag('--dry-run')) {
@@ -128,7 +138,7 @@ async function main() {
     }
     case 'check-licenses': {
       await migrate(pool);
-      const targets = allTargets();
+      const targets = [...allTargets(), ...licenseWatchTargets()];
       await syncTargetMetadata(pool, targets);
       const only = process.argv[3];
       const res = await checkLicenses(pool, only ? targets.filter((t) => t.meta.id === only) : targets, config.cacheDir);
@@ -141,7 +151,7 @@ async function main() {
       break;
     }
     case 'license-ack': {
-      const t = allTargets().find((x) => x.meta.id === process.argv[3]);
+      const t = [...allTargets(), ...licenseWatchTargets()].find((x) => x.meta.id === process.argv[3]);
       if (!t) throw new Error('usage: license-ack <source-id>');
       await ackLicense(pool, t, config.cacheDir);
       console.log('acknowledged', t.meta.id);

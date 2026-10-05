@@ -11,6 +11,7 @@ import { WD_COUNTRIES, wikidataLoader, wikidataMeta } from './sources/wikidata-c
 import { HOLIDAYS_SOURCE, loadHolidaysWithFeeds } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { logBody } from './sources/fetch.js';
+import { CLDR_SOURCE } from './sources/cldr.js';
 
 export type Cadence = 'daily' | 'weekly' | 'monthly' | 'annual' | 'event';
 export type Verdict = 'green' | 'amber' | 'red' | 'unread';
@@ -65,6 +66,14 @@ const nationalTargets = (): RefreshTarget[] => {
 export function allTargets(): RefreshTarget[] {
   return everyTarget().filter((t) => !config.disabledSources.includes(t.meta.id));
 }
+
+/**
+ * Sources that are enrichments (their data is written by `enrich:*`, not ingested as entities) but still need license monitoring.
+ * Not refreshed (`load` is never called): `check:licenses` / `license:ack` use them; their freshness is the monthly enrichment run.
+ */
+export const licenseWatchTargets = (): RefreshTarget[] => [
+  { meta: CLDR_SOURCE, cadence: 'annual', expectedRows: [0, 0], scope: { kinds: [] }, load: async () => [], licenseUrls: ['https://www.unicode.org/license.txt', 'https://www.unicode.org/copyright.html'], licenseVerdict: 'green', commercialUse: 'Unicode License v3: use, copy, modify, publish, distribute and sell with the copyright notice; docs/licenses/cldr.md (origin of some files unread: amber in the dossier)' },
+];
 
 const wikidataTargets = (): RefreshTarget[] =>
   WD_COUNTRIES.map((c) => ({
