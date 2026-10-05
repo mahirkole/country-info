@@ -11,6 +11,8 @@ export interface AccessOptions {
   now?: () => number;
   /** Looks up a presented key that is not in `apiKeys` (e.g. database-managed keys); returns its id and own rate limit. */
   resolveKey?: (key: string) => Promise<{ id: string; ratePerMin: number | null } | null>;
+  /** Called once per authorised /v1 request with the key id (`dbkey:<id>` for database keys, `key:...` for env keys); used for metering. */
+  onUse?: (id: string) => void;
   /** Shared counter store (several API instances); default is per-process memory. Returns the count in the current window after incrementing. */
   store?: (bucket: string, windowStartSec: number) => Promise<number>;
   /** Require a key on /v1/* even when `apiKeys` is empty (all keys then come from `resolveKey`). */
@@ -43,6 +45,7 @@ export function installAccessControl(app: FastifyInstance, o: AccessOptions): vo
     if ((o.apiKeys.length > 0 || o.requireKey) && !id) {
       return reply.code(401).send({ error: 'unauthorized', detail: 'send an API key in the x-api-key header or as a Bearer token' });
     }
+    if (id) o.onUse?.(id);
     if (limit <= 0) return;
     id = id || `ip:${req.ip}`;
     const t = now();

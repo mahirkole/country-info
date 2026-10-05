@@ -31,6 +31,7 @@ export const OPERATIONS: Op[] = [
   { method: 'get', path: '/v1/changes', tag: 'changes', summary: 'Change feed after a cursor (insert/update/delete with before/after)', query: [{ name: 'since', description: 'Cursor (seq), 0 = from the start' }, { name: 'until', description: 'Upper bound (seq)' }, { name: 'country', description: 'Comma-separated ISO alpha-2' }, { name: 'kind', description: 'Entity kind' }, { name: 'limit', description: 'Page size' }] },
   { method: 'post', path: '/v1/api-keys', tag: 'admin', summary: 'Create an API key (the key is returned once; optional per-key rate_per_min)', admin: true },
   { method: 'get', path: '/v1/api-keys', tag: 'admin', summary: 'List API keys (no secrets)', admin: true },
+  { method: 'get', path: '/v1/api-keys/usage', tag: 'admin', summary: 'Requests per API key and day (key_id 0 = env keys / admin token)', admin: true, query: [{ name: 'from', description: 'YYYY-MM-DD' }, { name: 'to', description: 'YYYY-MM-DD' }] },
   { method: 'delete', path: '/v1/api-keys/{id}', tag: 'admin', summary: 'Revoke an API key', admin: true },
   { method: 'post', path: '/v1/webhooks', tag: 'admin', summary: 'Subscribe a URL to signed change notifications', admin: true },
   { method: 'get', path: '/v1/webhooks', tag: 'admin', summary: 'List webhook subscriptions', admin: true },

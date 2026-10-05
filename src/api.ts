@@ -45,7 +45,22 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   app.decorate('routeList', routes);
   const keyCache = new Map<string, { at: number; v: { id: string; ratePerMin: number | null } | null }>();
   const sha = (k: string) => createHash('sha256').update(k).digest('hex');
+  // Usage metering: counts per key and day are kept in memory and flushed to api_usage every 10 s and on close.
+  const usage = new Map<string, number>();
+  const flushUsage = async () => {
+    const batch = [...usage];
+    usage.clear();
+    const day = new Date().toISOString().slice(0, 10);
+    for (const [id, n] of batch) {
+      const keyId = id.startsWith('dbkey:') ? Number(id.slice(6)) : 0;
+      await pool.query('INSERT INTO api_usage (day, key_id, requests) VALUES ($1, $2, $3) ON CONFLICT (day, key_id) DO UPDATE SET requests = api_usage.requests + $3', [day, keyId, n]).catch(() => undefined);
+    }
+  };
+  const flushTimer = setInterval(() => void flushUsage(), 10_000);
+  flushTimer.unref();
+  app.addHook('onClose', async () => { clearInterval(flushTimer); await flushUsage(); });
   installAccessControl(app, {
+    onUse: (id) => usage.set(id, (usage.get(id) ?? 0) + 1),
     apiKeys: opts.apiKeys ?? config.apiKeys, perWindow: opts.rateLimitPerMin ?? config.rateLimitPerMin, adminToken, requireKey: opts.requireApiKey ?? config.requireApiKey,
     store: (opts.rateLimitStore ?? config.rateLimitStore) === 'postgres'
       ? async (bucket, start) => {
@@ -324,6 +339,18 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   app.get('/v1/api-keys', { preHandler: requireAdmin }, async () => ({
     data: (await pool.query('SELECT id, name, rate_per_min, active, created_at, last_used_at FROM api_keys ORDER BY id')).rows,
   }));
+  app.get<{ Querystring: { from?: string; to?: string } }>('/v1/api-keys/usage', { preHandler: requireAdmin }, async (req) => {
+    await flushUsage();
+    return {
+      data: (
+        await pool.query(
+          `SELECT u.day, u.key_id, k.name, u.requests FROM api_usage u LEFT JOIN api_keys k ON k.id = u.key_id
+           WHERE ($1::date IS NULL OR u.day >= $1) AND ($2::date IS NULL OR u.day <= $2) ORDER BY u.day, u.key_id`,
+          [req.query.from ?? null, req.query.to ?? null],
+        )
+      ).rows.map((r) => ({ ...r, key_id: Number(r.key_id), requests: Number(r.requests) })),
+    };
+  });
   app.delete<{ Params: { id: string } }>('/v1/api-keys/:id', { preHandler: requireAdmin }, async (req, reply) => {
     const r = await pool.query('UPDATE api_keys SET active = false WHERE id = $1 AND active RETURNING key_hash', [req.params.id]);
     if (!r.rowCount) return reply.code(404).send({ error: 'not_found' });

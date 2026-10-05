@@ -361,6 +361,11 @@ d('database', () => {
     const listed = (await app.inject({ url: '/v1/api-keys', headers: admin })).json().data;
     expect(listed).toMatchObject([{ name: 'acme', active: true }]);
     expect(JSON.stringify(listed)).not.toContain(key);
+    await use();
+    await use();
+    const usageRows = (await app.inject({ url: '/v1/api-keys/usage', headers: admin })).json().data as { key_id: number; name: string | null; requests: number }[];
+    expect(usageRows.find((r) => r.key_id === id)).toMatchObject({ name: 'acme', requests: 5 }); // 3 earlier + 2 now, 429s included
+    expect(usageRows.some((r) => r.key_id === 0)).toBe(true); // admin-token requests are metered under key 0
     expect((await app.inject({ method: 'DELETE', url: `/v1/api-keys/${id}`, headers: admin })).statusCode).toBe(200);
     expect((await use()).statusCode).toBe(401); // revoked (cache entry dropped)
     expect((await app.inject({ method: 'DELETE', url: `/v1/api-keys/${id}`, headers: admin })).statusCode).toBe(404);
