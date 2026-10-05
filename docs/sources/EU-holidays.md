@@ -31,7 +31,8 @@ Sayılar 2026 yılı için kural sayısı (doğrulanmış/toplam).
 | SI | 0/15 | 2005 tarihli UPB1; pisrs.si yalnızca JS. |
 | BG, RO | – | Erişilemedi (lex.bg 403; RO siteleri bağlantı yok). Dosya yok. |
 | CY | – | Resmi bir tatil listesi bulunamadı (yalnızca devlet ofisi sayfası); veri alınmadı. |
-| FR, NL | – | Légifrance 403; wetten.overheid.nl bağlantı yok. Dosya yok. |
+| FR | verified (17 kural) | Code du travail L3133-1 ve L3134-13 (Alsace-Moselle), code.travail.gouv.fr (Çalışma Bakanlığı) kopyasından okundu (Légifrance hâlâ 403); Paskalya ofsetleri adlardan türetildi; Cuma (Vendredi Saint) yalnız "temple protestant ou église mixte" olan komünlerde — motor komün düzeyini bilmediği için département bütününe uygulanır (aşırı kapsama, atıfta belirtildi). Notlar: docs/sources/holidays/FR.md |
+| NL | 8 verified + Koningsdag tentative | Algemene termijnenwet art. 3 (wetten.overheid.nl/BWBR0002448) okundu; Goede Vrijdag yalnız "gelijkgesteld" (lid 2); Koningsdag tarihi kanunda yok — 27 Nisan/Pazar → 26 Nisan kuralı rijksoverheid sayfasından (2026–2027 verified, 2028–2040 tentative `listed`). Notlar: docs/sources/holidays/NL.md |
 
 ## Nager.Date alarmının bulguları (2026) — `npm run check:holidays 2026`
 - **SK:** Nager 8 Mayıs ve 15 Eylül'ü tatil gösteriyor; birincil metin (§ 4b) 2026'da dinlenme günü olmadıklarını söylüyor. Resmi kaynak doğru, aggregator yanlış.

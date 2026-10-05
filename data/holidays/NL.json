@@ -1,0 +1,245 @@
+{
+ "country": "NL",
+ "authority": "Koninkrijk der Nederlanden (Algemene termijnenwet)",
+ "default_language": "nl",
+ "rules": [
+  {
+   "id": "nieuwjaarsdag",
+   "names": {
+    "nl": "Nieuwjaarsdag",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Algemene termijnenwet art. 3 lid 1 (wetten.overheid.nl, BWBR0002448, geldend van 10-10-2010 t/m heden, geraadpleegd 05-10-2026): « de Nieuwjaarsdag »",
+    "url": "https://wetten.overheid.nl/BWBR0002448",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "tweede-paasdag",
+   "names": {
+    "nl": "Tweede Paasdag",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Algemene termijnenwet art. 3 lid 1 (wetten.overheid.nl, BWBR0002448, geldend van 10-10-2010 t/m heden, geraadpleegd 05-10-2026): « de Christelijke tweede Paas- en Pinksterdag »",
+    "url": "https://wetten.overheid.nl/BWBR0002448",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "hemelvaartsdag",
+   "names": {
+    "nl": "Hemelvaartsdag",
+    "en": "Ascension Day"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 39,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Algemene termijnenwet art. 3 lid 1 (wetten.overheid.nl, BWBR0002448, geldend van 10-10-2010 t/m heden, geraadpleegd 05-10-2026): « de Hemelvaartsdag »",
+    "url": "https://wetten.overheid.nl/BWBR0002448",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "tweede-pinksterdag",
+   "names": {
+    "nl": "Tweede Pinksterdag",
+    "en": "Whit Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Algemene termijnenwet art. 3 lid 1 (wetten.overheid.nl, BWBR0002448, geldend van 10-10-2010 t/m heden, geraadpleegd 05-10-2026): « de Christelijke tweede Paas- en Pinksterdag »",
+    "url": "https://wetten.overheid.nl/BWBR0002448",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "bevrijdingsdag",
+   "names": {
+    "nl": "Bevrijdingsdag",
+    "en": "Liberation Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 5
+    }
+   },
+   "source": {
+    "citation": "Algemene termijnenwet art. 3 lid 1 (wetten.overheid.nl, BWBR0002448, geldend van 10-10-2010 t/m heden, geraadpleegd 05-10-2026): « de vijfde mei »",
+    "url": "https://wetten.overheid.nl/BWBR0002448",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "eerste-kerstdag",
+   "names": {
+    "nl": "Eerste Kerstdag",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Algemene termijnenwet art. 3 lid 1 (wetten.overheid.nl, BWBR0002448, geldend van 10-10-2010 t/m heden, geraadpleegd 05-10-2026): « de beide Kerstdagen »",
+    "url": "https://wetten.overheid.nl/BWBR0002448",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "tweede-kerstdag",
+   "names": {
+    "nl": "Tweede Kerstdag",
+    "en": "Boxing Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Algemene termijnenwet art. 3 lid 1 (wetten.overheid.nl, BWBR0002448, geldend van 10-10-2010 t/m heden, geraadpleegd 05-10-2026): « de beide Kerstdagen »",
+    "url": "https://wetten.overheid.nl/BWBR0002448",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "goede-vrijdag",
+   "names": {
+    "nl": "Goede Vrijdag",
+    "en": "Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Algemene termijnenwet art. 3 lid 1 (wetten.overheid.nl, BWBR0002448, geldend van 10-10-2010 t/m heden, geraadpleegd 05-10-2026): lid 2: « Voor de toepassing van deze wet wordt de Goede Vrijdag met de in het vorige lid genoemde dagen gelijkgesteld. » (gelijkgesteld, geen feestdag in lid 1)",
+    "url": "https://wetten.overheid.nl/BWBR0002448",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "koningsdag",
+   "names": {
+    "nl": "Koningsdag",
+    "en": "King's Day"
+   },
+   "type": "public",
+   "when": {
+    "listed": {
+     "2026": {
+      "date": "2026-04-27",
+      "verification": "verified"
+     },
+     "2027": {
+      "date": "2027-04-27",
+      "verification": "verified"
+     },
+     "2028": {
+      "date": "2028-04-27",
+      "verification": "tentative"
+     },
+     "2029": {
+      "date": "2029-04-27",
+      "verification": "tentative"
+     },
+     "2030": {
+      "date": "2030-04-27",
+      "verification": "tentative"
+     },
+     "2031": {
+      "date": "2031-04-26",
+      "verification": "tentative"
+     },
+     "2032": {
+      "date": "2032-04-27",
+      "verification": "tentative"
+     },
+     "2033": {
+      "date": "2033-04-27",
+      "verification": "tentative"
+     },
+     "2034": {
+      "date": "2034-04-27",
+      "verification": "tentative"
+     },
+     "2035": {
+      "date": "2035-04-27",
+      "verification": "tentative"
+     },
+     "2036": {
+      "date": "2036-04-26",
+      "verification": "tentative"
+     },
+     "2037": {
+      "date": "2037-04-27",
+      "verification": "tentative"
+     },
+     "2038": {
+      "date": "2038-04-27",
+      "verification": "tentative"
+     },
+     "2039": {
+      "date": "2039-04-27",
+      "verification": "tentative"
+     },
+     "2040": {
+      "date": "2040-04-27",
+      "verification": "tentative"
+     }
+    }
+   },
+   "source": {
+    "citation": "Algemene termijnenwet art. 3 lid 1: « de dag waarop de verjaardag van de Koning wordt gevierd » (datum staat niet in de wet); datum 27 april en zondagsverschuiving: Rijksoverheid, « Is Koningsdag (27 april) een vrije dag? »: « Valt 27 april op een zondag, dan wordt Koningsdag op zaterdag gevierd. »; jaren 2026/2027 expliciet gelezen op « Wanneer zijn de officiële feestdagen in Nederland? »",
+    "url": "https://www.rijksoverheid.nl/vraag-en-antwoord/arbeidsovereenkomst-en-cao/koningsdag-27-april-vrije-dag",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "tentative"
+  }
+ ]
+}

@@ -1,0 +1,353 @@
+{
+ "country": "FR",
+ "authority": "République française (Code du travail)",
+ "default_language": "fr",
+ "rules": [
+  {
+   "id": "jour-de-l-an",
+   "names": {
+    "fr": "Jour de l'An",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 1°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "lundi-de-paques",
+   "names": {
+    "fr": "Lundi de Pâques",
+    "en": "Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 2°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "fete-du-travail",
+   "names": {
+    "fr": "Fête du Travail",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 3°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "victoire-1945",
+   "names": {
+    "fr": "Victoire 1945",
+    "en": "Victory in Europe Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 8
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 4°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "ascension",
+   "names": {
+    "fr": "Ascension",
+    "en": "Ascension Day"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 39,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 5°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "lundi-de-pentecote",
+   "names": {
+    "fr": "Lundi de Pentecôte",
+    "en": "Whit Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "gregorian"
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 6°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "fete-nationale",
+   "names": {
+    "fr": "Fête nationale",
+    "en": "Bastille Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 7,
+     "day": 14
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 7°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "assomption",
+   "names": {
+    "fr": "Assomption",
+    "en": "Assumption Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 8°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "toussaint",
+   "names": {
+    "fr": "Toussaint",
+    "en": "All Saints' Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 9°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "armistice-1918",
+   "names": {
+    "fr": "Armistice 1918",
+    "en": "Armistice Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 11
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 10°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "noel",
+   "names": {
+    "fr": "Noël",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Code du travail, art. L3133-1 (texte lu sur code.travail.gouv.fr, ministère du Travail; « Mis à jour le : 10/08/2016 »), 11°",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3133-1",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "vendredi-saint-57",
+   "names": {
+    "fr": "Vendredi Saint (dans les communes ayant un temple protestant ou une église mixte)",
+    "en": "Good Friday (only communes with a Protestant temple or mixed church)"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "region": "div:FR:dep-57",
+   "source": {
+    "citation": "Code du travail, art. L3134-13 (texte lu sur code.travail.gouv.fr; « Mis à jour le : 01/05/2008 »), 2° ; Moselle. Condition communale non modélisée ; L3134-14 (Moselle: ouverture des commerces fixée uniformément par l'autorité administrative)",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3134-13",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "second-jour-de-noel-57",
+   "names": {
+    "fr": "Deuxième jour de Noël (Saint-Étienne)",
+    "en": "Boxing Day / St Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "region": "div:FR:dep-57",
+   "source": {
+    "citation": "Code du travail, art. L3134-13 (texte lu sur code.travail.gouv.fr; « Mis à jour le : 01/05/2008 »), 12° (« Le premier et le second jour de Noël ») ; Moselle; 26 décembre = second jour de Noël, confirmé par service-public.fr F2405 (2026 : samedi 26 décembre)",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3134-13",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "vendredi-saint-67",
+   "names": {
+    "fr": "Vendredi Saint (dans les communes ayant un temple protestant ou une église mixte)",
+    "en": "Good Friday (only communes with a Protestant temple or mixed church)"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "region": "div:FR:dep-67",
+   "source": {
+    "citation": "Code du travail, art. L3134-13 (texte lu sur code.travail.gouv.fr; « Mis à jour le : 01/05/2008 »), 2° ; Bas-Rhin. Condition communale non modélisée ; L3134-14 (Moselle: ouverture des commerces fixée uniformément par l'autorité administrative)",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3134-13",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "second-jour-de-noel-67",
+   "names": {
+    "fr": "Deuxième jour de Noël (Saint-Étienne)",
+    "en": "Boxing Day / St Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "region": "div:FR:dep-67",
+   "source": {
+    "citation": "Code du travail, art. L3134-13 (texte lu sur code.travail.gouv.fr; « Mis à jour le : 01/05/2008 »), 12° (« Le premier et le second jour de Noël ») ; Bas-Rhin; 26 décembre = second jour de Noël, confirmé par service-public.fr F2405 (2026 : samedi 26 décembre)",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3134-13",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "vendredi-saint-68",
+   "names": {
+    "fr": "Vendredi Saint (dans les communes ayant un temple protestant ou une église mixte)",
+    "en": "Good Friday (only communes with a Protestant temple or mixed church)"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "gregorian"
+    }
+   },
+   "region": "div:FR:dep-68",
+   "source": {
+    "citation": "Code du travail, art. L3134-13 (texte lu sur code.travail.gouv.fr; « Mis à jour le : 01/05/2008 »), 2° ; Haut-Rhin. Condition communale non modélisée ; L3134-14 (Moselle: ouverture des commerces fixée uniformément par l'autorité administrative)",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3134-13",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "second-jour-de-noel-68",
+   "names": {
+    "fr": "Deuxième jour de Noël (Saint-Étienne)",
+    "en": "Boxing Day / St Stephen's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "region": "div:FR:dep-68",
+   "source": {
+    "citation": "Code du travail, art. L3134-13 (texte lu sur code.travail.gouv.fr; « Mis à jour le : 01/05/2008 »), 12° (« Le premier et le second jour de Noël ») ; Haut-Rhin; 26 décembre = second jour de Noël, confirmé par service-public.fr F2405 (2026 : samedi 26 décembre)",
+    "url": "https://code.travail.gouv.fr/code-du-travail/l3134-13",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  }
+ ]
+}
