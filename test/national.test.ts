@@ -9,6 +9,7 @@ import { parseCzso } from '../src/sources/national/cz.js';
 import { parseGv } from '../src/sources/national/de.js';
 import { parseAustria } from '../src/sources/national/at.js';
 import { parseSgc } from '../src/sources/national/ca.js';
+import { parseAsgs } from '../src/sources/national/au.js';
 import { parseBfs } from '../src/sources/national/ch.js';
 import { parseCsvRows } from '../src/sources/csv.js';
 import { readXlsx, columnIndex } from '../src/sources/xlsx.js';
@@ -236,5 +237,19 @@ describe('CH adapter', () => {
       'div:CH:kt-1<country:CH', 'div:CH:bez-10053<div:CH:kt-1', 'div:CH:gem-2<div:CH:bez-10053', 'div:CH:kt-2<country:CH', 'div:CH:gem-351<div:CH:kt-2',
     ]);
     expect(e[0]).toMatchObject({ name: 'Zürich', data: { type: 'canton', type_local: 'Kanton', level: 1 } });
+  });
+});
+
+describe('AU adapter', () => {
+  const H = ['SA2_CODE_2026', 'SA2_NAME_2026', 'CHANGE_FLAG_2026', 'CHANGE_LABEL_2026', 'SA3_CODE_2026', 'SA3_NAME_2026', 'SA4_CODE_2026', 'SA4_NAME_2026', 'GCCSA_CODE_2026', 'GCCSA_NAME_2026', 'STATE_CODE_2026', 'STATE_NAME_2026', 'AUS_CODE_2026', 'AUS_NAME_2026', 'AREA_ALBERS_SQKM'];
+  it('builds State > SA4 > SA3 > SA2 once each, with GCCSA kept as an attribute', () => {
+    const row = (sa2: string, n2: string, sa3: string, n3: string) => [sa2, n2, '0', 'No change', sa3, n3, '101', 'Capital Region', '1RNSW', 'Rest of NSW', '1', 'New South Wales', 'AUS', 'Australia', '3418.3524000000002'];
+    const e = parseAsgs([H, row('101021007', 'Braidwood', '10102', 'Queanbeyan'), row('101021008', 'Karabar', '10102', 'Queanbeyan')]);
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual([
+      'div:AU:ste-1<country:AU', 'div:AU:sa4-101<div:AU:ste-1', 'div:AU:sa3-10102<div:AU:sa4-101', 'div:AU:sa2-101021007<div:AU:sa3-10102', 'div:AU:sa2-101021008<div:AU:sa3-10102',
+    ]);
+    expect(e[1]!.data).toMatchObject({ gccsa: '1RNSW', gccsa_name: 'Rest of NSW', type_local: 'Statistical Area Level 4' });
+    expect(e[3]!.data).toMatchObject({ area_km2: 3418.35, level: 4 });
+    expect(() => parseAsgs([['x'], ['y']])).toThrow(/layout changed/);
   });
 });

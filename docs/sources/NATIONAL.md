@@ -28,9 +28,10 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 | DE | Destatis Gemeindeverzeichnis GV-ISys (`AuszugGV3QAktuell.xlsx`, çeyreklik; sabit "Aktuell" adı) | Land, Regierungsbezirk, Kreis, Gemeinde (+ koordinat, nüfus, alan) | ✅ | **read** (Destatis telif sayfası: ticari yeniden kullanım serbest, Quellennachweis) | **Yüklü: 11.386** (16 / 29 / 401 / 10.940; Gebietsstand 30.09.2026) |
 | AT | STATISTIK AUSTRIA reglisten.zip (`polbezirke.csv`, `gemliste_knz.csv`) | Bundesland, politischer Bezirk, Gemeinde (+ Viyana Gemeindebezirke) | ✅ | **read** (CC BY 4.0 + AGB § 10; "bearbeitet" notu) | **Yüklü: 2.218** (9 / 94 / 2.092 / 23); posta kodu sütunları alınmaz |
 | CA | Statistics Canada SGC 2021 structure (CSV) | region, province/territory, census division, census subdivision | ✅ | **read** (StatCan Open Licence; "Adapted from… not an endorsement" atfı) | **Yüklü: 5.473** (6 / 13 / 293 / 5.161) |
+| AU | ABS ASGS Edition 4 (SA2 allocation xlsx) | State/Territory, SA4, SA3, SA2 (GCCSA öznitelik; LGA alınmaz) | ✅ | **read** (ABS site CC BY 4.0; istisnalar logo/arma/mikrodata/3. taraf) | **Yüklü: 3.056** (10 / 108 / 367 / 2.571) |
 
 ## Dossier sonrası ek adaylar (lisans 🟢, ayrıntı `docs/licenses/README.md`)
-FI (Tilastokeskus sınıflandırma API'si, 308 belediye — **kunta→maakunta eşleme servisi 500 veriyor, hiyerarşi için beklemede**), PT (DGT CAOP), AU yapıları, JP (MIC xlsx; dosya kimliği kararsız, sayfadan keşif gerekir). CZ yüklendi. 🟡: GB, ES, DK, PL, NL (zaten yüklü). ⚪: BE (CAPTCHA).
+FI (Tilastokeskus sınıflandırma API'si, 308 belediye — **kunta→maakunta eşleme servisi 500 veriyor, hiyerarşi için beklemede**), PT (DGT CAOP), JP (MIC xlsx; dosya kimliği kararsız, sayfadan keşif gerekir). CZ yüklendi. 🟡: GB, ES, DK, PL, NL (zaten yüklü). ⚪: BE (CAPTCHA).
 
 ## Tasarım notları
 - GeoNames (`geonames`) hâlâ dünya geneli taban katman; ulusal kaynaklar `division` olarak **yanına** eklenir, GeoNames'i silmez. "Yalnızca resmi" mod için bkz. `docs/ROADMAP.md`.

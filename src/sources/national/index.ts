@@ -9,6 +9,7 @@ import { CZ } from './cz.js';
 import { DE } from './de.js';
 import { AT } from './at.js';
 import { CA } from './ca.js';
+import { AU } from './au.js';
 import { CH } from './ch.js';
 
 /**
@@ -16,7 +17,7 @@ import { CH } from './ch.js';
  * To add a country: read the publisher's license first (docs/LICENSES.md), write
  * `src/sources/national/<cc>.ts` exporting a NationalSource, register it here, add a test.
  */
-export const NATIONAL: Record<string, NationalSource> = { US, FR, IT, NL, NO, SE, CZ, DE, AT, CA, CH };
+export const NATIONAL: Record<string, NationalSource> = { US, FR, IT, NL, NO, SE, CZ, DE, AT, CA, CH, AU };
 
 export class LicenseNotEstablished extends Error {}
 
