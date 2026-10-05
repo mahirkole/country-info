@@ -407,3 +407,49 @@ describe('HU adapter', () => {
     expect(() => parseHnt([{ name: 'Helységek', rows: [['x']] }])).toThrow(/header not found/);
   });
 });
+
+import { createRequire } from 'node:module';
+import { readGpkg } from '../src/sources/gpkg.js';
+import { islandRows } from '../src/sources/national/pt.js';
+import { mkdtemp as mkdtempGp, readFile as readFileGp } from 'node:fs/promises';
+import { tmpdir as tmpdirGp } from 'node:os';
+import { join as joinGp } from 'node:path';
+
+describe('GeoPackage reader and PT islands', () => {
+  async function fixture(dir: string, prefix: string, rows: { dt: [string, string][]; mn: [string, string][]; fr: [string, string][] }) {
+    const { DatabaseSync } = createRequire(import.meta.url)('node:sqlite') as typeof import('node:sqlite');
+    const path = joinGp(dir, `${prefix}.gpkg`);
+    const db = new DatabaseSync(path);
+    db.exec('CREATE TABLE gpkg_contents (table_name TEXT); CREATE TABLE gpkg_geometry_columns (table_name TEXT, column_name TEXT);');
+    for (const [suffix, cols] of [['distritos', 'dt, distrito'], ['municipios', 'dtmn, municipio'], ['freguesias', 'dtmnfr, freguesia']] as const) {
+      db.exec(`CREATE TABLE ${prefix}_${suffix} (fid INTEGER PRIMARY KEY, ${cols}, area_ha REAL, geom BLOB)`);
+      db.exec(`INSERT INTO gpkg_contents VALUES ('${prefix}_${suffix}'); INSERT INTO gpkg_geometry_columns VALUES ('${prefix}_${suffix}', 'geom')`);
+    }
+    const ins = (t: string, list: [string, string][]) => list.forEach(([a, b]) => db.exec(`INSERT INTO ${prefix}_${t} (${t === 'distritos' ? 'dt, distrito' : t === 'municipios' ? 'dtmn, municipio' : 'dtmnfr, freguesia'}, area_ha, geom) VALUES ('${a}', '${b}', 1234, x'0001')`));
+    ins('distritos', rows.dt); ins('municipios', rows.mn); ins('freguesias', rows.fr);
+    db.close();
+    return new Uint8Array(await readFileGp(path));
+  }
+
+  it('reads attribute rows without geometry and island rows map into the PT hierarchy', async () => {
+    const dir = await mkdtempGp(joinGp(tmpdirGp(), 'gp-'));
+    const raa = await fixture(dir, 'raa_oci', { dt: [['49', 'Ilha do Corvo']], mn: [['4901', 'Corvo']], fr: [['490101', 'Corvo']] });
+    const ram = await fixture(dir, 'ram', { dt: [['31', 'Ilha da Madeira']], mn: [['3101', 'Calheta']], fr: [['310101', 'Arco da Calheta']] });
+    const t1 = await readGpkg(raa, dir, 'a.gpkg');
+    expect([...t1.keys()].sort()).toEqual(['raa_oci_distritos', 'raa_oci_freguesias', 'raa_oci_municipios']);
+    expect(t1.get('raa_oci_municipios')![0]).toEqual({ fid: 1, dtmn: '4901', municipio: 'Corvo', area_ha: 1234 }); // geom column left out
+    const isl = islandRows([t1, await readGpkg(ram, dir, 'b.gpkg')]);
+    expect([isl.distritos.length, isl.municipios.length, isl.freguesias.length]).toEqual([2, 2, 2]);
+    // mainland + islands together; the mainland rows only need to satisfy the sanity thresholds, so reuse the fixture helper's shape
+    const main = (n: number, f: (i: number) => Record<string, unknown>) => Array.from({ length: n }, (_, i) => f(i));
+    const d = [...main(18, (i) => ({ dt: String(i + 1).padStart(2, '0'), distrito: `D${i}` })), ...isl.distritos];
+    const m = [...main(278, (i) => ({ dtmn: `${String((i % 18) + 1).padStart(2, '0')}${String(Math.floor(i / 18) + 1).padStart(2, '0')}`, municipio: `M${i}` })), ...isl.municipios];
+    const f = [...main(3049, (i) => ({ dtmnfr: `${String((i % 18) + 1).padStart(2, '0')}${String(Math.floor((i % 278) / 18) + 1).padStart(2, '0')}${String(i % 100).padStart(2, '0')}`, freguesia: `F${i}` })), ...isl.freguesias];
+    const e = mapCaop(d, m, f);
+    expect(e.find((x) => x.id === 'div:PT:dt-49')).toMatchObject({ parent_id: 'country:PT', data: { level: 1, type: 'district', type_local: 'ilha', island: true } });
+    expect(e.find((x) => x.id === 'div:PT:dt-01')!.data.type_local).toBe('distrito');
+    expect(e.find((x) => x.id === 'div:PT:mn-4901')).toMatchObject({ parent_id: 'div:PT:dt-49', data: { area_km2: 12.34 } });
+    expect(e.find((x) => x.id === 'div:PT:fr-490101')!.parent_id).toBe('div:PT:mn-4901');
+    expect(e.find((x) => x.id === 'div:PT:fr-310101')!.parent_id).toBe('div:PT:mn-3101');
+  });
+});

@@ -15,6 +15,8 @@ Son güncelleme: 2026-10-05. Dal: `claude/country-info-mvp` (PR açılmadı). Ay
 
 **Güncelleme ve müşteri yayını (2026-10-05, plan: `/root/.claude/plans/kaynak-tarama-ve-musteri-yayini.md`):** üretim zamanlaması `scripts/cron/run-cycle.sh` (migrate → lisans izleme → refresh → aylık enrich → publish → digest; flock, adım başına çıkış kodu); operatör bildirimi `src/notify.ts` (`NOTIFY_WEBHOOK_URL`; tekrarsız needs_review, gecikmiş/engelli kaynak, Eylül'den itibaren eksik tatil yılı); müşteri webhook'ları API anahtarına bağlı (`events`/`countries`/`kinds`, teslimat günlüğü, `replay`, `test`, atomik kiralama ile çift teslimat yok; migration 011); sürüm notları (`release_notes`, `/v1/releases`, `release.published`/`release.retracted`) ve e-posta özeti (`release_subscribers`, `digest`, `MAIL_WEBHOOK_URL`; migration 012); dosya paketleri `publish` (commercial/full profil, her snapshot için delta, manifest en son, yükleme öncesi 🔴 taraması, `license_changed` kaynak dışarıda, geri alma) + S3 (SigV4, AWS vektörüyle doğrulandı) ve yerel imzalı `/dl` depoları, `GET /v1/exports/latest` (anahtarın `export_profile`'ı). Gerçek veriyle denendi: commercial 60 MB / full 83 MB, ikinci çalıştırma "nothing new".
 
+**PT (2026-10-05):** Açores/Madeira eklendi (GeoPackage, `src/sources/gpkg.ts`, `node:sqlite` → Node ≥22.13): nat-pt 3.596 kayıt (29 distrito+ada / 308 município / 3.259 freguesia), ikinci çalıştırma unchanged.
+
 **Sayılar (dev DB):** 133 test yeşil; AB27 LAU yerine kapsam 23/27 (18 resmî + 5 Wikidata).
 
 ## Bilinçli olarak yüklenmeyenler
@@ -26,7 +28,7 @@ Veri eklemeden önce lisans yayıncının sayfasından okunur; `verified` tatil 
 ## Kalan işler (2026-10-05 sonu) — hepsi dış engele veya iş/hukuk kararına bağlı
 - **Erişim gerektirenler:** BG/RO/CY tatil doğrulaması (lex.bg 403, justice.government.bg 503, legislatie.just.ro engelli), TR (TÜİK/NVİ/data.gov.tr/Resmî Gazete/Diyanet), RO/MT/LT/HR resmî kaynakları.
 - **Lisans/hukuk kararı:** EE resmî EHAK (CC BY-SA), LAU'nun tamamen kaldırılması (4 AB ülkesi — CY, HR, IE, MT — resmî/doğrulanmış kaynaksız), CC BY-IGO/CLDR kökeni, ES belediye adları (REL), ticari lansman öncesi avukat onayı, ToS/DPA/SLA, fiyatlandırma.
-- **Veri:** KR (sınıf eşlemesi), PT Açores/Madeira (gpkg), HR resmî kodları, IN ilçeleri, posta kodları ve mahalle/sokak (hacim + KVKK/GDPR + posta lisansları), OSM (ODbL kararı).
+- **Veri:** KR (Wikidata sınıfları dağınık: 17 üst birim için 16, si-gun-gu için 208 ≠ 226; eşleme için resmî liste gerekir), HR resmî kodları, IN ilçeleri, posta kodları ve mahalle/sokak (hacim + KVKK/GDPR + posta lisansları), OSM (ODbL kararı).
 - **Ürün:** planlar/kota tabloları ve faturalama entegrasyonu.
 - **Güncelleme/yayın kalanları (kod, engelsiz):** gerçek bir S3/MinIO ile uçtan uca deneme (yalnızca sahte sunucuyla test edildi), e-posta sağlayıcısını `MAIL_WEBHOOK_URL` arkasına bağlama, müşteri başına ülke filtreli paketler, Atom/RSS sürüm akışı, TS/Python SDK'da webhook/release/export yöntemleri, `run-cycle.sh` için bir kuru koşu CI testi. Üretim cron'unu kurmak operasyon işidir (docs/OPERATIONS.md).
 Konteyner dışı bir ağdan veya kullanıcı kararıyla ilerlenebilir; ayrıntı `docs/ROADMAP.md`.

@@ -30,7 +30,7 @@
     "enrich:cldr": "tsx src/cli.ts enrich-cldr"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13"
   },
   "dependencies": {
     "@fastify/static": "^8.0.0",

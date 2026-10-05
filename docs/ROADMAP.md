@@ -67,7 +67,7 @@ Hedef: her ülkenin kendi resmi verisinden tüm idari seviyeler (şehir, il, il�
 |---|---|---|
 | LAU yerine AB27 | 13/27 kapsandı; **eksik 14: CY EE GR HR HU IE LT LU LV MT PL RO SI SK** | Wikidata sınıf/sayı eşleşmedi; ulusal adaptör gerekir |
 | Wikidata katmanı | PL, KR, TR(ilçe), SI, SK, GR, HR, RO yüklenemedi | sayı kapısı |
-| PT Açores/Madeira | 30 belediye yok | yalnız gpkg |
+| PT Açores/Madeira | YAPILDI 2026-10-05 (GeoPackage, 3.596 kayıt) | — |
 | FI/DK/PL/BE/IN/KR/BR resmi kaynak | Wikidata ile geçici | lisans/erişim |
 | TR | il/ilçe GeoNames+İBBS; mahalle/sokak yok | NVİ/TÜİK kapalı |
 | Tatiller | BG RO FR NL CY dosyası yok; çoğu `unverified` | resmi metin okunmalı |

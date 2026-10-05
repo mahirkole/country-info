@@ -24,7 +24,7 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 | GB | ONS Open Geography (ArcGIS REST; en yeni vintage arama ile bulunur) | nation, region (yalnız İngiltere), local authority district (county/UA öznitelik) | ✅ | partial 🟡 OGL v3 (dossier) | **Yüklü: 374** (4 / 9 / 361); posta kodu/UPRN alınmaz; atıf "Source: Office for National Statistics licensed under the Open Government Licence v.3.0" |
 | AU | ABS ASGS | state, SA4…SA1 | ✅ | 🟢 yapılar CC BY 4.0 / 🟡 LGA | Sırada (Edition 4) |
 | ES | INE diccionario YY.xlsx (belediye) + INEbase Tempus API (CCAA/il adları, değişken 70/115) | comunidad autónoma, provincia, municipio | ✅ | partial 🟡 (INE yeniden kullanım metni okundu 2026-10-05; belediye adlarının REL kaynaklı olması belirsiz, dossier) | **Yüklü: 8.203** (19 / 52 / 8.132 — resmî sayılarla aynı); atıf "Elaboración propia con datos extraídos del sitio web del INE: www.ine.es" |
-| PT | DGT CAOP2025 OGC API (CSV, geometrisiz) | distrito, município, freguesia (yalnız kıta) | ✅ | **read** 🟢 (CC BY 4.0; Açores/Madeira yok) | **Yüklü: 3.345** (18 / 278 / 3.049) |
+| PT | DGT CAOP2025 OGC API (CSV) + Açores/Madeira GeoPackage (`node:sqlite`) | distrito/ilha, município, freguesia | ✅ | **read** 🟢 (CC BY 4.0; ada dosyaları için lisans kapsayıcı beyanla, dosya-bazlı metin yok) | **Yüklü: 3.596** (29 / 308 / 3.259) |
 | JP | MIC 全国地方公共団体コード (xlsx; sayfadan en yeni dosya keşfi) | 都道府県, 市区町村, 区 (政令指定都市) | ✅ | partial 🟢 (MIC site telif metni okundu: 公共データ利用規約 v1.0, atıf + işlendi notu) | **Yüklü: 1.965** (47 / 1.747 / 171 — sayfa R6.1.1 durumu, Hamamatsu 2024 birleşmesi sonrası 171 ward) |
 | DK | DAWA (`api.dataforsyningen.dk`) | region, municipality | ❌ 410 (adres değişmiş) | – | Yeni adres araştırılacak |
 | CA | Statistics Canada | province, census division, subdivision | ❌ 403 | – | Başka erişim yolu |
@@ -39,7 +39,7 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 | AU | ABS ASGS Edition 4 (SA2 allocation xlsx) | State/Territory, SA4, SA3, SA2 (GCCSA öznitelik; LGA alınmaz) | ✅ | **read** (ABS site CC BY 4.0; istisnalar logo/arma/mikrodata/3. taraf) | **Yüklü: 3.056** (10 / 108 / 367 / 2.571) |
 
 ## Dossier sonrası ek adaylar (lisans 🟢, ayrıntı `docs/licenses/README.md`)
-FI (Tilastokeskus sınıflandırma API'si, 308 belediye — **kunta→maakunta eşleme servisi 500 veriyor, hiyerarşi için beklemede**), PT Açores/Madeira (gpkg). CZ yüklendi. 🟡: DK, PL, NL (zaten yüklü). ⚪: BE (CAPTCHA).
+FI (Tilastokeskus sınıflandırma API'si, 308 belediye — **kunta→maakunta eşleme servisi 500 veriyor, hiyerarşi için beklemede**), CZ yüklendi. 🟡: DK, PL, NL (zaten yüklü). ⚪: BE (CAPTCHA).
 
 ## Wikidata bölünme katmanı (topluluk, CC0 — resmi kaynağı kapalı/okunamayan ülkeler)
 Motor: `src/sources/wikidata-divisions.ts`, ülke yapılandırması `src/sources/wikidata-countries.ts` (kaynak kimliği `wd-<cc>`, `source_class=community`, aylık `refresh`). Her seviye için Wikidata sınıfı + **resmi sayı bandı**; band dışı seviye yüklenmez. Sınıflar GeoNames'in bağladığı öğelerin `P31` değerlerinden veya adı bilinen belediyelerden **veriyle** doğrulandı (hafızadaki QID'ler bir kez yanlış çıktı: Q2039348 = Hollanda belediyesi). Üst birim = önceki seviyelerdeki `P131` atası (en derin seviye kazanır); atasız öğe atlanır (>%1 ise hata).

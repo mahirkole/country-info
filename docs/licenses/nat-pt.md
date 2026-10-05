@@ -41,3 +41,10 @@
 - Kaynak: DGT OGC API (`ogcapi.dgterritorio.gov.pt`, CSV, `skipGeometry=true`): koleksiyonlar `distritos`, `municipios`, `freguesias`. Yüklü: 18 / 278 / 3.049 (**yalnızca Continente**; Açores ve Madeira OGC API'de yok, gpkg zip olarak yayımlanıyor — okunmadı, 30 belediye eksik).
 - Freguesia kodu birleşmiş freguesia'lar için harf içerir (`0302FA`); kod INE sorumluluğunda (yukarıdaki boşluk 1) — yalnızca kod/ad saklanır.
 - JSON yerine CSV: GeoJSON zarfındaki `timeStamp` ham-girdi hash'ini her çalıştırmada değiştirir.
+
+## Güncelleme (2026-10-05): Açores ve Madeira eklendi
+- Kaynak: `https://geo2.dgterritorio.gov.pt/caop/CAOP_RAA_2025-gpkg.zip` (iki gpkg: Grupo Ocidental, Grupo Central+Oriental) ve `CAOP_RAM_2025-gpkg.zip` (Last-Modified 2026-02-02); DGT CAOP sayfasındaki (`dgterritorio.gov.pt/cartografia/cartografia-tematica/caop`) bağlantılarla aynı veri merkezi. Öznitelik tabloları (`*_distritos`, `*_municipios`, `*_freguesias`) OGC API koleksiyonlarıyla aynı sütunlara sahip; geometri okunmaz (`src/sources/gpkg.ts`, `node:sqlite`).
+- **Lisans notu (dürüst sınır):** CAOP sayfası ve gpkg dosyalarının üst verisi (`gpkg_metadata`) kendi başına lisans metni içermiyor; kapsayıcı ifade DGT açık veri sayfasındaki ("veri merkezinden indirilen coğrafi bilgi CC BY 4.0, yalnızca DGT'ye atıf şartı") beyandır. Ada dosyaları aynı veri merkezinden indirildiği için aynı beyan kapsamında kabul edildi; yayıncıdan dosya-bazlı teyit alınmadı (kullanıcı kararı: izin yazışması yok).
+- Sayılar (dosyalardan okundu): Açores 9 ada (distrito_ilha: 41–49), 19 município, 156 freguesia; Madeira 2 ada (31, 32), 11 município, 54 freguesia. Adaptör 30 / 210 dışında sapma görürse durur (`needs_review`/failed).
+- Kimlikler: `div:PT:dt-31`, `mn-3101`, `fr-310101` … (anakara kodlarıyla çakışmaz). Ada "distrito"ları `type_local = ilha`, `data.island = true`.
+- Sonuç: **3.596** kayıt (11 + 18 ada/distrito, 308 município, 3.259 freguesia); ikinci çalıştırma "unchanged".
