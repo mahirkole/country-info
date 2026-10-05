@@ -317,3 +317,26 @@ describe('PT adapter', () => {
     expect(() => mapCaop([], [], [])).toThrow(/layout changed/);
   });
 });
+
+import { parseMic, findCodeFile } from '../src/sources/national/jp.js';
+describe('JP adapter', () => {
+  it('finds the first xlsx on the MIC page', () => {
+    expect(findCodeFile('<a href="/main_content/000925834.pdf">x</a><a href="/main_content/000925835.xlsx">y</a><a href="/main_content/000875488.xlsx">z</a>')).toBe('https://www.soumu.go.jp/main_content/000925835.xlsx');
+    expect(() => findCodeFile('<html>')).toThrow(/layout changed/);
+  });
+  it('builds prefecture > municipality > ward, cleans appended kana and validates counts', () => {
+    const H = ['団体コード', '都道府県名\r\n（漢字）', '市区町村名\r\n（漢字）', 'k', 'k'];
+    const rows: string[][] = [H];
+    for (let p = 1; p <= 47; p++) {
+      const pc = String(p).padStart(2, '0');
+      rows.push([`${pc}0006`, `P${p}`, '', 'k', '']);
+      for (let m = 1; m <= 37; m++) rows.push([`${pc}${String(100 + m * 2)}${0}`, `P${p}`, `M${p}-${m}市`, 'k', 'k']);
+    }
+    rows.push(['431001', '熊本県', '熊本市', 'k', 'k']);
+    const sheet2 = [H, ['431001', '熊本県', '熊本市', 'k', 'k'], ['431044', '熊本県', '熊本市南区クマモトシミナミク', 'k', 'k']];
+    const e = parseMic([{ name: 'R6.1.1現在の団体', rows }, { name: 'ward', rows: sheet2 }]);
+    expect(e.find((x) => x.id === 'div:JP:mun-431044')).toMatchObject({ name: '熊本市南区', parent_id: 'div:JP:mun-431001', data: { level: 3, type: 'ward' } });
+    expect(e.find((x) => x.id === 'div:JP:pref-43')!.parent_id).toBe('country:JP');
+    expect(() => parseMic([{ name: 'x', rows: [['bad']] }, { name: 'y', rows: [] }])).toThrow(/header changed/);
+  });
+});
