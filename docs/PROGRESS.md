@@ -17,6 +17,14 @@ Son güncelleme: 2026-10-05. Dal: `claude/country-info-mvp` (PR açılmadı). Ay
 
 **PT (2026-10-05):** Açores/Madeira eklendi (GeoPackage, `src/sources/gpkg.ts`, `node:sqlite` → Node ≥22.13): nat-pt 3.596 kayıt (29 distrito+ada / 308 município / 3.259 freguesia), ikinci çalıştırma unchanged.
 
+**Bu oturumun (2026-10-05, Faz 7) ek işleri:** S3 deposu bağımsız bir S3 uygulamasına (moto, imza denetimli) karşı doğrulandı (`scripts/dev/s3-e2e.sh`); `run-cycle.sh` bayrakları + kabuk testleri; SDK'larda webhook/release/export/`verifyWebhook`; `prune` bakımı ve `/v1/status` inceleme sayıları; ülke bazlı dosya paketleri (`by-country/<CC>/…`, `api_keys.export_countries`, migration 013); Atom akışı `/v1/releases.atom`; tatil motorunda `substitute` (hafta sonu devri → `data.observed`), `if_weekday` (koşullu kural) ve `hours` (yarım gün); PT Açores/Madeira; **TR tatilleri doğrulandı** (2429 sayılı Kanun metni mevzuat.gov.tr'den ve Diyanet «Dini Günler» tabloları 2024–2026 okundu; 2027–2028 dini bayramlar tentative); `refresh` artık başka kaynağın birimlerine bağlı kayıtları (bölgesel tatiller → `div:FR:dep-57`) hiyerarşi hatası saymıyor (bu hata aylık `official-holidays` yenilemesini `needs_review`'a düşürüyordu).
+
+**Erişim notu (2026-10-05):** konteynerden artık açılanlar: mevzuat.gov.tr, vakithesaplama.diyanet.gov.tr, tuik.gov.tr, cylaw.org, resmigazete.gov.tr, data.gov.hr, dzs.gov.hr; hâlâ kapalı: lex.bg (403), justice.government.bg, legislatie.just.ro, insse.ro, data.gov.ro, data.gov.tr, adres.nvi.gov.tr, nso.gov.mt (403), osp.stat.gov.lt (403), mlsi/gov.cy/pio.gov.cy (403).
+
+**HR bulgusu:** Adalet ve Yönetim Bakanlığı «Popis županija, gradova i općina» (data.gov.hr, XLS: 21 županija [Zagreb dahil] + 428 općina + 128 grad = 556 satır, ad + tür, resmî kod yok; dosya 2013 tarihli ama sayılar bakanlığın güncel beyanıyla uyumlu). **Yüklenmedi:** data.gov.hr «Otvorena dozvola (OD)» lisansının metni okunamadı (portal SPA, metin sunmuyor). Lisans metni okunursa adaptör ~1 saatlik iştir (`readXls` hazır; kimlikler ad tabanlı olur).
+
+**KR/IN bulgusu:** KR için Wikidata sınıfları dağınık (17 üst birim → 16, si-gun-gu → 208 ≠ 226); IN ilçe için doğrulanabilir resmî sayı yok (Wikidata 798) → ikisi de yüklenmedi.
+
 **Sayılar (dev DB):** 133 test yeşil; AB27 LAU yerine kapsam 23/27 (18 resmî + 5 Wikidata).
 
 ## Bilinçli olarak yüklenmeyenler
@@ -26,7 +34,7 @@ EE (CC BY-SA), HR (resmî kod yok), SK (DATAcube kapandı, sayı uzlaşmıyor), 
 Veri eklemeden önce lisans yayıncının sayfasından okunur; `verified` tatil yalnızca okunan resmî metinle; alt-ajan raporları veri sayılır, alıntılar yeniden doğrulanır; yeşil/sarı olmayan kaynak ticari pakete girmez; her adım commit + push, PR yalnızca istenirse. Yeni planlar `/root/.claude/plans/` altında **yeni dosya** olarak yazılır (eski plan dosyası Faz 1–6'yı içerir).
 
 ## Kalan işler (2026-10-05 sonu) — hepsi dış engele veya iş/hukuk kararına bağlı
-- **Erişim gerektirenler:** BG/RO/CY tatil doğrulaması (lex.bg 403, justice.government.bg 503, legislatie.just.ro engelli), TR (TÜİK/NVİ/data.gov.tr/Resmî Gazete/Diyanet), RO/MT/LT/HR resmî kaynakları.
+- **Erişim gerektirenler:** BG/RO/CY tatil doğrulaması (lex.bg 403, justice.government.bg, legislatie.just.ro; CY için kamu tatili listesi yasası bulunamadı), TR il/ilçe kodları (TÜİK 🔴 lisans; NVİ/data.gov.tr kapalı), RO/MT/LT resmî kaynakları. TR resmî tatil verisi artık doğrulandı (yalnızca idari izin/köprü günleri yok).
 - **Lisans/hukuk kararı:** EE resmî EHAK (CC BY-SA), LAU'nun tamamen kaldırılması (4 AB ülkesi — CY, HR, IE, MT — resmî/doğrulanmış kaynaksız), CC BY-IGO/CLDR kökeni, ES belediye adları (REL), ticari lansman öncesi avukat onayı, ToS/DPA/SLA, fiyatlandırma.
 - **Veri:** KR (Wikidata sınıfları dağınık: 17 üst birim için 16, si-gun-gu için 208 ≠ 226; eşleme için resmî liste gerekir), HR resmî kodları, IN ilçeleri, posta kodları ve mahalle/sokak (hacim + KVKK/GDPR + posta lisansları), OSM (ODbL kararı).
 - **Ürün:** planlar/kota tabloları ve faturalama entegrasyonu.
