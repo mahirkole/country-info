@@ -1,0 +1,347 @@
+{
+ "country": "RO",
+ "authority": "Romania (Parlamentul Romaniei; Codul muncii)",
+ "default_language": "ro",
+ "rules": [
+  {
+   "id": "new-year",
+   "names": {
+    "ro": "Anul Nou (1 ianuarie)",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "new-year-2",
+   "names": {
+    "ro": "Anul Nou (2 ianuarie)",
+    "en": "New Year holiday (2 January)"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 2
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "epiphany",
+   "names": {
+    "ro": "Botezul Domnului - Boboteaza",
+    "en": "Epiphany"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified",
+   "from_year": 2023
+  },
+  {
+   "id": "st-john",
+   "names": {
+    "ro": "Soborul Sfantului Proroc Ioan Botezatorul",
+    "en": "Synaxis of St John the Baptist"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 7
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified",
+   "from_year": 2023
+  },
+  {
+   "id": "union-day",
+   "names": {
+    "ro": "Ziua Unirii Principatelor Romane",
+    "en": "Union of the Romanian Principalities Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified",
+   "from_year": 2023
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "ro": "Vinerea Mare",
+    "en": "Orthodox Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified",
+   "from_year": 2023
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "ro": "Prima zi de Pasti",
+    "en": "Orthodox Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "ro": "A doua zi de Pasti",
+    "en": "Orthodox Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "ro": "1 Mai",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "childrens-day",
+   "names": {
+    "ro": "1 iunie",
+    "en": "Children's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 6,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified",
+   "from_year": 2023
+  },
+  {
+   "id": "st-andrew",
+   "names": {
+    "ro": "Sfantul Apostol Andrei, cel Intai chemat, Ocrotitorul Romaniei",
+    "en": "St Andrew's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 11,
+     "day": 30
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "national-day",
+   "names": {
+    "ro": "1 decembrie",
+    "en": "National Day (Great Union)"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii)",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "whit-sunday",
+   "names": {
+    "ro": "Prima zi de Rusalii",
+    "en": "Orthodox Pentecost Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 49,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii) - textul spune doar 'prima zi de Rusalii'; offsetul +49 din Pasti nu este in text",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "whit-monday",
+   "names": {
+    "ro": "A doua zi de Rusalii",
+    "en": "Orthodox Pentecost Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii) - textul spune doar 'a doua zi de Rusalii'; offsetul +50 nu este in text",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "dormition",
+   "names": {
+    "ro": "Adormirea Maicii Domnului",
+    "en": "Dormition of the Mother of God"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii) - textul nu da data calendaristica; 15 august din memorie",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "ro": "Prima zi de Craciun",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii) - textul nu da datele; 25 decembrie din memorie",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas-2",
+   "names": {
+    "ro": "A doua zi de Craciun",
+    "en": "Second Day of Christmas"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Legea nr. 53/2003 - Codul muncii (republicat, M.Of. nr. 345/18.05.2011), art. 139 alin. (1), forma consolidata la 21.03.2023 (copie Inspectia Muncii) - textul nu da datele; 26 decembrie din memorie",
+    "url": "https://www.inspectiamuncii.ro/documents/558066/58123041/codul+muncii+din+24+ianuarie+2003.pdf/74898488-ba66-483c-a185-1eab00d43892?version=1.0"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

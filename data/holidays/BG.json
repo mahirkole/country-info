@@ -1,0 +1,273 @@
+{
+ "country": "BG",
+ "authority": "Република България (Кодекс на труда; Държавен вестник)",
+ "default_language": "bg",
+ "rules": [
+  {
+   "id": "new-year",
+   "names": {
+    "bg": "Нова година",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "liberation-day",
+   "names": {
+    "bg": "Ден на Освобождението на България от османско иго",
+    "en": "Liberation Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 3,
+     "day": 3
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "bg": "Велики петък",
+    "en": "Orthodox Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "holy-saturday",
+   "names": {
+    "bg": "Велика събота",
+    "en": "Orthodox Holy Saturday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -1,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-sunday",
+   "names": {
+    "bg": "Великден (неделя)",
+    "en": "Orthodox Easter Sunday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 0,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "bg": "Великден (понеделник)",
+    "en": "Orthodox Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "bg": "Ден на труда и на международната работническа солидарност",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "st-george",
+   "names": {
+    "bg": "Гергьовден, Ден на храбростта и Българската армия",
+    "en": "St George's Day / Bulgarian Army Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "culture-day",
+   "names": {
+    "bg": "Ден на българската просвета и култура и на славянската писменост",
+    "en": "Day of Bulgarian Education and Culture"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "unification-day",
+   "names": {
+    "bg": "Ден на Съединението",
+    "en": "Unification Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 9,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "independence-day",
+   "names": {
+    "bg": "Ден на Независимостта на България",
+    "en": "Independence Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 9,
+     "day": 22
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas-eve",
+   "names": {
+    "bg": "Бъдни вечер",
+    "en": "Christmas Eve"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 24
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "bg": "Рождество Христово (25 декември)",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas-2",
+   "names": {
+    "bg": "Рождество Христово (26 декември)",
+    "en": "Second Day of Christmas"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Кодекс на труда, чл. 154, ал. 1 (официален текст не е прочетен: lex.bg 403/Cloudflare, parliament.bg JS-challenge, gli.government.bg и dv.parliament.bg недостъпни за чл. 154)",
+    "url": "https://www.lex.bg/laws/ldoc/1594373121"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

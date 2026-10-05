@@ -1,13 +1,16 @@
-> **Not:** Bu dosya bir ajanın okuma notudur (2026-10-04). Depodaki `data/holidays/CY.json` esas alınır; orada `verification` durumu bu notlardan farklı olabilir (güncel olmayan metin sürümü veya hafızadan gelen tanım tespit edilenler `unverified`'a indirildi).
+# CY – Kıbrıs Cumhuriyeti resmi tatiller (taslak) – 1/15 `verified`
 
-# CY evidence
+**Genel "kamu tatilleri" listesini veren bir yasa bulunamadı.** cylaw.org (Παγκύπριος Δικηγορικός Σύλλογος, Ενοποιημένη Νομοθεσία) alfabetik indekslerinin tamamı tarandı; "αργί" geçen yalnızca iki mevzuat var. Gerisi (Ministry of Labour / pio.gov.cy genel listesi) okunmadı: pio.gov.cy sayfasında ilgili liste çıkmadı, mlsi.gov.cy/dli.mlsi.gov.cy'den metin alınamadı. Wikipedia ve ticari siteler resmi sayılmadığı için kullanılmadı.
 
-NO rule verified. No statute listing the nationwide public holidays was found on cylaw.org: searches of the cylaw alphabetical index returned no 'Αργιών' holiday law other than the Bank Holidays Law (Ο περί Τραπεζικών Αργιών Νόμος 13(I)/1996, banking only, not read). The Ministry of Labour, Department of Labour Relations page (https://www.mlsi.gov.cy/mlsi/dlr/dlr.nsf/All/3E9D6B185B14F8A2C22586DB00407502, read 2026-10-04) says: "Οι αργίες ρυθμίζονται με συμφωνίες μεταξύ εργοδοτών και εργοδοτουμένων ή μέσω συλλογικών συμβάσεων με εξαίρεση τους εργοδοτούμενους στα καταστήματα, στα κέντρα αναψυχής και στα ξενοδοχεία για τους οποίους καθορίζονται πληρωμένες αργίες στους σχετικούς νόμους." i.e. no general holidays statute; days are set by sectoral laws/agreements and yearly Council of Ministers practice.
+**1) `verified`: 1 Nisan.** Ο περί Καθορισμού της 1ης Απριλίου ως Εθνικής Επετείου και Επίσημης Δημόσιας Αργίας Νόμος του 1989 (Ν. 121/1989). URL: https://www.cylaw.org/nomoi/enop/non-ind/1989_1_121/full.html (okundu 2026-10-05). Alıntı:
+> "2. Για την έμπρακτη απόδοση από τη Δημοκρατία της Κύπρου τιμής προς τους πολεμιστές, τους αγωνιστές, τους νεκρούς και τα θύματα του εθνικού απελευθερωτικού αγώνα καθιερώνεται η 1η Απριλίου κάθε έτους ως εθνική επέτειος και επίσημη δημόσια αργία."
 
-The unverified list follows the Cyprus government office page https://financialombudsman.org.cy/episimes-argies/ (not legal text, read 2026-10-04): "τις επίσημες αργίες του κράτους, οι οποίες είναι οι εξής: Πρωτοχρονιά – 1 Ιανουαρίου; Θεοφάνια – 6 Ιανουαρίου; Καθαρή Δευτέρα – κινητή; ... 25 Μαρτίου; 1 Απριλίου; Μεγάλη Παρασκευή; Δευτέρα του Πάσχα; 1 Μαΐου; Του Αγίου Πνεύματος / Δευτέρα του Κατακλυσμού; 15 Αυγούστου; 1 Οκτωβρίου; 28 Οκτωβρίου; 24 Δεκεμβρίου; 25 Δεκεμβρίου; 26 Δεκεμβρίου". Weak source; treat all as unverified. Clean Monday offset -48 and Kataklysmos +50 (Orthodox) are computed.
+**2) Banka tatilleri yasası (kamu tatili değil) – diğer 14 kural `unverified`.** Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5. URL: https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html (okundu). Alıntı:
+> "Οι πιο κάτω ημέρες είναι τραπεζικές αργίες- (α) Κάθε Κυριακή (β) Κάθε Σάββατο για σκοπούς Τραπεζικών Συναλλαγών (γ) 1η Ιανουαρίου (δ) 6η Ιανουαρίου-Θεοφάνεια (ε) Καθαρή Δευτέρα (στ) 25η Μαρτίου (ζ) 1η Απριλίου (η) Μεγάλη Παρασκευή (Ελληνική Ορθόδοξη Εκκλησία) (θ) Δευτέρα της Διακαινησίμου (Ελληνική Ορθόδοξη Εκκλησία) (ι) Τρίτη της Διακαινησίμου (Ελληνική Ορθόδοξη Εκκλησία) (ια) 1η Μαΐου (ιβ) Δευτέρα του Αγίου Πνεύματος (ιγ) 15η Αυγούστου (ιδ) 1η Οκτωβρίου (ιε) 28η Οκτωβρίου (ιστ) Χριστούγεννα (25η Δεκεμβρίου) (ιζ) 26η Δεκεμβρίου."
 
-## Not included
-- 24 December (listed by that office, but half-day/sector-specific, not confirmed as a general public holiday), local/regional days, Easter Tuesday/Saturday sectoral days.
+Bu liste yalnızca **banka** tatilleri; işçi/kamu tatili statüsünü kanıtlamaz, bu yüzden bu günler `unverified` bırakıldı (aynı liste kamu tatilleriyle örtüşüyor ama bağ okunmadı). Kural dosyasında `source.citation` bunu açıkça belirtir. `checked_on` yalnızca 1 Nisan kuralında var. Not: 13(I)/1996 art. 7 "Ο περί Τραπεζικών Αργιών Νόμος (Κεφ. 123) καταργείται" der; güncel konsolide sürümün bu olduğu cylaw indeksinden alındı, değişiklik geçmişi (Ιστορικό Τροποποιήσεων) kontrol edilmedi.
 
-## Could not read
-- Any statute establishing the list (none located); cylaw full-text search is not accessible via simple curl.
+- easter-tuesday (Διακαινησίμου Salı) yalnızca banka tatili olduğundan `type: observance`, `unverified`.
+- Paskalya Pazarı/Cumartesi ve Pazar günleri listede yok (Pazar/Cumartesi zaten banka tatili); eklenmedi.
+- Ofsetler: Καθαρά Δευτέρα = Paskalya-48, Αγίου Πνεύματος = +50 (Ortodoks); metin ofsetleri vermiyor, ad/gelenekten türetildi.
+- Modellenemeyen: kamu tatili hafta sonuna denk gelirse Pazartesiye kaydırma uygulaması (kamu sektörü uygulaması) – hiçbir resmi metinde okunmadı; Bakanlar Kurulu'nun (art. 6) ek/yer değiştirme tatili ilan yetkisi yıllık, modellenmedi.

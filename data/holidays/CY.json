@@ -1,0 +1,293 @@
+{
+ "country": "CY",
+ "authority": "Κυπριακή Δημοκρατία (cylaw.org – Παγκύπριος Δικηγορικός Σύλλογος, ενοποιημένη νομοθεσία)",
+ "default_language": "el",
+ "rules": [
+  {
+   "id": "april-1",
+   "names": {
+    "el": "Εθνική Επέτειος 1ης Απριλίου",
+    "en": "Greek Cypriot National Day (1 April)"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 4,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Ο περί Καθορισμού της 1ης Απριλίου ως Εθνικής Επετείου και Επίσημης Δημόσιας Αργίας Νόμος του 1989 (Ν. 121/1989), άρθρο 2",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1989_1_121/full.html",
+    "checked_on": "2026-10-05"
+   },
+   "verification": "verified"
+  },
+  {
+   "id": "new-year",
+   "names": {
+    "el": "Πρωτοχρονιά",
+    "en": "New Year's Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "epiphany",
+   "names": {
+    "el": "Θεοφάνεια",
+    "en": "Epiphany"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 1,
+     "day": 6
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "green-monday",
+   "names": {
+    "el": "Καθαρά Δευτέρα",
+    "en": "Clean (Green) Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -48,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "independence-day-gr",
+   "names": {
+    "el": "Εθνική Επέτειος 25ης Μαρτίου",
+    "en": "Greek Independence Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 3,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "good-friday",
+   "names": {
+    "el": "Μεγάλη Παρασκευή",
+    "en": "Orthodox Good Friday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": -2,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-monday",
+   "names": {
+    "el": "Δευτέρα της Διακαινησίμου",
+    "en": "Orthodox Easter Monday"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 1,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "labour-day",
+   "names": {
+    "el": "Πρωτομαγιά",
+    "en": "Labour Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 5,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "whit-monday",
+   "names": {
+    "el": "Δευτέρα του Αγίου Πνεύματος",
+    "en": "Pentecost Monday (Kataklysmos)"
+   },
+   "type": "public",
+   "when": {
+    "easter": {
+     "offset": 50,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "dormition",
+   "names": {
+    "el": "Δεκαπενταύγουστος (15η Αυγούστου)",
+    "en": "Dormition / Assumption"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 8,
+     "day": 15
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "cyprus-independence-day",
+   "names": {
+    "el": "Επέτειος Ανεξαρτησίας της Κύπρου (1η Οκτωβρίου)",
+    "en": "Cyprus Independence Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 1
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "ohi-day",
+   "names": {
+    "el": "Ημέρα του Όχι (28η Οκτωβρίου)",
+    "en": "Ohi Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 10,
+     "day": 28
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas",
+   "names": {
+    "el": "Χριστούγεννα (25η Δεκεμβρίου)",
+    "en": "Christmas Day"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 25
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "christmas-2",
+   "names": {
+    "el": "Δεύτερη ημέρα Χριστουγέννων (26η Δεκεμβρίου)",
+    "en": "Boxing Day / 2nd day of Christmas"
+   },
+   "type": "public",
+   "when": {
+    "fixed": {
+     "month": 12,
+     "day": 26
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  },
+  {
+   "id": "easter-tuesday",
+   "names": {
+    "el": "Τρίτη της Διακαινησίμου",
+    "en": "Orthodox Easter Tuesday (bank holiday only)"
+   },
+   "type": "observance",
+   "when": {
+    "easter": {
+     "offset": 2,
+     "calendar": "orthodox"
+    }
+   },
+   "source": {
+    "citation": "Ο περί Τραπεζικών Αργιών Νόμος του 1996 (Ν. 13(I)/1996), άρθρο 5 - τραπεζικές αργίες (όχι ο νόμος δημοσίων αργιών· δεν βρέθηκε γενικός νόμος δημοσίων αργιών στο cylaw)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/1996_1_13/full.html"
+   },
+   "verification": "unverified"
+  }
+ ]
+}

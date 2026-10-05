@@ -96,7 +96,7 @@ Hedef: her ülkenin kendi resmi verisinden tüm idari seviyeler (şehir, il, il�
 - Posta kodları ve mahalle/sokak (Faz 3-C Dalga 5): ayrı kapı — hacim, KVKK/GDPR, posta kodu lisansları; OSM ODbL kararı verilmeden başlamaz.
 
 **6-E. Tatiller**
-- FR ve NL dosyaları yapıldı (2026-10-05); kalan BG, RO, CY (resmi mevzuat metni **okunarak**); `unverified` → `verified` (BE, LU, FI, GR, LT, MT, SI, DE eyalet, IT, DK, PT, SK, TR); motor: koşullu kural (IE), hafta sonu devri, yarım gün, hicri liste. Nager.Date yalnız alarm. Yıllık Eylül döngüsü.
+- FR, NL, BG, RO, CY dosyaları eklendi (2026-10-05; BG tümüyle ve CY büyük çoğunlukla `unverified`, RO 2023 konsolide metne dayanıyor) — kalan iş: bunların güncel resmî metinle doğrulanması (legislatie.just.ro, lex.bg erişimi gerekir); `unverified` → `verified` (BE, LU, FI, GR, LT, MT, SI, DE eyalet, IT, DK, PT, SK, TR); motor: koşullu kural (IE), hafta sonu devri, yarım gün, hicri liste. Nager.Date yalnız alarm. Yıllık Eylül döngüsü.
 
 **6-F. Ürün ve operasyon**
 - OpenAPI şeması (Fastify schema'dan), API anahtarı + hız sınırı, SDK (TS/Python), webhook `kinds`/`source_ids`/`vintage`, abonelik filtreleri.

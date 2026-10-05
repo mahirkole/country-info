@@ -29,8 +29,9 @@ Sayılar 2026 yılı için kural sayısı (doğrulanmış/toplam).
 | LT | 0/14 | Darbo kodeksas m. 123'ün 2016 sürümü okundu; güncel konsolide sürüm yok. |
 | MT | 0/14 | Cap. 252, 12.02.2021 tarihli sürüm; sonraki değişiklikler kontrol edilmedi. |
 | SI | 0/15 | 2005 tarihli UPB1; pisrs.si yalnızca JS. |
-| BG, RO | – | Erişilemedi (lex.bg 403; RO siteleri bağlantı yok). Dosya yok. |
-| CY | – | Resmi bir tatil listesi bulunamadı (yalnızca devlet ofisi sayfası); veri alınmadı. |
+| BG | 14 kural, hepsi `unverified` | Kodeks na truda md. 154(1) resmî sitelerden okunamadı (lex.bg 403, parliament.bg JS engeli); liste yalnızca ikincil özetten → `checked_on` yok. Notlar: docs/sources/holidays/BG.md |
+| RO | 12 verified + 5 unverified | Codul muncii art. 139(1), Inspecția Muncii'nin konsolide PDF'inden okundu (**9–22 Mart 2023 formu**; sonraki değişiklikler legislatie.just.ro engelli olduğundan denetlenmedi); 15 Ağustos ve 25/26 Aralık takvim günleri metinde yok, Rusalii ofsetleri metinde yok → `unverified`; `from_year: 2023` güvenli alt sınır. Notlar: docs/sources/holidays/RO.md |
+| CY | 1 verified + 14 unverified | Genel bir resmî tatil kanunu bulunamadı; 1 Nisan N. 121/1989 art. 2'den (verified). Diğerleri Banka Tatilleri Kanunu N. 13(I)/1996 art. 5'ten (banka tatilleri ≠ resmî tatil → `unverified`). Notlar: docs/sources/holidays/CY.md |
 | FR | verified (17 kural) | Code du travail L3133-1 ve L3134-13 (Alsace-Moselle), code.travail.gouv.fr (Çalışma Bakanlığı) kopyasından okundu (Légifrance hâlâ 403); Paskalya ofsetleri adlardan türetildi; Cuma (Vendredi Saint) yalnız "temple protestant ou église mixte" olan komünlerde — motor komün düzeyini bilmediği için département bütününe uygulanır (aşırı kapsama, atıfta belirtildi). Notlar: docs/sources/holidays/FR.md |
 | NL | 8 verified + Koningsdag tentative | Algemene termijnenwet art. 3 (wetten.overheid.nl/BWBR0002448) okundu; Goede Vrijdag yalnız "gelijkgesteld" (lid 2); Koningsdag tarihi kanunda yok — 27 Nisan/Pazar → 26 Nisan kuralı rijksoverheid sayfasından (2026–2027 verified, 2028–2040 tentative `listed`). Notlar: docs/sources/holidays/NL.md |
 
