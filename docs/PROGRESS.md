@@ -11,7 +11,7 @@ Son güncelleme: 2026-10-05. Dal: `claude/country-info-mvp` (PR açılmadı). Ay
 
 **Tatiller (28 ülke dosyası):** resmî kaynaktan kural motoru; FR, NL (2026-10-05, metinler yeniden okundu), BG/RO/CY eklendi — BG tümüyle, CY çoğunlukla `unverified`, RO 2023 konsolide metne dayanıyor.
 
-**Model/ürün:** `source_class` (official/community), `?official_only`, `sources.priority` + `?canonical=true`, ülke/bölge yanıtında `names`/`xrefs`/`links`, ardıl önerileri (`replaced_by`/`merged_into` → `review_items`, admin onayıyla `entity_successors`, `/v1/regions/:id/successors`), koşullu GET + ham arşiv, OpenAPI (`/openapi.json`, rota-eşleşme testi), API anahtarı + hız sınırı, webhook yükünde `source_ids`/`vintage`/`reason`, TypeScript (`src/sdk.ts`) ve Python (`sdk/python`) istemcileri, veritabanı API anahtarları + kullanım ölçümü + paylaşımlı hız sınırlayıcı, aylık Wikidata/CLDR/link zinciri (workflow), `scripts/pg-start.sh`.
+**Model/ürün:** `source_class` (official/community), `?official_only`, `sources.priority` + `?canonical=true`, ülke/bölge yanıtında `names`/`xrefs`/`links`, ardıl önerileri (`replaced_by`/`merged_into` → `review_items`, admin onayıyla `entity_successors`, `/v1/regions/:id/successors`), koşullu GET + ham arşiv, OpenAPI (`/openapi.json`, rota-eşleşme testi), API anahtarı + hız sınırı, webhook yükünde `source_ids`/`vintage`/`reason`, TypeScript (`src/sdk.ts`) ve Python (`sdk/python`) istemcileri, veritabanı API anahtarları + kullanım ölçümü + paylaşımlı hız sınırlayıcı, aylık Wikidata/CLDR/link zinciri (workflow; ISO 3166-2 kodları, katman QID bağları: 10.580 `wikidata_qid` bağı), `scripts/pg-start.sh`.
 
 **Sayılar (dev DB):** 112 test yeşil; AB27 LAU yerine kapsam 23/27 (18 resmî + 5 Wikidata).
 

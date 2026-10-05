@@ -34,7 +34,7 @@ Hedef: her ülkenin kendi resmi verisinden tüm idari seviyeler (şehir, il, il�
 2. **Doğrulanmamış ülkeleri doğrulama** (alternatif resmi kaynak/sürüm ara): BE, LU, FI, GR, LT, MT, SI, DE eyalet yasaları, IT Legge 260/1949, DK birincil helligdag hükmü ve Store Bededag tanımı, PT 2013 öncesi, SK 17 Kasım 2024, SE değişiklikler (SFS 2004 sonrası).
 3. **Eksik tatiller:** ES yıllık BOE takvimi ve özerk topluluklar; DE bölgesel günler (`region: nuts:DEx`); IE St Brigid's Day (motora koşullu kural: "Şubat ilk Pazartesisi, 1 Şubat Cuma ise o gün"); GR Temiz Pazartesi/Büyük Cuma/Pentekost Pazartesi; LV hafta sonu devri; IT 4 Ekim.
 4. **Eşleme kapsamını artırma:** GeoNames `alternateNamesV2` veya ISO 3166-2 (`iso-codes`, LGPL) ile admin1↔NUTS (şu an %22).
-5. **ISO 3166-2** (`data.iso3166_2`) ve çok dilli adlar (şehir/bölge için alternateNames/CLDR).
+5. **ISO 3166-2 YAPILDI** (2026-10-05; Wikidata P300, `entity_xrefs` scheme `iso3166-2`, `/v1/regions/:id` `xrefs` içinde; admin1'in 3.281/3.603'ü kodlu, admin2/division'da seyrek) ve çok dilli adlar (Wikidata etiketleri + CLDR). Katman QID'leri (`wd-*`) de xref'e yazılıp QID bağlama 1.169 → 10.580 bağa çıktı.
 6. **Posta kodları** (GeoNames `postalCodes`, CC BY; ülke lisansı kontrol edilmeli).
 7. **LAU↔NUTS3 bağlantısı** (GISCO LAU CSV'sinde yok).
 8. **Operasyon:** `npm run ingest:all` + `docs/OPERATIONS.md`, zamanlanmış ingest (cron), API anahtarı/hız sınırı, OpenAPI şeması, SDK'lar.
