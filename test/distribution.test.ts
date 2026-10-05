@@ -183,7 +183,14 @@ d('distribution', () => {
       await deliver(calls);
       expect(calls).toHaveLength(1);
 
+      const atom = await app.inject('/v1/releases.atom');
+      expect(atom.headers['content-type']).toContain('application/atom+xml');
+      expect(atom.body).toContain(`<id>tag:country-info,2026:release:${id}</id>`);
+      expect(atom.body).toContain('Green Office');
+      expect(atom.body).not.toContain('Red Office'); // not cleared for sale: not listed
+      expect(atom.body.match(/<entry>/g)).toHaveLength(1);
       expect(await retractRelease(pool, id!)).toBe(true);
+      expect((await app.inject('/v1/releases.atom')).body).toContain('[retracted]');
       await deliver(calls);
       expect(calls.at(-1)!.event).toBe('release.retracted');
       await app.close();

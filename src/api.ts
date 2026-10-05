@@ -467,6 +467,29 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     const data = more ? rows.slice(0, limit) : rows;
     return { data, has_more: more, next_before: more ? data[data.length - 1]!.id : null };
   });
+  /** Atom feed of the latest customer-visible release notes (for feed readers; sent with the API key like any /v1 call). */
+  app.get('/v1/releases.atom', async (_req, reply) => {
+    const rows = (await pool.query('SELECT id, title, body_md, retracted, created_at FROM release_notes WHERE public ORDER BY id DESC LIMIT 50')).rows;
+    const esc = (x: string) => x.replace(/[<>&"']/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[c]!);
+    const updated = new Date(rows[0]?.created_at ?? 0).toISOString();
+    const base = config.publicBaseUrl.replace(/\/$/, '');
+    const entries = rows.map((r) => `  <entry>
+    <id>tag:country-info,2026:release:${r.id}</id>
+    <title>${esc((r.retracted ? '[retracted] ' : '') + r.title)}</title>
+    <updated>${new Date(r.created_at).toISOString()}</updated>
+    <link href="${esc(`${base}/v1/releases/${r.id}`)}"/>
+    <content type="text">${esc(r.body_md)}</content>
+  </entry>`).join('\n');
+    return reply.header('content-type', 'application/atom+xml; charset=utf-8').send(`<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>tag:country-info,2026:releases</id>
+  <title>country-info release notes</title>
+  <updated>${updated}</updated>
+  <link rel="self" href="${esc(`${base}/v1/releases.atom`)}"/>
+${entries}
+</feed>
+`);
+  });
   app.get<{ Params: { id: string } }>('/v1/releases/:id', async (req, reply) => {
     const r = /^\d+$/.test(req.params.id) ? await pool.query('SELECT id, snapshot_id, source_id, vintage, reason, title, body_md, totals, countries, highlight, retracted, created_at FROM release_notes WHERE public AND id = $1', [req.params.id]) : null;
     return r?.rows[0] ?? reply.code(404).send({ error: 'not_found' });
