@@ -20,3 +20,10 @@ EE (CC BY-SA), HR (resmî kod yok), SK (DATAcube kapandı, sayı uzlaşmıyor), 
 
 ## Çalışma kuralları (özet)
 Veri eklemeden önce lisans yayıncının sayfasından okunur; `verified` tatil yalnızca okunan resmî metinle; alt-ajan raporları veri sayılır, alıntılar yeniden doğrulanır; yeşil/sarı olmayan kaynak ticari pakete girmez; her adım commit + push, PR yalnızca istenirse. Yeni planlar `/root/.claude/plans/` altında **yeni dosya** olarak yazılır (eski plan dosyası Faz 1–6'yı içerir).
+
+## Kalan işler (2026-10-05 sonu) — hepsi dış engele veya iş/hukuk kararına bağlı
+- **Erişim gerektirenler:** BG/RO/CY tatil doğrulaması (lex.bg 403, justice.government.bg 503, legislatie.just.ro engelli), TR (TÜİK/NVİ/data.gov.tr/Resmî Gazete/Diyanet), RO/MT/LT/HR resmî kaynakları.
+- **Lisans/hukuk kararı:** EE resmî EHAK (CC BY-SA), LAU'nun tamamen kaldırılması (4 AB ülkesi — CY, HR, IE, MT — resmî/doğrulanmış kaynaksız), CC BY-IGO/CLDR kökeni, ES belediye adları (REL), ticari lansman öncesi avukat onayı, ToS/DPA/SLA, fiyatlandırma.
+- **Veri:** KR (sınıf eşlemesi), PT Açores/Madeira (gpkg), HR resmî kodları, IN ilçeleri, posta kodları ve mahalle/sokak (hacim + KVKK/GDPR + posta lisansları), OSM (ODbL kararı).
+- **Ürün:** planlar/kota tabloları ve faturalama entegrasyonu.
+Konteyner dışı bir ağdan veya kullanıcı kararıyla ilerlenebilir; ayrıntı `docs/ROADMAP.md`.
