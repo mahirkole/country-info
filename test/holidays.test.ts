@@ -88,10 +88,10 @@ describe('TR data file', () => {
   it('keeps the years Diyanet has not published yet tentative', async () => {
     const tr = (await loadHolidayFiles()).find((f) => f.country === 'TR')!;
     const h = compileHolidays(tr, 2027, 2028);
-    const religious = h.filter((x) => /^(ramazan|kurban)/.test(x.code));
+    const religious = h.filter((x) => /^(ramazan|kurban)/.test(x.code ?? ""));
     expect(religious.length).toBeGreaterThan(0);
     expect(religious.every((x) => x.data.verification === 'tentative')).toBe(true);
-    expect(h.filter((x) => !/^(ramazan|kurban)/.test(x.code)).every((x) => x.data.verification === 'verified')).toBe(true); // fixed days come from the law
+    expect(h.filter((x) => !/^(ramazan|kurban)/.test(x.code ?? "")).every((x) => x.data.verification === 'verified')).toBe(true); // fixed days come from the law
   });
   it('does not emit 15 Temmuz before 2017', async () => {
     const tr = (await loadHolidayFiles()).find((f) => f.country === 'TR')!;
