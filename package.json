@@ -22,7 +22,8 @@
     "check:holidays": "tsx src/cli.ts check-holidays",
     "export": "tsx src/cli.ts export",
     "serve": "tsx src/cli.ts serve",
-    "test": "vitest run"
+    "test": "vitest run",
+    "enrich:cldr": "tsx src/cli.ts enrich-cldr"
   },
   "engines": {
     "node": ">=20"

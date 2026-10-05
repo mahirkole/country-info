@@ -24,6 +24,7 @@ npm run check:sources                    # = refresh --dry-run: indir, doğrula,
 npm run check:licenses [id]              # lisans sayfası parmak izi (ilk çalıştırma = baseline)
 npm run license:ack -- <id>              # lisans sayfasını okuyup onayladıktan sonra kaynağı serbest bırak
 npm run enrich:wikidata [-- --spec geonames --limit N --langs en,tr]   # Wikidata (CC0): QID, çok dilli adlar; sonra `npm run link`
+npm run enrich:cldr                      # CLDR (Unicode License v3): ülke adları (29 dil) + güncel para birimi; yalnızca territories.json ve currencyData
 ```
 Çıkış kodu 1: en az bir kaynak `failed`/`needs_review` (veya lisans `changed`/`error`).
 

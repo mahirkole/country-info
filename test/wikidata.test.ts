@@ -132,3 +132,20 @@ describe('wikidata divisions', () => {
     expect(() => buildDivisions(C, [few, l2])).toThrow(/official band/);
   });
 });
+
+import { parseCurrencies, parseTerritories } from '../src/sources/cldr.js';
+describe('cldr', () => {
+  it('keeps alpha-2 territory names only', () => {
+    const j = { main: { tr: { localeDisplayNames: { territories: { '001': 'Dünya', '419': 'LatAm', TR: 'Türkiye', XA: 'Sahte', 'GB-alt-short': 'x', DE: 'Almanya' } } } } };
+    expect([...parseTerritories(j, 'tr')]).toEqual([['TR', 'Türkiye'], ['DE', 'Almanya']]);
+    expect(() => parseTerritories({ main: {} }, 'tr')).toThrow(/layout changed/);
+  });
+  it('picks current legal-tender currencies and rejects a truncated file', () => {
+    const region: Record<string, unknown[]> = { TR: [{ TRY: { _from: '2005-01-01' } }, { TRL: { _from: '1922-11-01', _to: '2005-12-31' } }], ZW: [{ ZWL: { _from: '2009-01-01', _tender: 'false' } }] };
+    for (let i = 0; i < 160; i++) region[`A${i}`] = [{ XXX: { _from: '2000-01-01' } }];
+    const m = parseCurrencies({ supplemental: { currencyData: { region } } });
+    expect(m.get('TR')).toEqual(['TRY']);
+    expect(m.has('ZW')).toBe(false);
+    expect(() => parseCurrencies({ supplemental: { currencyData: { region: { TR: [] } } } })).toThrow(/layout changed/);
+  });
+});

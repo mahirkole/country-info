@@ -19,4 +19,4 @@
 - Her kaynağın lisans dossier'i `docs/licenses/<source-id>.md` (şablon: `TEMPLATE.md`); dossier'siz kaynak ticari pakete girmez.
 
 ## Komutlar
-`npm run refresh [-- --due|--source id|--force|--dry-run] | check:sources | check:licenses | license:ack -- <id> | ingest | ingest:gisco | ingest:national <CC|all> | ingest:holidays | link | enrich:wikidata | check:holidays | export | serve`, `npm test` (+ `TEST_DATABASE_URL`), `npx tsc --noEmit -p .`
+`npm run refresh [-- --due|--source id|--force|--dry-run] | check:sources | check:licenses | license:ack -- <id> | ingest | ingest:gisco | ingest:national <CC|all> | ingest:holidays | link | enrich:wikidata | enrich:cldr | check:holidays | export | serve`, `npm test` (+ `TEST_DATABASE_URL`), `npx tsc --noEmit -p .`

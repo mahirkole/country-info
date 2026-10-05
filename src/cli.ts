@@ -17,6 +17,7 @@ import { diffHolidays, fetchNager } from './holidays/check.js';
 import { exportSnapshot } from './export.js';
 import { processDeliveries } from './webhooks.js';
 import { buildApp } from './api.js';
+import { enrichCldr } from './sources/cldr.js';
 
 const cmd = process.argv[2];
 /** `ALLOW_BULK_DELETE=1` disables the ingest delete guard for an intentional large removal. */
@@ -133,6 +134,12 @@ async function main() {
       console.log('linked by QID:', await linkByQid(pool));
       break;
     }
+    case 'enrich-cldr': {
+      // enrich-cldr: localized country names and current currencies from Unicode CLDR (Unicode License v3).
+      await migrate(pool);
+      console.log(await enrichCldr(pool, config.cacheDir));
+      break;
+    }
     case 'export':
       {
       const idArg = process.argv.slice(3).find((a) => /^\d+$/.test(a));
@@ -151,7 +158,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

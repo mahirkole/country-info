@@ -45,7 +45,10 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
 
   app.get<{ Params: { code: string } }>('/v1/countries/:code', async (req, reply) => {
     const r = await pool.query(`SELECT ${COLS} FROM entities WHERE kind = 'country' AND code = $1`, [req.params.code.toUpperCase()]);
-    return r.rows[0] ?? reply.code(404).send({ error: 'not_found' });
+    if (!r.rows[0]) return reply.code(404).send({ error: 'not_found' });
+    const names = Object.fromEntries((await pool.query("SELECT lang, name FROM entity_names WHERE entity_id = $1 ORDER BY lang, (source = 'wikidata') DESC, source", [r.rows[0].id])).rows.map((n) => [n.lang, n.name]));
+    const xrefs = (await pool.query('SELECT scheme, value, source FROM entity_xrefs WHERE entity_id = $1 AND value IS NOT NULL', [r.rows[0].id])).rows;
+    return { ...r.rows[0], names, xrefs };
   });
 
   app.get<{ Params: { code: string }; Querystring: { level?: string; limit?: string; after?: string; official_only?: string } }>(
@@ -144,7 +147,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
         [req.params.id],
       )
     ).rows;
-    const names = Object.fromEntries((await pool.query('SELECT lang, name FROM entity_names WHERE entity_id = $1 ORDER BY lang, source', [req.params.id])).rows.map((n) => [n.lang, n.name]));
+    const names = Object.fromEntries((await pool.query("SELECT lang, name FROM entity_names WHERE entity_id = $1 ORDER BY lang, (source = 'wikidata') DESC, source", [req.params.id])).rows.map((n) => [n.lang, n.name]));
     const xrefs = (await pool.query('SELECT scheme, value, source FROM entity_xrefs WHERE entity_id = $1 AND value IS NOT NULL', [req.params.id])).rows;
     return { ...r.rows[0], names, xrefs, links };
   });
