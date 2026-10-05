@@ -37,6 +37,7 @@ const nationalTargets = (): RefreshTarget[] => {
     NL: { cadence: 'annual', rows: [300, 420], licenseUrls: ['https://www.cbs.nl/en-gb/about-us/website/copyright'], verdict: 'amber', commercial: 'CC BY 4.0 for website content; table-specific text not located' },
     SE: { cadence: 'annual', rows: [300, 330], licenseUrls: ['https://www.scb.se/en/services/open-data-api/', 'https://statistikdatabasen.scb.se/api/v2/config'], verdict: 'green', commercial: 'CC0 (SCB open data): use, disseminate and sell without attribution; see docs/licenses/nat-se.md' },
     CZ: { cadence: 'annual', rows: [6000, 6800], licenseUrls: ['https://csu.gov.cz/podminky_pro_vyuzivani_a_dalsi_zverejnovani_statistickych_udaju_csu'], verdict: 'green', commercial: 'CC BY 4.0 (ČSÚ); attribution and metadata must travel with the data; see docs/licenses/nat-cz.md' },
+    DE: { cadence: 'monthly', rows: [10000, 12500], licenseUrls: ['https://www.destatis.de/DE/Service/Impressum/copyright-allgemein.html'], verdict: 'green', commercial: 'Destatis copyright page: commercial reuse allowed with source citation; docs/licenses/nat-de.md' },
     NO: { cadence: 'monthly', rows: [350, 400], licenseUrls: ['https://kartkatalog.geonorge.no/api/getdata/041f1e6e-bdbc-4091-b48f-8a5990f3cc5b'], verdict: 'green', commercial: 'CC BY 4.0 (dataset records), commercial use allowed per Kartverket terms; API record status Arkivert, see docs/licenses/nat-no.md' },
   };
   return Object.entries(NATIONAL).map(([cc, s]) => {

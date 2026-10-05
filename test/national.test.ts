@@ -6,6 +6,7 @@ import { parseCbs } from '../src/sources/national/nl.js';
 import { mapNorway } from '../src/sources/national/no.js';
 import { mapSweden, pickLatestTable } from '../src/sources/national/se.js';
 import { parseCzso } from '../src/sources/national/cz.js';
+import { parseGv } from '../src/sources/national/de.js';
 import { parseCsvRows } from '../src/sources/csv.js';
 import { readXlsx, columnIndex } from '../src/sources/xlsx.js';
 import { zipSync, strToU8 } from 'fflate';
@@ -163,5 +164,38 @@ describe('CZ adapter', () => {
     ]);
     expect(e[3]).toMatchObject({ name: 'Abertamy', data: { level: 4, type: 'municipality', type_local: 'město' } });
     expect(e[1]!.data).toMatchObject({ type: 'region', type_local: 'kraj', abbreviation: 'KVK', nuts: 'CZ041' });
+  });
+});
+
+describe('DE adapter', () => {
+  const rows = [
+    ['Gemeinden in Deutschland nach Fläche'],
+    [],
+    ['Satzart', 'Textkennzeichen', 'Amtlicher Regionalschlüssel (ARS)', '', '', '', '', 'Gemeindename', 'Fläche km2 1)', 'Bevölkerung auf Grundlage des Zensus', '', '', '', 'Postleitzahl3)', 'Geografische Mittelpunktkoordinaten'],
+    ['', '', 'Land', 'RB', 'Kreis', 'VB', 'Gem', '', '', 'insgesamt', 'männlich', 'weiblich', 'je km2', '', 'Längengrad', 'Breitengrad'],
+    ['', '', 'Gebietsstand am 31.12.2025 (Jahr)'],
+    [],
+    ['10', '', '01', '', '', '', '', 'Schleswig-Holstein'],
+    ['40', '41', '01', '0', '01', '', '', 'Flensburg, Stadt'],
+    ['50', '50', '01', '0', '01', '0000', '', 'Flensburg, Stadt'],
+    ['60', '61', '01', '0', '01', '0000', '000', 'Flensburg, Stadt', '56.73', '95568', '47298', '48270', '1685', '24937', '9,43751', '54,78252'],
+    ['10', '', '09', '', '', '', '', 'Bayern'],
+    ['20', '', '09', '1', '', '', '', 'Oberbayern'],
+    ['40', '', '09', '1', '62', '', '', 'München, Landeshauptstadt'],
+    ['60', '', '09', '1', '62', '0000', '000', 'München, Landeshauptstadt', '310.7', '1512491'],
+    ['60', '', '09', '9', '99', '0000', '001', 'Gemeinde ohne Kreiszeile'],
+  ];
+  it('builds Land > (Regierungsbezirk) > Kreis > Gemeinde; Gemeindeverband and orphan rows are not modelled', () => {
+    const { entities: e, asOf } = parseGv(rows);
+    expect(asOf).toBe('31.12.2025');
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual([
+      'div:DE:land-01<country:DE', 'div:DE:kreis-01001<div:DE:land-01', 'div:DE:gem-01001000<div:DE:kreis-01001',
+      'div:DE:land-09<country:DE', 'div:DE:rb-091<div:DE:land-09', 'div:DE:kreis-09162<div:DE:rb-091', 'div:DE:gem-09162000<div:DE:kreis-09162',
+    ]);
+    const fl = e.find((x) => x.id === 'div:DE:gem-01001000')!;
+    expect(fl).toMatchObject({ name: 'Flensburg, Stadt', lon: 9.43751, lat: 54.78252, data: { population: 95568, area_km2: 56.73, type: 'municipality', level: 4 } });
+  });
+  it('fails loudly if the layout changes', () => {
+    expect(() => parseGv([['x']])).toThrow(/layout changed/);
   });
 });
