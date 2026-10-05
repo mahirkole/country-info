@@ -13,6 +13,7 @@
     "ingest:gisco": "tsx src/cli.ts ingest-gisco",
     "ingest:holidays": "tsx src/cli.ts ingest-holidays",
     "link": "tsx src/cli.ts link",
+    "enrich:wikidata": "tsx src/cli.ts enrich-wikidata",
     "refresh": "tsx src/cli.ts refresh",
     "check:sources": "tsx src/cli.ts refresh --dry-run",
     "check:licenses": "tsx src/cli.ts check-licenses",

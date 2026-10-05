@@ -148,6 +148,24 @@ d('database', () => {
     await app.close();
   });
 
+  it('filters by source class (official_only) and exposes names and xrefs on a region', async () => {
+    await ingest(pool, SRC, [E('country:DE', 'country', 'DE', 'Germany', null), E('gn:1', 'admin1', 'DE', 'Istanbul', 'country:DE')], { kinds: KINDS });
+    await ingest(pool, { id: 'gisco-nuts', authority: 'x' }, [E('nuts:DE6', 'nuts1', 'DE', 'Hamburg', 'country:DE')], { kinds: ['nuts1'] });
+    await pool.query(`UPDATE sources SET source_class = 'official' WHERE id = 'gisco-nuts'`);
+    await pool.query(`UPDATE sources SET source_class = 'community' WHERE id = 't'`);
+    await pool.query(`INSERT INTO entity_xrefs(entity_id, scheme, value, source) VALUES ('nuts:DE6','wikidata','Q1055','wikidata')`);
+    await pool.query(`INSERT INTO entity_names(entity_id, lang, name, source) VALUES ('nuts:DE6','tr','Hamburg','wikidata')`);
+    const app = await buildApp(pool, { adminToken: 'tok', exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    const ids = async (u: string) => (await app.inject(u)).json().data.map((r: { id: string }) => r.id);
+    expect(await ids('/v1/search?q=hamburg&official_only=true')).toEqual(['nuts:DE6']);
+    expect(await ids('/v1/search?q=istanbul')).toEqual(['gn:1']);
+    expect(await ids('/v1/search?q=istanbul&official_only=true')).toEqual([]);
+    const r = (await app.inject('/v1/regions/nuts:DE6')).json();
+    expect(r.names).toEqual({ tr: 'Hamburg' });
+    expect(JSON.stringify(r.xrefs)).toContain('Q1055');
+    await app.close();
+  });
+
   it('serves national divisions by level and type, isolated per source', async () => {
     await ingest(pool, SRC, [E('country:FR', 'country', 'FR', 'France', null)], { kinds: ['country'] });
     const nat = { id: 'nat-fr', authority: 'INSEE' };

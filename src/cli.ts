@@ -6,6 +6,7 @@ import { GEONAMES } from './sources/geonames.js';
 import { GISCO_NUTS, GISCO_LAU, loadNuts, loadLau } from './sources/gisco.js';
 import { EU27 } from './sources/eu.js';
 import { linkRegions } from './linking.js';
+import { enrichWikidata, linkByQid } from './enrich.js';
 import { NATIONAL, nationalSource } from './sources/national/index.js';
 import { allTargets, syncTargetMetadata } from './targets.js';
 import { dueSourceIds, runRefresh } from './refresh.js';
@@ -122,6 +123,16 @@ async function main() {
       console.log('acknowledged', t.meta.id);
       break;
     }
+    case 'enrich-wikidata': {
+      // enrich-wikidata [--spec a,b] [--limit N] [--langs en,tr,...]: QIDs and multilingual labels from Wikidata (CC0), incremental.
+      await migrate(pool);
+      const args = process.argv.slice(3);
+      const val = (n: string) => args[args.indexOf(n) + 1];
+      const res = await enrichWikidata(pool, { specs: args.includes('--spec') ? val('--spec')!.split(',') : undefined, limit: args.includes('--limit') ? Number(val('--limit')) : undefined, langs: args.includes('--langs') ? val('--langs')!.split(',') : undefined });
+      console.table(res);
+      console.log('linked by QID:', await linkByQid(pool));
+      break;
+    }
     case 'export':
       {
       const idArg = process.argv.slice(3).find((a) => /^\d+$/.test(a));
@@ -140,7 +151,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

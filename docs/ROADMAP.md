@@ -1,6 +1,6 @@
 # Yol haritası ve kalan işler (sonraki oturumlar için)
 
-Son güncelleme: 2026-10-04. Dal: `claude/country-info-mvp` (PR açılmadı). Her maddeyi bitirince burayı güncelleyin.
+Son güncelleme: 2026-10-05. Dal: `claude/country-info-mvp` (PR açılmadı). Her maddeyi bitirince burayı güncelleyin.
 
 ## Tamamlandı
 - MVP: GeoNames ülke/admin1/admin2 ingest, snapshot/delta/webhook, dosya dışa aktarım.
@@ -10,6 +10,8 @@ Son güncelleme: 2026-10-04. Dal: `claude/country-info-mvp` (PR açılmadı). He
 - GeoNames şehirleri (`cities15000`, 34.152 kayıt).
 - GeoNames↔NUTS ad eşlemesi (770 admin1'den 169 bağ), `/v1/review-items`.
 - Atıf: `sources.attribution`, `/v1/sources`, `ATTRIBUTION.md`; lisans okuma bulguları `docs/LICENSES.md`.
+
+- Wikidata (CC0) zenginleştirme: `entity_xrefs`/`entity_names`, `npm run enrich:wikidata`, QID ile bağlama (`linkByQid`); `sources.source_class` (official|community) ve `?official_only=true`. **Kalan:** `source_priority` kuralları, TR/IN/KR/BR/BE/DK/FI/PL için altın-sayı kapılı Wikidata bölünme katmanı (TR ilçe 1.039≠973 → kullanılmaz), LAU'yu ulusal kaynaklarla değiştirip `gisco-lau`'yu kaldırma, CLDR ile M49/dil/para birimi, JP/PT/GB/ES adaptörleri.
 
 ## Kullanıcı ağı/ilişkisi gerektirenler (bu konteynerden erişilemedi)
 1. **TÜİK** il/ilçe kodları ve İBBS; **data.gov.tr**; **NVİ UAVT/MAKS** (başvuru/lisans); **PTT** posta kodu lisansı. Sonucu `docs/sources/TR.md`'ye yazın, sonra `src/sources/official/tr-tuik.ts`.

@@ -23,8 +23,11 @@ npm run refresh -- --source nat-it --force   # ham girdi aynı olsa da çalışt
 npm run check:sources                    # = refresh --dry-run: indir, doğrula, hiçbir şey yazma
 npm run check:licenses [id]              # lisans sayfası parmak izi (ilk çalıştırma = baseline)
 npm run license:ack -- <id>              # lisans sayfasını okuyup onayladıktan sonra kaynağı serbest bırak
+npm run enrich:wikidata [-- --spec geonames --limit N --langs en,tr]   # Wikidata (CC0): QID, çok dilli adlar; sonra `npm run link`
 ```
 Çıkış kodu 1: en az bir kaynak `failed`/`needs_review` (veya lisans `changed`/`error`).
+
+**Wikidata zenginleştirme:** `enrich:wikidata` `entity_xrefs` (QID; `value` NULL = arandı, tekil eşleşme yok) ve `entity_names` (çok dilli ad) tablolarını doldurur; ≤1 istek/sn, 429'da `Retry-After`. Aylık çalıştırılır. Wikidata topluluk verisidir (`source_class=community`, CC0); resmi kaynağın alanlarını ezmez, ayrı tabloda tutulur. Ardından `link` QID üzerinden GeoNames↔NUTS↔ulusal bağları ekler.
 
 ## Zamanlama
 `.github/workflows/refresh.yml` günlük çalışır: önce `check:licenses`, sonra `refresh --due`. Gerekli sır: `DATABASE_URL`. `ci.yml` her push'ta `tsc` + testler. Elle tetikleme: Actions → refresh → *Run workflow* (örn. `--source nat-it --force`).

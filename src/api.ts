@@ -9,6 +9,10 @@ import { config } from './config.js';
 const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data, source_id, updated_seq';
 const MAX_LIMIT = 1000;
 
+/** `?official_only=true` keeps only records of sources whose class is `official` (community sources such as GeoNames/Wikidata are left out). */
+const OFFICIAL = "source_id IN (SELECT id FROM sources WHERE source_class = 'official')";
+const officialOnly = (q: { official_only?: string }) => (q.official_only === 'true' || q.official_only === '1' ? `AND ${OFFICIAL}` : '');
+
 function page(q: { limit?: string; after?: string }) {
   const limit = Math.min(Math.max(parseInt(q.limit ?? '100', 10) || 100, 1), MAX_LIMIT);
   return { limit, after: q.after ?? '' };
@@ -44,7 +48,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     return r.rows[0] ?? reply.code(404).send({ error: 'not_found' });
   });
 
-  app.get<{ Params: { code: string }; Querystring: { level?: string; limit?: string; after?: string } }>(
+  app.get<{ Params: { code: string }; Querystring: { level?: string; limit?: string; after?: string; official_only?: string } }>(
     '/v1/countries/:code/regions',
     async (req, reply) => {
       const cc = req.params.code.toUpperCase();
@@ -52,7 +56,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
       if (!kind) return reply.code(400).send({ error: 'level must be 1 or 2' });
       const { limit, after } = page(req.query);
       const rows = (
-        await pool.query(`SELECT ${COLS} FROM entities WHERE country_code = $1 AND kind = $2 AND id > $3 ORDER BY id LIMIT $4`, [cc, kind, after, limit + 1])
+        await pool.query(`SELECT ${COLS} FROM entities WHERE country_code = $1 AND kind = $2 AND id > $3 ${officialOnly(req.query)} ORDER BY id LIMIT $4`, [cc, kind, after, limit + 1])
       ).rows;
       return paged(rows, limit, 'id');
     },
@@ -114,14 +118,14 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
    * Administrative divisions from national sources, any level and local type.
    * `source` limits to one source id (e.g. nat-fr); `level` is 1 = first level below the country.
    */
-  app.get<{ Params: { code: string }; Querystring: { level?: string; type?: string; source?: string; limit?: string; after?: string } }>(
+  app.get<{ Params: { code: string }; Querystring: { level?: string; type?: string; source?: string; limit?: string; after?: string; official_only?: string } }>(
     '/v1/countries/:code/divisions',
     async (req) => {
       const { limit, after } = page(req.query);
       const rows = (
         await pool.query(
           `SELECT ${COLS} FROM entities WHERE kind = 'division' AND country_code = $1 AND id > $2
-             AND ($3::text IS NULL OR source_id = $3) AND ($4::int IS NULL OR (data->>'level')::int = $4) AND ($5::text IS NULL OR data->>'type' = $5)
+             AND ($3::text IS NULL OR source_id = $3) AND ($4::int IS NULL OR (data->>'level')::int = $4) AND ($5::text IS NULL OR data->>'type' = $5) ${officialOnly(req.query)}
            ORDER BY id LIMIT $6`,
           [req.params.code.toUpperCase(), after, req.query.source ?? null, req.query.level ? Number(req.query.level) : null, req.query.type ?? null, limit + 1],
         )
@@ -140,7 +144,9 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
         [req.params.id],
       )
     ).rows;
-    return { ...r.rows[0], links };
+    const names = Object.fromEntries((await pool.query('SELECT lang, name FROM entity_names WHERE entity_id = $1 ORDER BY lang, source', [req.params.id])).rows.map((n) => [n.lang, n.name]));
+    const xrefs = (await pool.query('SELECT scheme, value, source FROM entity_xrefs WHERE entity_id = $1 AND value IS NOT NULL', [req.params.id])).rows;
+    return { ...r.rows[0], names, xrefs, links };
   });
 
   app.get<{ Querystring: { status?: string; limit?: string } }>('/v1/review-items', { preHandler: requireAdmin }, async (req) => ({
@@ -152,20 +158,20 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     ).rows,
   }));
 
-  app.get<{ Params: { id: string }; Querystring: { limit?: string; after?: string } }>('/v1/regions/:id/children', async (req) => {
+  app.get<{ Params: { id: string }; Querystring: { limit?: string; after?: string; official_only?: string } }>('/v1/regions/:id/children', async (req) => {
     const { limit, after } = page(req.query);
-    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE parent_id = $1 AND id > $2 ORDER BY id LIMIT $3`, [req.params.id, after, limit + 1])).rows;
+    const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE parent_id = $1 AND id > $2 ${officialOnly(req.query)} ORDER BY id LIMIT $3`, [req.params.id, after, limit + 1])).rows;
     return paged(rows, limit, 'id');
   });
 
-  app.get<{ Querystring: { q?: string; country?: string; kind?: string; limit?: string } }>('/v1/search', async (req, reply) => {
+  app.get<{ Querystring: { q?: string; country?: string; kind?: string; limit?: string; official_only?: string } }>('/v1/search', async (req, reply) => {
     const q = (req.query.q ?? '').trim();
     if (q.length < 2) return reply.code(400).send({ error: 'q must be at least 2 characters' });
     const { limit } = page(req.query);
     const esc = q.toLowerCase().replace(/[\\%_]/g, '\\$&');
     const rows = (
       await pool.query(
-        `SELECT ${COLS} FROM entities WHERE lower(name) LIKE $1 || '%' AND ($2::text IS NULL OR country_code = $2) AND ($3::text IS NULL OR kind = $3)
+        `SELECT ${COLS} FROM entities WHERE lower(name) LIKE $1 || '%' AND ($2::text IS NULL OR country_code = $2) AND ($3::text IS NULL OR kind = $3) ${officialOnly(req.query)}
          ORDER BY kind, name LIMIT $4`,
         [esc, req.query.country?.toUpperCase() ?? null, req.query.kind ?? null, limit],
       )
@@ -177,7 +183,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   app.get('/v1/sources', async () => ({
     data: (
       await pool.query(
-        `SELECT id, authority, url, license, version, attribution, retrieved_at, cadence, status, last_checked_at, last_changed_at, next_due_at,
+        `SELECT id, authority, url, license, version, attribution, retrieved_at, source_class, cadence, status, last_checked_at, last_changed_at, next_due_at,
                 license_verdict, commercial_use, license_checked_at,
                 (next_due_at IS NOT NULL AND next_due_at < now() - interval '2 days') AS stale
          FROM sources ORDER BY id`,
