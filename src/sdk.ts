@@ -12,7 +12,7 @@ export interface ClientOptions {
 
 export class ApiError extends Error {
   constructor(public status: number, public body: unknown, url: string) {
-    super(`GET ${url}: ${status}`);
+    super(`${url}: ${status}`);
   }
 }
 
@@ -40,18 +40,24 @@ export class CountryInfo {
     this.sleep = o.sleep ?? ((ms) => new Promise((r) => setTimeout(r, ms)));
   }
 
-  async get<T>(path: string, query: Query = {}): Promise<T> {
+  get<T>(path: string, query: Query = {}): Promise<T> {
+    return this.request<T>('GET', path, undefined, query);
+  }
+
+  /** Any call; `body` is sent as JSON. A 204 answers `null`. */
+  async request<T>(method: string, path: string, body?: unknown, query: Query = {}): Promise<T> {
     const qs = new URLSearchParams(Object.entries(query).filter(([, v]) => v !== undefined).map(([k, v]) => [k, String(v)]));
     const url = `${this.o.baseUrl.replace(/\/$/, '')}${path}${qs.size ? `?${qs}` : ''}`;
+    const headers: Record<string, string> = { accept: 'application/json', ...(this.o.apiKey ? { 'x-api-key': this.o.apiKey } : {}), ...(body !== undefined ? { 'content-type': 'application/json' } : {}) };
     for (let attempt = 0; ; attempt++) {
-      const res = await this.fetchFn(url, { headers: this.o.apiKey ? { 'x-api-key': this.o.apiKey, accept: 'application/json' } : { accept: 'application/json' } });
+      const res = await this.fetchFn(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
       if (res.status === 429 && attempt === 0) {
         await this.sleep(Math.min(Number(res.headers.get('retry-after')) || 1, 60) * 1000);
         continue;
       }
-      const body = await res.json().catch(() => null);
-      if (!res.ok) throw new ApiError(res.status, body, url);
-      return body as T;
+      const payload = await res.json().catch(() => null);
+      if (!res.ok) throw new ApiError(res.status, payload, url);
+      return payload as T;
     }
   }
 
@@ -77,6 +83,38 @@ export class CountryInfo {
   sources = () => this.get<{ data: Record<string, unknown>[] }>('/v1/sources');
   status = () => this.get<Record<string, unknown>>('/v1/status');
 
+  // ---- webhooks (your own subscriptions) -------------------------------
+  createWebhook = (w: { url: string; events?: WebhookEvent[]; countries?: string[]; kinds?: string[] }) => this.request<Webhook & { secret: string }>('POST', '/v1/webhooks', w);
+  webhooks = async () => (await this.get<{ data: Webhook[] }>('/v1/webhooks')).data;
+  deleteWebhook = (id: number | string) => this.request<null>('DELETE', `/v1/webhooks/${id}`);
+  /** Delivery log, newest first; pass `before` (`next_before` of the previous page) to continue. */
+  webhookDeliveries = (id: number | string, q: Query = {}) => this.get<{ data: Delivery[]; has_more: boolean; next_before: string | null }>(`/v1/webhooks/${id}/deliveries`, q);
+  replayDelivery = (id: number | string, deliveryId: number | string) => this.request<{ id: number; status: string }>('POST', `/v1/webhooks/${id}/deliveries/${deliveryId}/replay`);
+  testWebhook = (id: number | string) => this.request<{ id: number; status: string }>('POST', `/v1/webhooks/${id}/test`);
+
+  // ---- release notes and file bundles -----------------------------------
+  /** Release notes, newest first (follows `next_before`). */
+  async *releases(q: Query = {}): AsyncGenerator<ReleaseNote> {
+    let before: string | undefined;
+    for (;;) {
+      const page = await this.get<{ data: ReleaseNote[]; has_more: boolean; next_before: string | null }>('/v1/releases', { ...q, before });
+      yield* page.data;
+      if (!page.has_more || page.next_before == null) return;
+      before = String(page.next_before);
+    }
+  }
+  release = (id: number | string) => this.get<ReleaseNote & { body_md: string }>(`/v1/releases/${id}`);
+  exportsLatest = () => this.get<ExportBundle>('/v1/exports/latest');
+  /** Download one file of a bundle (`bundle.files[name]` or a snapshot's `delta`) and verify its sha256; throws on mismatch. */
+  async download(file: { url: string; sha256: string }): Promise<Uint8Array> {
+    const res = await this.fetchFn(file.url);
+    if (!res.ok) throw new ApiError(res.status, null, file.url);
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    const got = hex(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)));
+    if (got !== file.sha256) throw new Error(`sha256 mismatch for ${file.url}: expected ${file.sha256}, got ${got}`);
+    return bytes;
+  }
+
   /** Change feed after `since` (0 = from the start); yields changes and returns the cursor to resume from. */
   async *changes(since = 0, q: Query = {}): AsyncGenerator<Change, number> {
     let cursor = since;
@@ -87,4 +125,28 @@ export class CountryInfo {
       if (!feed.has_more) return cursor;
     }
   }
+}
+
+const hex = (b: Uint8Array) => [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+
+export type WebhookEvent = 'snapshot.completed' | 'release.published' | 'release.retracted';
+export interface Webhook { id: number; url: string; events: WebhookEvent[] | null; countries: string[] | null; kinds: string[] | null; active: boolean }
+export interface Delivery { id: number; event: string; snapshot_id: number | null; status: 'pending' | 'delivered' | 'failed'; attempts: number; last_error: string | null; payload: Record<string, unknown> }
+export interface ReleaseNote { id: number; snapshot_id: number; source_id: string; vintage: string | null; title: string; totals: { inserted: number; updated: number; deleted: number }; countries: Record<string, number>; highlight: boolean; retracted: boolean; created_at: string }
+export interface BundleFile { url: string; sha256: string; bytes: number }
+export interface ExportBundle { profile: string; snapshot_id: number; from_seq: number; to_seq: number; files: Record<string, BundleFile>; snapshots: { snapshot_id: number; from_seq: number; to_seq: number; delta_only: boolean; delta: BundleFile }[]; retracted: number[] }
+
+/**
+ * Check a webhook delivery in your receiver: `signature` is the `x-countryinfo-signature` header, `timestamp` the
+ * `x-countryinfo-timestamp` header and `body` the raw request body. Rejects deliveries older than `toleranceSec` (default 300).
+ */
+export async function verifyWebhook(secret: string, body: string, timestamp: string, signature: string, toleranceSec = 300, nowMs = Date.now()): Promise<boolean> {
+  if (Math.abs(nowMs / 1000 - Number(timestamp)) > toleranceSec) return false;
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const mac = hex(new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${timestamp}.${body}`))));
+  const given = signature.replace(/^sha256=/, '');
+  if (given.length !== mac.length) return false;
+  let diff = 0;
+  for (let i = 0; i < mac.length; i++) diff |= mac.charCodeAt(i) ^ given.charCodeAt(i);
+  return diff === 0;
 }

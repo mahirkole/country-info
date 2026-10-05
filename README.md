@@ -61,6 +61,8 @@ Erişim: `API_KEYS=k1,k2` ayarlanırsa `/v1/*` için `x-api-key` (veya `Authoriz
 
 İstemci (TypeScript, bağımlılıksız): `import { CountryInfo } from './src/sdk'` — `new CountryInfo({ baseUrl, apiKey })`; `for await (const c of client.countries())`, `client.regions('DE')`, `client.divisions('FR', { level: 2 })`, `client.holidays('TR', 2026)`, `client.search('ist')`; değişiklik akışı `for await (const ch of client.changes(sinceSeq))` (üreteç sonunda devam imleci döner); 429'da `Retry-After` kadar bekleyip bir kez yeniden dener, hatalar `ApiError`.
 
+Dağıtım uçları her iki istemcide de var: `createWebhook/webhooks/deleteWebhook/webhookDeliveries/replayDelivery/testWebhook`, `releases()/release(id)`, `exportsLatest()` + `download(dosya)` (sha256 doğrular) ve alıcı tarafında `verifyWebhook(secret, body, timestamp, signature)` (Python: `create_webhook`, …, `verify_webhook`).
+
 Python istemcisi (yalnızca standart kütüphane): `sdk/python/countryinfo` — `CountryInfo(base_url, api_key=...)`, aynı yöntemler ve `changes(since)` (`last_cursor` devam imleci); testler: `cd sdk/python && python3 -m unittest discover -s tests`.
 
 Webhook yükü (`snapshot.completed`): `source`, `source_ids`, `vintage` (kaynağın sürümü), `reason` (sürüm geçişiyse `vintage_change: …`), `from_seq`/`to_seq`, `totals`, `changes_by_country`, `changes_url`.
