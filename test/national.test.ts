@@ -8,6 +8,8 @@ import { mapSweden, pickLatestTable } from '../src/sources/national/se.js';
 import { parseCzso } from '../src/sources/national/cz.js';
 import { parseGv } from '../src/sources/national/de.js';
 import { parseAustria } from '../src/sources/national/at.js';
+import { parseSgc } from '../src/sources/national/ca.js';
+import { parseBfs } from '../src/sources/national/ch.js';
 import { parseCsvRows } from '../src/sources/csv.js';
 import { readXlsx, columnIndex } from '../src/sources/xlsx.js';
 import { zipSync, strToU8 } from 'fflate';
@@ -214,5 +216,25 @@ describe('AT adapter', () => {
     expect(e.find((x) => x.id === 'div:AT:gem-10101')).toMatchObject({ name: 'Eisenstadt', data: { type_local: 'Statutarstadt', status: 'SR' } });
     expect(JSON.stringify(e)).not.toContain('7000');
     expect(() => parseAustria('x', gem)).toThrow(/layout changed/);
+  });
+});
+
+describe('CA adapter', () => {
+  it('builds region > province > census division > census subdivision from code prefixes', () => {
+    const r = (Level: string, Code: string, name: string) => ({ Level, 'Hierarchical structure': 'x', Code, 'Class title': name });
+    const e = parseSgc([r('1', '1', 'Atlantic'), r('2', '10', 'Newfoundland and Labrador'), r('3', '1001', 'Division No. 1'), r('4', '1001105', 'Portugal Cove South'), { Level: '9', Code: '77', 'Class title': 'x', 'Hierarchical structure': '' }]);
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual(['div:CA:1<country:CA', 'div:CA:10<div:CA:1', 'div:CA:1001<div:CA:10', 'div:CA:1001105<div:CA:1001']);
+    expect(e[3]).toMatchObject({ name: 'Portugal Cove South', data: { type: 'municipality', type_local: 'census subdivision', level: 4 } });
+  });
+});
+
+describe('CH adapter', () => {
+  const r = (HistoricalCode: string, BfsCode: string, Level: string, Parent: string, Name: string) => ({ HistoricalCode, BfsCode, Level, Parent, Name, ShortName: Name, ValidFrom: '12.09.1848' });
+  it('builds canton > Bezirk > Gemeinde via HistoricalCode parents; skips rows with unknown parents', () => {
+    const e = parseBfs([r('1', '1', '1', '', 'Zürich'), r('10053', '101', '2', '1', 'Bezirk Affoltern'), r('11742', '2', '3', '10053', 'Affoltern am Albis'), r('99', '9', '3', '555', 'Orphan'), r('2', '2', '1', '', 'Bern'), r('20001', '351', '3', '2', 'Bern direct')]);
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual([
+      'div:CH:kt-1<country:CH', 'div:CH:bez-10053<div:CH:kt-1', 'div:CH:gem-2<div:CH:bez-10053', 'div:CH:kt-2<country:CH', 'div:CH:gem-351<div:CH:kt-2',
+    ]);
+    expect(e[0]).toMatchObject({ name: 'Zürich', data: { type: 'canton', type_local: 'Kanton', level: 1 } });
   });
 });

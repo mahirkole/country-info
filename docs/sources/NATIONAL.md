@@ -10,7 +10,7 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 |---|---|---|---|---|---|
 | US | Census Bureau ANSI/FIPS codes 2020 | state, county (+parish, borough, independent city, municipio) | ✅ | partial (17 U.S.C. § 105; sayfada açık "public domain" ifadesi bulunamadı) | **Yüklü: 3.292 birim** |
 | FR | INSEE Code officiel géographique 2026 (CSV; en yeni sayfa otomatik keşfedilir) | région, département, commune (+ arrondissement municipal, commune associée/déléguée) | ✅ | **read** (Licence Ouverte 2.0) | **Yüklü: 37.031** (18 / 101 / 34.875 / alt: 1.521 déléguée, 471 associée, 45 ARM) |
-| CH | BFS Amtliches Gemeindeverzeichnis (`agvchapp.bfs.admin.ch/api/communes/snapshot`) | canton, district, municipality (hiyerarşi içinde) | ✅ | **unread:** opendata.swiss paket metaverisinde lisans alanı boş; 4 kullanım şartından hangisi olduğu okunamadı | **Bloklu** (lisans) |
+| CH | BFS Amtliches Gemeindeverzeichnis (REST snapshot `date=01-01-<yıl>`) | Kanton, Bezirk, Gemeinde | ✅ | 🟡 opendata.swiss "Open use" (ticari serbest, kaynak önerilir; yeniden dağıtım cümlesi yok) | **Yüklü: 2.280** (26 / 144 / 2.110) |
 | IT | ISTAT Elenco dei comuni italiani (**xlsx**, güncel; CSV bayat) | region, province/UTS, comune (+ NUTS 2024) | ✅ | **read** (CC BY 4.0) | **Yüklü: 8.024** (20 / 110 / 7.894; 21.02.2026 durumu, Sardinya yeniden yapılanması delta olarak yakalandı) |
 | JP | MIC/Soumu 全国地方公共団体コード (xlsx) | prefecture, municipality | ✅ | okunmadı | Sırada (xlsx ayrıştırıcı gerekir) |
 | NL | CBS StatLine 86247NED "Gebieden in Nederland 2026" | landsdeel, provincie, gemeente | ✅ (Node istemcisi 406 alıyor, curl yedeği kullanılıyor) | partial (CBS web sitesi CC BY 4.0; OData tablosuna ayrı lisans metni bulunamadı) | **Yüklü: 358 birim** (4 / 12 / 342) |
@@ -27,9 +27,10 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 | CZ | ČSÚ Struktura území ČR (CSV) | region soudržnosti (NUTS 2), kraj (NUTS 3), okres, obec | ✅ | **read** (CC BY 4.0) | **Yüklü: 6.357** (8 / 14 / 77 / 6.258) |
 | DE | Destatis Gemeindeverzeichnis GV-ISys (`AuszugGV3QAktuell.xlsx`, çeyreklik; sabit "Aktuell" adı) | Land, Regierungsbezirk, Kreis, Gemeinde (+ koordinat, nüfus, alan) | ✅ | **read** (Destatis telif sayfası: ticari yeniden kullanım serbest, Quellennachweis) | **Yüklü: 11.386** (16 / 29 / 401 / 10.940; Gebietsstand 30.09.2026) |
 | AT | STATISTIK AUSTRIA reglisten.zip (`polbezirke.csv`, `gemliste_knz.csv`) | Bundesland, politischer Bezirk, Gemeinde (+ Viyana Gemeindebezirke) | ✅ | **read** (CC BY 4.0 + AGB § 10; "bearbeitet" notu) | **Yüklü: 2.218** (9 / 94 / 2.092 / 23); posta kodu sütunları alınmaz |
+| CA | Statistics Canada SGC 2021 structure (CSV) | region, province/territory, census division, census subdivision | ✅ | **read** (StatCan Open Licence; "Adapted from… not an endorsement" atfı) | **Yüklü: 5.473** (6 / 13 / 293 / 5.161) |
 
 ## Dossier sonrası ek adaylar (lisans 🟢, ayrıntı `docs/licenses/README.md`)
-FI (Tilastokeskus sınıflandırma API'si, 308 belediye — **kunta→maakunta eşleme servisi 500 veriyor, hiyerarşi için beklemede**), PT (DGT CAOP), AU yapıları, CA (StatCan SGC), JP (MIC xlsx). CZ yüklendi. 🟡: GB, ES, DK, PL, NL (zaten yüklü). ⚪: BE (CAPTCHA).
+FI (Tilastokeskus sınıflandırma API'si, 308 belediye — **kunta→maakunta eşleme servisi 500 veriyor, hiyerarşi için beklemede**), PT (DGT CAOP), AU yapıları, JP (MIC xlsx; dosya kimliği kararsız, sayfadan keşif gerekir). CZ yüklendi. 🟡: GB, ES, DK, PL, NL (zaten yüklü). ⚪: BE (CAPTCHA).
 
 ## Tasarım notları
 - GeoNames (`geonames`) hâlâ dünya geneli taban katman; ulusal kaynaklar `division` olarak **yanına** eklenir, GeoNames'i silmez. "Yalnızca resmi" mod için bkz. `docs/ROADMAP.md`.
