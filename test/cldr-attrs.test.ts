@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CLDR_BASE, newerThanPinned } from '../src/sources/cldr.js';
-import { parseCalendars, parseFractions, parseLikely, parseLocaleFormats, parseMeasurement, parseTime, parseUnits, parseWeek } from '../src/sources/cldr-attrs.js';
+import { localesOf, parseAvailableLocales, pickLocale, parseCalendars, parseFractions, parseLikely, parseLocaleFormats, parseMeasurement, parseTime, parseUnits, parseWeek } from '../src/sources/cldr-attrs.js';
 
 const S = (k: string, v: unknown) => ({ supplemental: { version: { _cldrVersion: '48' }, [k]: v } });
 
@@ -42,8 +42,24 @@ describe('cldr attributes', () => {
     expect(fr.get('AMD')!.cash_digits).toBe(0);
     const l = parseLikely(S('likelySubtags', { und: 'en-Latn-US', 'und-TR': 'tr-Latn-TR', 'und-CH': 'de-Latn-CH' }));
     expect(l('CH')).toEqual({ language: 'de', script: 'Latn', locale: 'de' });
-    expect(l('US')).toEqual({ language: 'en', script: 'Latn', locale: 'en' });
     expect(l('XX')).toBeUndefined();
+    expect(l('GB')).toBeUndefined(); // no und-GB entry and no locales given
+    const av = new Set(['en', 'en-GB']);
+    expect(l('GB', av)).toEqual({ language: 'en', script: 'Latn', locale: 'en' }); // root `und` = en-Latn-US, believed because en-GB exists
+    expect(l('AQ', av)).toBeUndefined();
+    expect(l('US')).toEqual({ language: 'en', script: 'Latn', locale: 'en' }); // the region of `und` itself
+  });
+  it('picks the most specific existing locale and lists a territory\'s locales', () => {
+    const list = ['en', 'en-GB', 'pt', 'pt-PT', 'zh-Hans', 'zh-Hans-CN', 'de', 'de-CH', 'fr', 'fr-CH', 'it', 'it-CH'];
+    for (let i = 0; i < 200; i++) list.push(`x${i}`);
+    const av = parseAvailableLocales({ availableLocales: { full: list } });
+    expect(pickLocale({ language: 'pt', script: 'Latn' }, 'PT', av)).toBe('pt-PT');
+    expect(pickLocale({ language: 'pt', script: 'Latn' }, 'BR', av)).toBe('pt');
+    expect(pickLocale({ language: 'zh', script: 'Hans' }, 'CN', av)).toBe('zh-Hans-CN');
+    expect(pickLocale({ language: 'zh', script: 'Hans' }, 'SG', av)).toBe('zh-Hans');
+    expect(pickLocale({ language: 'pau', script: 'Latn' }, 'PW', av)).toBeUndefined();
+    expect(localesOf('CH', av)).toEqual(['de-CH', 'fr-CH', 'it-CH']);
+    expect(() => parseAvailableLocales({})).toThrow(/layout changed/);
   });
   it('locale formats', () => {
     const dates = { main: { tr: { dates: { calendars: { gregorian: { dateFormats: { full: 'd MMMM y EEEE', long: 'd MMMM y', medium: 'd MMM y', short: 'd.MM.y' }, timeFormats: { full: 'HH:mm:ss zzzz', long: 'HH:mm:ss z', medium: 'HH:mm:ss', short: 'HH:mm' }, dateTimeFormats: { full: '{1} {0}', short: '{1} {0}' } } } } } } };

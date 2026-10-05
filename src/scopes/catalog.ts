@@ -84,7 +84,7 @@ export const CATALOG: ScopeDef[] = [
   },
   {
     id: 'locale', title: 'Locale', description: 'Primary locale (language and script) from CLDR likely subtags.', applies_to: ['country'], default: false, availability: { country: 'full' },
-    fields: [f('default', 'string', 'Default locale', 'cldr'), f('language', 'string', 'Language', 'cldr'), f('script', 'string', 'Script', 'cldr')],
+    fields: [f('default', 'string', 'Default locale', 'cldr'), f('language', 'string', 'Language', 'cldr'), f('script', 'string', 'Script', 'cldr'), f('available', 'array', 'CLDR locales of this territory (e.g. de-CH, fr-CH, it-CH); any of them can be passed as `locale`', 'cldr')],
   },
 ];
 

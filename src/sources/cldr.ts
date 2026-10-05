@@ -121,7 +121,7 @@ export async function checkCldrContract(cacheDir: string): Promise<{ version: st
   const a = await import('./cldr-attrs.js');
   const get = async (path: string, name: string) => JSON.parse(await fetchText(`${CLDR_BASE}/${path}`, name, cacheDir)) as unknown;
   const raw = Object.fromEntries(await Promise.all(Object.entries(a.ATTR_FILES).map(async ([k, p]) => [k, await get(p, `cldr_${k}.json`)] as const)));
-  a.parseWeek(raw.week); a.parseMeasurement(raw.measurement); a.parseTime(raw.time); a.parseCalendars(raw.calendar); a.parseUnits(raw.units); a.parseFractions(raw.currency); a.parseLikely(raw.likely);
+  a.parseWeek(raw.week); a.parseMeasurement(raw.measurement); a.parseTime(raw.time); a.parseCalendars(raw.calendar); a.parseUnits(raw.units); a.parseFractions(raw.currency); a.parseLikely(raw.likely); a.parseAvailableLocales(raw.locales);
   parseCurrencies(raw.currency);
   parseUnMembers(await get('cldr-core/supplemental/territoryContainment.json', 'cldr_containment.json'));
   parseTerritories(await get('cldr-localenames-full/main/en/territories.json', 'cldr_terr_en.json'), 'en');

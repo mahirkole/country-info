@@ -80,18 +80,45 @@ export function parseFractions(json: unknown): Map<string, CurrencyFraction> {
   return out;
 }
 
-/** Primary locale of a territory from likelySubtags `und-XX` (e.g. `tr-Latn-TR`): language and script. */
-export function parseLikely(json: unknown): (cc: string) => { language: string; script: string; locale: string } | undefined {
+/**
+ * Primary language and script of a territory from likelySubtags `und-XX` (e.g. `tr-Latn-TR`). Territories without an `und-XX` entry
+ * resolve through the root entry `und` (`en-Latn-US`, UTS #35 likely-subtags lookup); that is only believed when CLDR actually has a
+ * locale of that language for the territory (`en-AU`), so uninhabited territories stay empty.
+ */
+export function parseLikely(json: unknown): (cc: string, available?: Set<string>) => { language: string; script: string; locale: string } | undefined {
   const l = sup(json, 'likelySubtags') as Terr<string>;
-  if (!l['und-TR']) throw new Error('CLDR likelySubtags: layout changed');
-  return (cc) => {
-    // the root entry `und` (en-Latn-US) stands for the territory it names, which therefore has no `und-US` entry of its own
-    const root = l['und'];
-    const v = l[`und-${cc}`] ?? (root?.split('-')[2] === cc ? root : undefined);
-    if (!v) return undefined;
-    const [language, script] = v.split('-');
-    return { language: language!, script: script!, locale: language! };
+  if (!l['und-TR'] || !l['und']) throw new Error('CLDR likelySubtags: layout changed');
+  const [rootLang, rootScript, rootRegion] = l['und']!.split('-');
+  return (cc, available) => {
+    const v = l[`und-${cc}`];
+    if (v) {
+      const [language, script] = v.split('-');
+      return { language: language!, script: script!, locale: language! };
+    }
+    if (cc === rootRegion || (available && (available.has(`${rootLang}-${cc}`) || available.has(`${rootLang}-${rootScript}-${cc}`)))) return { language: rootLang!, script: rootScript!, locale: rootLang! };
+    return undefined;
   };
+}
+
+/** Locale ids that have full data in cldr-json (`en`, `pt-PT`, `zh-Hans`, ...). */
+export function parseAvailableLocales(json: unknown): Set<string> {
+  const full = (json as { availableLocales?: { full?: string[] } }).availableLocales?.full;
+  if (!full || full.length < 200) throw new Error('CLDR availableLocales: layout changed');
+  return new Set(full);
+}
+
+/**
+ * Locale a country's formats come from: the most specific CLDR locale for its primary language that exists
+ * (`pt-PT` before `pt`, `zh-Hans-CN` before `zh-Hans`); `undefined` when the language has no CLDR locale.
+ */
+export function pickLocale(lk: { language: string; script: string } | undefined, cc: string, available: Set<string>): string | undefined {
+  if (!lk) return undefined;
+  return [`${lk.language}-${lk.script}-${cc}`, `${lk.language}-${cc}`, `${lk.language}-${lk.script}`, lk.language].find((l) => available.has(l));
+}
+
+/** Every CLDR locale of a territory (`de-CH`, `fr-CH`, `it-CH`, ...): those whose region subtag is the territory. */
+export function localesOf(cc: string, available: Set<string>): string[] {
+  return [...available].filter((l) => l.split('-').at(-1) === cc && l.includes('-')).sort();
 }
 
 export interface LocaleFormats {
@@ -130,6 +157,7 @@ export const ATTR_FILES = {
   units: 'cldr-core/supplemental/unitPreferenceData.json',
   currency: 'cldr-core/supplemental/currencyData.json',
   likely: 'cldr-core/supplemental/likelySubtags.json',
+  locales: 'cldr-core/availableLocales.json',
 } as const;
 
 /**
@@ -147,19 +175,23 @@ export async function enrichCldrAttributes(pool: pg.Pool, cacheDir: string, curr
   const units = parseUnits(raw.units);
   const fractions = parseFractions(raw.currency);
   const likely = parseLikely(raw.likely);
+  const available = parseAvailableLocales(raw.locales);
 
   const countries = (await pool.query(`SELECT id, code FROM entities WHERE kind = 'country'`)).rows as { id: string; code: string }[];
   const locales = new Set(extraLocales);
   const rows: { id: string; grp: string; data: unknown }[] = [];
   for (const { id, code } of countries) {
-    const lk = likely(code);
-    if (lk) locales.add(lk.locale);
+    const lk = likely(code, available);
+    const def = pickLocale(lk, code, available);
+    const all = localesOf(code, available);
+    if (def) locales.add(def);
+    for (const l of all) locales.add(l);
     rows.push({ id, grp: 'week', data: week(code) }, { id, grp: 'measurement', data: meas(code) }, { id, grp: 'calendar', data: { preferred: cals(code) } }, { id, grp: 'units', data: units(code) });
     const t = time(code);
     if (t) rows.push({ id, grp: 'time', data: t });
     const cur = currentCurrencies.get(code);
     if (cur) rows.push({ id, grp: 'currency', data: { codes: cur, primary: cur[0], details: cur.map((c) => ({ code: c, ...(fractions.get(c) ?? fractions.get('DEFAULT')!) })) } });
-    if (lk) rows.push({ id, grp: 'locale', data: { default: lk.locale, language: lk.language, script: lk.script } });
+    if (lk) rows.push({ id, grp: 'locale', data: { ...(def ? { default: def } : {}), language: lk.language, script: lk.script, ...(all.length ? { available: all } : {}) } });
   }
   const formats = new Map<string, LocaleFormats>();
   for (const loc of [...locales].sort()) {
