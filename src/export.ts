@@ -56,6 +56,8 @@ async function sha256(path: string): Promise<{ sha256: string; bytes: number }> 
  * Write the files for one snapshot under `<out>/snapshots/<id>/` and refresh
  * `<out>/latest/` and `<out>/manifest.json`:
  *   countries.json / countries.csv   full country list
+ *   attributes.ndjson                CLDR country attributes (currency, week, time, measurement, units, calendar, locale), one country per line
+ *   locale_formats.ndjson            date/time/number patterns per CLDR locale
  *   regions.ndjson                   all subdivisions (admin, NUTS, LAU), one JSON per line
  *   holidays.ndjson / holidays.csv   all holiday occurrences
  *   delta.ndjson                     change log of this snapshot (empty for the first import = all inserts)
@@ -108,6 +110,18 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
         countries.map((c) => csvRow([c.code, c.data.iso3, c.data.numeric, c.name, c.data.capital, c.data.continent, c.data.un_status, c.data.currency?.code, c.data.phone_code, (c.data.languages ?? []).join(' '), c.data.tld, c.data.population, c.data.area_km2])).join(''),
     );
 
+    // CLDR-derived country attributes and per-locale formats (the scopes currency, datetime, numbers, measurement, locale).
+    const attrSrc = opts.commercialOnly ? `AND source IN (SELECT o.id FROM sources o WHERE ${ok('o')})` : '';
+    const attrByCountry = new Map<string, Record<string, unknown>>();
+    for (const a of (await pool.query(`SELECT e.code, a.grp, a.data, a.vintage FROM entity_attributes a JOIN entities e ON e.id = a.entity_id WHERE e.kind = 'country' ${attrSrc.replace('source IN', 'a.source IN')} ORDER BY e.code, a.grp`)).rows) {
+      const o: Record<string, unknown> = attrByCountry.get(a.code) ?? { country: a.code, vintage: a.vintage };
+      o[a.grp] = a.data;
+      attrByCountry.set(a.code, o);
+    }
+    await writeFile(join(dir, 'attributes.ndjson'), [...attrByCountry.values()].map((o) => JSON.stringify(o) + '\n').join(''));
+    for (const c of countries) await writeFile(join(dir, 'by-country', c.code, 'attributes.json'), JSON.stringify(attrByCountry.get(c.code) ?? { country: c.code }, null, 1));
+    await writeFile(join(dir, 'locale_formats.ndjson'), (await pool.query(`SELECT locale, data, vintage FROM locale_formats WHERE true ${attrSrc} ORDER BY locale`)).rows.map((r) => JSON.stringify(r) + '\n').join(''));
+
     await writeFile(join(dir, 'regions.ndjson'), '');
     for (let after = ''; ; ) {
       const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE kind NOT IN ('country', 'holiday') ${cleared} AND id > $1 ORDER BY id LIMIT 5000`, [after])).rows;
@@ -152,7 +166,7 @@ export async function exportSnapshot(pool: pg.Pool, outDir: string, snapshotId?:
   );
 
   const files: ManifestEntry['files'] = {};
-  for (const f of opts.deltaOnly ? ['ATTRIBUTION.md', 'delta.ndjson'] : ['countries.json', 'countries.csv', 'regions.ndjson', 'holidays.ndjson', 'holidays.csv', 'ATTRIBUTION.md', 'delta.ndjson']) {
+  for (const f of opts.deltaOnly ? ['ATTRIBUTION.md', 'delta.ndjson'] : ['countries.json', 'countries.csv', 'attributes.ndjson', 'locale_formats.ndjson', 'regions.ndjson', 'holidays.ndjson', 'holidays.csv', 'ATTRIBUTION.md', 'delta.ndjson']) {
     files[f] = { path: `snapshots/${snap.id}/${f}`, ...(await sha256(join(dir, f))) };
   }
   // Per-country files (only those that exist: a delta file only for countries with changes in this snapshot).

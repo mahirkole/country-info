@@ -42,7 +42,7 @@ npm test                        # TEST_DATABASE_URL ile DB testleri de çalış�
 
 ```
 GET  /v1/countries?un_status=member&continent=EU&limit=&after=
-GET  /v1/countries/:iso2
+GET  /v1/countries/:iso2        # ?scopes=currency,datetime → yalnızca seçilen scope'lar
 GET  /v1/countries/:iso2/regions?level=1|2
 GET  /v1/countries/:iso2/divisions?level=&type=&source=   # ulusal kaynaklı idari birimler
 GET  /v1/regions/:id            GET /v1/regions/:id/children
@@ -76,6 +76,17 @@ GET  /v1/releases[/:id]                 insan okunur sürüm notları (yalnızca
 GET  /v1/exports/latest                 anahtarın profili için en son dosya paketi + imzalı indirme bağlantıları
 GET  /files/manifest.json, /files/latest/*, /files/snapshots/<id>/*   (EXPORT_DIR'in ham, profilsiz dökümü; müşterilere /v1/exports/latest verin)
 ```
+
+### Scope'lar, metadata ve birleşik profil
+Ülke bilgisi **scope**'lara bölünmüştür (`GET /v1/scopes`): `default` (varsayılan), `contact`, `divisions`, `holidays`, `currency`, `datetime` (tarih/saat kalıbı, saat döngüsü, hafta, takvim), `numbers`, `measurement` (ölçü sistemi, kâğıt, sıcaklık, kütle/uzunluk/hız tercihleri), `locale`. Yeni öznitelikler Unicode CLDR'den (`enrich:cldr`) gelir.
+```
+GET /v1/schema                                   # genel metadata: katalog + dünya kapsama oranı
+GET /v1/schema/countries/TR                      # ülke metadata'sı: yalnızca TR için gerçekten dolu alanlar
+GET /v1/schema?countries=TR,DE,US&scopes=measurement,datetime&mode=intersect   # kesişim (union: birleşim)
+GET /v1/profile?countries=TR,DE&scopes=currency,datetime&mode=intersect&locale=de
+POST /v1/scope-profiles {name, scopes, countries, mode, locale, default}       # kayıtlı seçim; ?profile=<ad> veya anahtarın varsayılanı
+```
+`mode=intersect`: yalnızca istenen **her** ülkede dolu alanlar kalır (hepsi aynı şekilde döner); `union`: tüm veri, eksikler `omitted` içinde. Metadata JSON-Schema biçimindedir; her alanda `x-source`, `x-source-class`, `x-license-verdict`, çok ülkede `x-present-in`/`x-coverage`. `datetime`/`numbers` kalıpları `?locale=` ile değişir (çok dilli ülkeler); yerel ayar yüklü değilse alan boş döner ve nedeni `omitted`'a yazılır. Şehir (`locality`) seviyesi için veri yok: katalog bunu `availability: none` olarak bildirir. Dosya paketlerinde `attributes.ndjson`, `locale_formats.ndjson` ve `by-country/<CC>/attributes.json` bulunur. SDK: `profile()`, `schema()`, `scopes()`, `createScopeProfile()`.
 
 ### Delta nasıl tüketilir
 `/v1/changes?since=0` ile başlayın; yanıttaki `next_seq` değerini saklayıp bir sonrakinde `since` olarak verin. Her kayıt `op` (`insert|update|delete`), `changed_fields` (ör. `name`, `data.population`), `before` ve `after` içerir.

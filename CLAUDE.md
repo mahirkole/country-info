@@ -17,7 +17,8 @@
 
 - Kaynak güncellemesi `docs/OPERATIONS.md`'deki `refresh` ile yapılır (ham hash, bant, vintage, lisans izleme); yeni kaynak `src/targets.ts`'e sıklık, satır bandı ve lisans sayfalarıyla eklenir.
 - **Satış kuralı:** `license_verdict` green/amber olmayan kaynak (şu an `gisco-lau` 🔴, BM M49 🔴) ticari pakete girmez; satılan/dağıtılan çıktı `npm run export -- --commercial` ile üretilir. Yazılı teyit listesi: `docs/licenses/OUTREACH.md`.
+- **Scope'lar:** yeni ülke bilgisi `src/scopes/catalog.ts`'e alan/scope + `resolve.ts`'e çözücü olarak eklenir (test eşleşmeyi zorlar); yeni uç `src/openapi.ts`'e girer. Öznitelik kaynağı otomasyon kuralına uymalıdır.
 - Her kaynağın lisans dossier'i `docs/licenses/<source-id>.md` (şablon: `TEMPLATE.md`); dossier'siz kaynak ticari pakete girmez.
 
 ## Komutlar
-`npm run refresh [-- --due|--source id|--force|--dry-run] | check:sources | check:licenses | license:ack -- <id> | ingest | ingest:gisco | ingest:national <CC|all> | ingest:holidays | link | enrich:wikidata | enrich:cldr | check:holidays | export | publish [-- --profile p | --rollback id] | digest | deliver | serve`, `scripts/cron/run-cycle.sh` (üretim güncelleme döngüsü; bkz. docs/OPERATIONS.md), `scripts/pg-start.sh` (yerel Postgres'i başlatır; konteyner yeniden başlayınca gerekir), `npm test` (+ `TEST_DATABASE_URL`), `npx tsc --noEmit -p .`
+`npm run refresh [-- --due|--source id|--force|--dry-run] | check:sources | check:licenses | license:ack -- <id> | ingest | ingest:gisco | ingest:national <CC|all> | ingest:holidays | link | enrich:wikidata | enrich:cldr (ülke adları, para birimi, UN, tarih/saat/sayı/ölçü öznitelikleri) | check:holidays | export | publish [-- --profile p | --rollback id] | digest | deliver | serve`, `scripts/cron/run-cycle.sh` (üretim güncelleme döngüsü; bkz. docs/OPERATIONS.md), `scripts/pg-start.sh` (yerel Postgres'i başlatır; konteyner yeniden başlayınca gerekir), `npm test` (+ `TEST_DATABASE_URL`), `npx tsc --noEmit -p .`

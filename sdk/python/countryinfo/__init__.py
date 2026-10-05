@@ -107,6 +107,34 @@ class CountryInfo:
         return self.get("/v1/status")
 
     # --- webhooks (your own subscriptions) -------------------------------
+    # --- scopes, metadata and composed profiles ----------------------------
+    def scopes(self) -> Dict[str, Any]:
+        return self.get("/v1/scopes")
+
+    def scope(self, scope_id: str) -> Dict[str, Any]:
+        return self.get(f"/v1/scopes/{urllib.parse.quote(scope_id)}")
+
+    def schema(self, **q: Any) -> Dict[str, Any]:
+        """Global metadata, or metadata of `countries="TR,DE"` (mode="union"|"intersect")."""
+        return self.get("/v1/schema", **q)
+
+    def country_schema(self, code: str, **q: Any) -> Dict[str, Any]:
+        return self.get(f"/v1/schema/countries/{urllib.parse.quote(code)}", **q)
+
+    def profile(self, countries: str, scopes: Optional[str] = None, **q: Any) -> Dict[str, Any]:
+        """Data of several countries for the chosen scopes, e.g. profile("TR,DE", "currency,datetime", mode="intersect")."""
+        return self.get("/v1/profile", countries=countries, scopes=scopes, **q)
+
+    def create_scope_profile(self, name: str, scopes: Optional[list] = None, countries: Optional[list] = None, mode: str = "union", locale: Optional[str] = None, default: bool = False) -> Dict[str, Any]:
+        body = {"name": name, "scopes": scopes, "countries": countries, "mode": mode, "locale": locale, "default": default}
+        return self.request("POST", "/v1/scope-profiles", {k: v for k, v in body.items() if v is not None})
+
+    def scope_profiles(self) -> list:
+        return self.get("/v1/scope-profiles")["data"]
+
+    def delete_scope_profile(self, profile_id: Any) -> None:
+        self.request("DELETE", f"/v1/scope-profiles/{profile_id}")
+
     def create_webhook(self, url: str, events: Optional[list] = None, countries: Optional[list] = None, kinds: Optional[list] = None) -> Dict[str, Any]:
         body = {k: v for k, v in {"url": url, "events": events, "countries": countries, "kinds": kinds}.items() if v is not None}
         return self.request("POST", "/v1/webhooks", body)

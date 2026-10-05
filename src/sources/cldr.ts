@@ -9,7 +9,7 @@ export const CLDR_SOURCE = {
   id: 'cldr',
   authority: 'Unicode CLDR (cldr-json) – localized territory names and currency data',
   url: 'https://github.com/unicode-org/cldr-json',
-  license: 'Unicode License v3 (unicode.org/license.txt, read): use, copy, modify, merge, publish, distribute and/or sell. territories.json (country names), currencyData and the `UN` grouping of territoryContainment (UN membership) are used; territoryInfo and the rest of territoryContainment are not (UN M.49 / third-party origins, docs/licenses/cldr.md).',
+  license: 'Unicode License v3 (unicode.org/license.txt, read): use, copy, modify, merge, publish, distribute and/or sell. territories.json (country names), currencyData, the `UN` grouping of territoryContainment (UN membership) and the country attributes (week, measurement, time, units, calendar, likelySubtags, per-locale dates and numbers) are used; territoryInfo and the rest of territoryContainment are not (UN M.49 / third-party origins, docs/licenses/cldr.md).',
   attribution: 'Copyright © Unicode, Inc. Data from the Unicode Common Locale Data Repository (CLDR), distributed under the Unicode License v3.',
 };
 

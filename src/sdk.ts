@@ -83,6 +83,18 @@ export class CountryInfo {
   sources = () => this.get<{ data: Record<string, unknown>[] }>('/v1/sources');
   status = () => this.get<Record<string, unknown>>('/v1/status');
 
+  // ---- scopes, metadata and composed profiles ----------------------------
+  scopes = () => this.get<{ schema_version: number; default_scopes: string[]; data: ScopeInfo[] }>('/v1/scopes');
+  scope = (id: string) => this.get<Record<string, unknown>>(`/v1/scopes/${encodeURIComponent(id)}`);
+  /** Global metadata (no `countries`) or the metadata of the given countries (`mode`: union | intersect). */
+  schema = (q: Query = {}) => this.get<Record<string, unknown>>('/v1/schema', q);
+  countrySchema = (code: string, q: Query = {}) => this.get<Record<string, unknown>>(`/v1/schema/countries/${encodeURIComponent(code)}`, q);
+  /** Data of several countries for the chosen scopes, e.g. `profile({ countries: 'TR,DE', scopes: 'currency,datetime', mode: 'intersect' })`. */
+  profile = (q: Query) => this.get<ProfileResult>('/v1/profile', q);
+  createScopeProfile = (p: { name: string; scopes?: string[]; countries?: string[]; mode?: 'union' | 'intersect'; locale?: string; default?: boolean }) => this.request<ScopeProfile>('POST', '/v1/scope-profiles', p);
+  scopeProfiles = async () => (await this.get<{ data: ScopeProfile[] }>('/v1/scope-profiles')).data;
+  deleteScopeProfile = (id: number | string) => this.request<null>('DELETE', `/v1/scope-profiles/${id}`);
+
   // ---- webhooks (your own subscriptions) -------------------------------
   createWebhook = (w: { url: string; events?: WebhookEvent[]; countries?: string[]; kinds?: string[] }) => this.request<Webhook & { secret: string }>('POST', '/v1/webhooks', w);
   webhooks = async () => (await this.get<{ data: Webhook[] }>('/v1/webhooks')).data;
@@ -129,6 +141,9 @@ export class CountryInfo {
 
 const hex = (b: Uint8Array) => [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
 
+export interface ScopeInfo { id: string; title: string; description: string; applies_to: string[]; default: boolean; availability: Record<string, string>; fields: string[] }
+export interface ScopeProfile { id: number; name: string; scopes: string[]; countries: string[] | null; mode: 'union' | 'intersect'; locale: string | null }
+export interface ProfileResult { schema_version: number; mode: string; scopes: string[]; countries: string[]; unknown_countries: string[]; data: Record<string, Record<string, Record<string, unknown> | null>>; omitted: { country: string; scope: string; reason: string }[] }
 export type WebhookEvent = 'snapshot.completed' | 'release.published' | 'release.retracted';
 export interface Webhook { id: number; url: string; events: WebhookEvent[] | null; countries: string[] | null; kinds: string[] | null; active: boolean }
 export interface Delivery { id: number; event: string; snapshot_id: number | null; status: 'pending' | 'delivered' | 'failed'; attempts: number; last_error: string | null; payload: Record<string, unknown> }

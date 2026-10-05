@@ -9,6 +9,9 @@ Tek bir hiyerarşik tablo (`entities`): `id`, `kind`, `parent_id`, `country_code
 - Yeni nitelikler (tatil, özel gün, posta kodu) şimdilik `data` içine eklenebilir; hacmi büyüdüğünde kendi tablosuna (`entity_id`, `valid_from/to`) taşınır. Tatiller tarihe/yıla bağlı olduğundan ayrı tablo önerilir.
 - Kimlikler kararlıdır: `country:TR`, `gn:<geonameid>`. Kod/isim değişse bile kimlik sabit kalır.
 
+## Scope'lar ve metadata (Faz 9)
+`src/scopes/catalog.ts` (sürümlü `SCHEMA_VERSION`) her scope'un alanlarını, kaynağını ve ayrıntı düzeyini (`applies_to`: country/admin1/admin2/locality) tanımlar; `resolve.ts` her scope için bir çözücü içerir (test eşleşmeyi zorlar), `schema.ts` metadata (JSON Schema + `x-*`), kesişim/birleşim ve profil birleştirmeyi yapar. Ülke anahtarlı CLDR öznitelikleri `entity_attributes(entity_id, grp, data)`, yerel ayar anahtarlıları (tarih/saat/sayı kalıpları) `locale_formats` tablosundadır; ikisi de `enrich:cldr` ile her çalıştırmada baştan yazılır (el ile veri yok). Ülkenin yerel ayarı CLDR `likelySubtags`'tan (tek birincil dil; çok dilli ülkede `?locale=`). Bu öznitelikler `changes`/webhook akışına girmez; sürüm farkı `vintage` alanındadır (`CLDR 48`). Kayıtlı profiller `scope_profiles` (anahtara ait). `export_countries` yalnızca dosya paketlerini sınırlar, API'yi değil.
+
 ## Güncelleme ve delta
 1. Kaynaktan kanonik `EntityInput` listesi üretilir.
 2. Her kaydın içeriği anahtar-sıralı JSON üzerinden SHA-256 ile özetlenir.

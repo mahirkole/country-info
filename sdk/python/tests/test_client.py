@@ -59,6 +59,10 @@ class H(BaseHTTPRequestHandler):
             return self._send(200, {"files": {"a.json": {"url": f"http://127.0.0.1:{self.server.server_port}/dl/a.json", "sha256": hashlib.sha256(b"{}").hexdigest()}}})
         if u.path == "/v1/webhooks":
             return self._send(200, {"data": [{"id": 1}]})
+        if u.path == "/v1/profile":
+            return self._send(200, {"countries": q["countries"].split(","), "data": {}})
+        if u.path == "/v1/scope-profiles":
+            return self._send(200, {"data": [{"id": 3, "name": "ui"}]})
         self._send(404, {"error": "not_found"})
 
     def _body(self):
@@ -70,6 +74,8 @@ class H(BaseHTTPRequestHandler):
         CALLS.append((u.path, self._body(), self.headers.get("x-api-key")))
         if u.path == "/v1/webhooks":
             return self._send(201, {"id": 1, "secret": "s"})
+        if u.path == "/v1/scope-profiles":
+            return self._send(201, {"id": 3, "name": "ui"})
         return self._send(202, {"id": 9, "status": "pending"})
 
     def do_DELETE(self):
@@ -122,6 +128,17 @@ class ClientTest(unittest.TestCase):
         self.assertFalse(verify_webhook("sec", body + " ", ts, sig, now=1700000100))
         self.assertFalse(verify_webhook("sec", body, ts, sig, now=1700009999))  # too old
         self.assertFalse(verify_webhook("other", body, ts, sig, now=1700000100))
+
+    def test_scopes_and_profiles(self):
+        CALLS.clear()
+        c = CountryInfo(self.base, api_key="k1")
+        r = c.profile("TR,DE", "currency,datetime", mode="intersect")
+        self.assertEqual(r["countries"], ["TR", "DE"])
+        self.assertEqual(CALLS[-1][1], {"countries": "TR,DE", "scopes": "currency,datetime", "mode": "intersect"})
+        self.assertEqual(c.create_scope_profile("ui", scopes=["currency"], default=True)["id"], 3)
+        self.assertEqual(CALLS[-1][1], {"name": "ui", "scopes": ["currency"], "mode": "union", "default": True})
+        self.assertEqual(c.scope_profiles(), [{"id": 3, "name": "ui"}])
+        self.assertIsNone(c.delete_scope_profile(3))
 
 
 if __name__ == "__main__":

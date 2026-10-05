@@ -146,3 +146,29 @@ describe.skipIf(!url)('scopes, metadata and profiles', () => {
     expect((await get('/v1/profile?countries=TR', h1)).json().scopes).toEqual(['default']); // default cleared
   });
 });
+
+import { exportSnapshot } from '../src/export.js';
+import { readFile } from 'node:fs/promises';
+describe.skipIf(!url)('attribute export', () => {
+  const pool = new pg.Pool({ connectionString: url });
+  afterAll(() => pool.end());
+  it('writes attributes and locale formats, global and per country; the commercial profile drops attributes of uncleared sources', async () => {
+    await migrate(pool);
+    await pool.query('TRUNCATE entity_attributes, locale_formats, snapshots, changes, entities, sources RESTART IDENTITY CASCADE');
+    await pool.query(`INSERT INTO sources (id, authority, url, license, attribution, source_class, license_verdict) VALUES ('cldr','U','u','l','a','community','green'), ('geonames','G','u','l','a','community','green')`);
+    await pool.query(`INSERT INTO entities (id, kind, country_code, code, name, data, content_hash, updated_seq, source_id) VALUES ('country:TR','country','TR','TR','Turkey','{}','h',1,'geonames')`);
+    await pool.query(`INSERT INTO entity_attributes (entity_id, grp, data, source, vintage) VALUES ('country:TR','measurement','{"system":"metric"}','cldr','CLDR 48')`);
+    await pool.query(`INSERT INTO locale_formats (locale, data, source, vintage) VALUES ('tr','{"date":{"short":"d.MM.y"}}','cldr','CLDR 48')`);
+    await pool.query(`INSERT INTO snapshots (id, source, from_seq, to_seq, finished_at, reason) VALUES (1,'geonames',0,1,now(),'test')`);
+    const dir = await mkdtemp(join(tmpdir(), 'ex-'));
+    const m = await exportSnapshot(pool, dir, 1, {});
+    expect(m.files['attributes.ndjson']).toBeDefined();
+    expect(m.files['by-country/TR/attributes.json']).toBeDefined();
+    expect(JSON.parse((await readFile(join(dir, 'latest', 'attributes.ndjson'), 'utf8')).trim())).toMatchObject({ country: 'TR', measurement: { system: 'metric' }, vintage: 'CLDR 48' });
+    expect((await readFile(join(dir, 'latest', 'locale_formats.ndjson'), 'utf8')).trim()).toContain('"locale":"tr"');
+    await pool.query("UPDATE sources SET license_verdict = 'red' WHERE id = 'cldr'");
+    await exportSnapshot(pool, dir, 1, { commercialOnly: true });
+    expect(await readFile(join(dir, 'latest', 'attributes.ndjson'), 'utf8')).toBe('');
+    expect(await readFile(join(dir, 'latest', 'locale_formats.ndjson'), 'utf8')).toBe('');
+  });
+});
