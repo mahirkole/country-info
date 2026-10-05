@@ -85,7 +85,9 @@ export function parseLikely(json: unknown): (cc: string) => { language: string; 
   const l = sup(json, 'likelySubtags') as Terr<string>;
   if (!l['und-TR']) throw new Error('CLDR likelySubtags: layout changed');
   return (cc) => {
-    const v = l[`und-${cc}`];
+    // the root entry `und` (en-Latn-US) stands for the territory it names, which therefore has no `und-US` entry of its own
+    const root = l['und'];
+    const v = l[`und-${cc}`] ?? (root?.split('-')[2] === cc ? root : undefined);
     if (!v) return undefined;
     const [language, script] = v.split('-');
     return { language: language!, script: script!, locale: language! };

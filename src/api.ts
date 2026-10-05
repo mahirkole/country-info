@@ -10,6 +10,8 @@ import { installAccessControl } from './access.js';
 import { openApiSpec } from './openapi.js';
 import { WEBHOOK_EVENTS } from './webhooks.js';
 import { UN_SQL, withUn } from './export.js';
+import { CATALOG, DEFAULT_SCOPES, SCHEMA_VERSION, scopeById } from './scopes/catalog.js';
+import { catalogDocument, composeProfile, globalSchema, schemaFor, validateScopes, type Mode } from './scopes/schema.js';
 import { createStore, exportLinks, PROFILES, type Profile } from './publish.js';
 import { contentTypeOf, FsStore, type ObjectStore } from './object-store.js';
 import { createReadStream } from 'node:fs';
@@ -111,7 +113,14 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     return paged(rows, limit, 'code');
   });
 
-  app.get<{ Params: { code: string } }>('/v1/countries/:code', async (req, reply) => {
+  app.get<{ Params: { code: string }; Querystring: SelQuery }>('/v1/countries/:code', async (req, reply) => {
+    if (req.query.scopes || req.query.profile) {
+      const sel = await selection(req.query, who(req), req.apiKeyId, req.params.code);
+      if ('error' in sel) return reply.code(400).send({ error: sel.error });
+      const doc = await composeProfile(pool, sel.countries, sel.scopes, 'union', optsOf(sel));
+      const cc = sel.countries[0]!;
+      return doc.data[cc] ? { code: cc, schema_version: doc.schema_version, scopes: doc.data[cc], omitted: doc.omitted } : reply.code(404).send({ error: 'not_found' });
+    }
     const r = await pool.query(`SELECT ${COLS}, ${UN_SQL} AS un_x FROM entities WHERE kind = 'country' AND code = $1`, [req.params.code.toUpperCase()]);
     if (!r.rows[0]) return reply.code(404).send({ error: 'not_found' });
     r.rows[0] = withUn(r.rows[0]);
@@ -516,6 +525,98 @@ ${entries}
   });
 
   // ---- published file bundles ------------------------------------------
+
+
+  // ---- scopes, metadata and composed profiles ------------------------------------
+  // `scopes` (csv) picks slices of country information from the catalog (src/scopes/catalog.ts); `mode=intersect` keeps only what every
+  // requested country has, `union` (default) everything. A named profile (own, per API key) stores such a selection.
+  const MAX_PROFILE_COUNTRIES = 50;
+  const csv = (v?: string): string[] => (v ? v.split(',').map((x) => x.trim()).filter(Boolean) : []);
+  type SelQuery = { countries?: string; scopes?: string; mode?: string; locale?: string; level?: string; year?: string; region?: string; profile?: string };
+  /** Selection from the query, completed by the named profile (explicit query parameters win), or an error message. */
+  const selection = async (q: SelQuery, w: ReturnType<typeof who>, keyId: string | undefined, pathCountry?: string): Promise<{ countries: string[]; scopes: string[]; mode: Mode; locale?: string; level?: 1 | 2; year?: number; region?: string } | { error: string }> => {
+    let prof: { scopes: string[]; countries: string[] | null; mode: Mode; locale: string | null } | undefined;
+    const name = q.profile ?? (keyId?.startsWith('dbkey:') ? (await pool.query('SELECT default_profile FROM api_keys WHERE id = $1', [keyId.slice(6)])).rows[0]?.default_profile : undefined);
+    if (name) {
+      const owner = w?.admin ? null : keyId?.startsWith('dbkey:') ? Number(keyId.slice(6)) : null;
+      prof = (await pool.query('SELECT scopes, countries, mode, locale FROM scope_profiles WHERE name = $1 AND api_key_id IS NOT DISTINCT FROM $2', [name, owner])).rows[0];
+      if (!prof && q.profile) return { error: `unknown profile ${q.profile}` };
+    }
+    const countries = pathCountry ? [pathCountry.toUpperCase()] : csv(q.countries).length ? csv(q.countries).map((c) => c.toUpperCase()) : (prof?.countries ?? []);
+    if (!countries.length) return { error: 'countries is required (comma-separated ISO codes) unless the profile lists them' };
+    if (countries.length > MAX_PROFILE_COUNTRIES) return { error: `at most ${MAX_PROFILE_COUNTRIES} countries per request` };
+    const scopes = csv(q.scopes).length ? csv(q.scopes) : (prof?.scopes ?? DEFAULT_SCOPES);
+    const bad = validateScopes(scopes);
+    if (bad) return { error: bad };
+    const mode = (q.mode ?? prof?.mode ?? 'union') as Mode;
+    if (mode !== 'union' && mode !== 'intersect') return { error: 'mode must be union or intersect' };
+    if (q.level && q.level !== '1' && q.level !== '2') return { error: 'level must be 1 or 2' };
+    const year = q.year ? Number(q.year) : undefined;
+    if (year !== undefined && (!Number.isInteger(year) || year < 1900 || year > 2200)) return { error: 'invalid year' };
+    return { countries, scopes, mode, locale: q.locale ?? prof?.locale ?? undefined, level: q.level ? (Number(q.level) as 1 | 2) : undefined, year, region: q.region };
+  };
+  const optsOf = (s: { locale?: string; level?: 1 | 2; year?: number; region?: string }) => ({ locale: s.locale, level: s.level, year: s.year, region: s.region });
+
+  app.get('/v1/scopes', async () => ({ schema_version: SCHEMA_VERSION, default_scopes: DEFAULT_SCOPES, data: CATALOG.map((s) => ({ id: s.id, title: s.title, description: s.description, applies_to: s.applies_to, default: s.default, availability: s.availability, fields: s.fields.map((f) => f.path) })) }));
+  app.get<{ Params: { id: string } }>('/v1/scopes/:id', async (req, reply) => {
+    if (!scopeById(req.params.id)) return reply.code(404).send({ error: 'not_found' });
+    const doc = (await catalogDocument(pool)) as { scopes: Record<string, unknown> };
+    return { schema_version: SCHEMA_VERSION, id: req.params.id, ...(doc.scopes[req.params.id] as object) };
+  });
+  /** Global metadata (no `countries`): catalog with world coverage. With `countries`: only the fields those countries carry (`mode`). */
+  app.get<{ Querystring: SelQuery }>('/v1/schema', async (req, reply) => {
+    if (!req.query.countries) return globalSchema(pool);
+    const sel = await selection(req.query, who(req), req.apiKeyId);
+    if ('error' in sel) return reply.code(400).send({ error: sel.error });
+    return schemaFor(pool, sel.countries, sel.scopes.length ? sel.scopes : DEFAULT_SCOPES, sel.mode, optsOf(sel));
+  });
+  app.get<{ Params: { code: string }; Querystring: SelQuery }>('/v1/schema/countries/:code', async (req, reply) => {
+    const sel = await selection(req.query, who(req), req.apiKeyId, req.params.code);
+    if ('error' in sel) return reply.code(400).send({ error: sel.error });
+    const doc = await schemaFor(pool, sel.countries, req.query.scopes || req.query.profile ? sel.scopes : CATALOG.map((s) => s.id), 'union', optsOf(sel));
+    return doc.countries.length ? doc : reply.code(404).send({ error: 'not_found' });
+  });
+  app.get<{ Querystring: SelQuery }>('/v1/profile', async (req, reply) => {
+    const sel = await selection(req.query, who(req), req.apiKeyId);
+    if ('error' in sel) return reply.code(400).send({ error: sel.error });
+    return composeProfile(pool, sel.countries, sel.scopes, sel.mode, optsOf(sel));
+  });
+
+  app.post<{ Body: { name?: string; scopes?: string[]; countries?: string[]; mode?: string; locale?: string; api_key_id?: number; default?: boolean } }>('/v1/scope-profiles', async (req, reply) => {
+    const w = who(req);
+    if (!w) return reply.code(401).send({ error: 'unauthorized' });
+    const b = req.body ?? {};
+    if (!b.name || !/^[\w.-]{1,64}$/.test(b.name)) return reply.code(400).send({ error: 'name must be 1-64 characters (letters, digits, _ . -)' });
+    const scopes = b.scopes?.length ? b.scopes : DEFAULT_SCOPES;
+    const bad = validateScopes(scopes);
+    if (bad) return reply.code(400).send({ error: bad });
+    if (b.mode && b.mode !== 'union' && b.mode !== 'intersect') return reply.code(400).send({ error: 'mode must be union or intersect' });
+    if ((b.countries?.length ?? 0) > MAX_PROFILE_COUNTRIES) return reply.code(400).send({ error: `at most ${MAX_PROFILE_COUNTRIES} countries` });
+    const owner = w.admin ? (b.api_key_id ?? null) : w.keyId;
+    try {
+      const r = await pool.query('INSERT INTO scope_profiles (api_key_id, name, scopes, countries, mode, locale) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, api_key_id, name, scopes, countries, mode, locale, created_at', [owner, b.name, scopes, b.countries?.map((c) => c.toUpperCase()) ?? null, b.mode ?? 'union', b.locale ?? null]);
+      if (b.default && owner !== null) await pool.query('UPDATE api_keys SET default_profile = $1 WHERE id = $2', [b.name, owner]);
+      return reply.code(201).send(r.rows[0]);
+    } catch (e) {
+      if ((e as { code?: string }).code === '23505') return reply.code(409).send({ error: 'a profile with this name already exists' });
+      throw e;
+    }
+  });
+  app.get('/v1/scope-profiles', async (req, reply) => {
+    const w = who(req);
+    if (!w) return reply.code(401).send({ error: 'unauthorized' });
+    return { data: (await pool.query('SELECT id, api_key_id, name, scopes, countries, mode, locale, created_at FROM scope_profiles WHERE $1::boolean OR api_key_id = $2 ORDER BY id', [w.admin, w.keyId])).rows };
+  });
+  app.delete<{ Params: { id: string } }>('/v1/scope-profiles/:id', async (req, reply) => {
+    const w = who(req);
+    if (!w) return reply.code(401).send({ error: 'unauthorized' });
+    if (!/^\d+$/.test(req.params.id)) return reply.code(404).send({ error: 'not_found' });
+    const r = await pool.query('DELETE FROM scope_profiles WHERE id = $1 AND ($2::boolean OR api_key_id = $3) RETURNING name, api_key_id', [req.params.id, w.admin, w.keyId]);
+    if (!r.rowCount) return reply.code(404).send({ error: 'not_found' });
+    if (r.rows[0].api_key_id !== null) await pool.query('UPDATE api_keys SET default_profile = NULL WHERE id = $1 AND default_profile = $2', [r.rows[0].api_key_id, r.rows[0].name]);
+    return reply.code(204).send();
+  });
+
   const store = opts.store === undefined ? createStore() : opts.store;
   /** Latest bundle of the caller's profile (a database key's `export_profile`; env keys and admin get `commercial`, admin may ask `?profile=full`). */
   app.get<{ Querystring: { profile?: string; country?: string } }>('/v1/exports/latest', async (req, reply) => {

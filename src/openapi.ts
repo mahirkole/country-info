@@ -11,9 +11,17 @@ const scope: Param[] = [
   { name: 'canonical', description: 'true: when records of several sources are linked, only the best-sourced one (official > Wikidata layer > GeoNames)' },
 ];
 
+const sel: Param[] = [
+  { name: 'scopes', description: 'Comma-separated scope ids from /v1/scopes (default: default)' },
+  { name: 'mode', description: 'union (default): all data; intersect: only fields every requested country has' },
+  { name: 'locale', description: 'CLDR locale for the datetime/numbers patterns (default: the country\'s primary locale)' },
+  { name: 'level', description: 'divisions scope: 1 or 2 to list that level' }, { name: 'year', description: 'holidays scope: year' }, { name: 'region', description: 'holidays scope: region id' },
+  { name: 'profile', description: 'Name of a saved scope profile (own, or the key\'s default); explicit parameters override it' },
+];
+
 export const OPERATIONS: Op[] = [
   { method: 'get', path: '/v1/countries', tag: 'countries', summary: 'List countries', query: [...page, { name: 'un_status', description: 'UN membership: member or other (from CLDR; observer states are not distinguished)' }, { name: 'continent', description: 'Continent code' }] },
-  { method: 'get', path: '/v1/countries/{code}', tag: 'countries', summary: 'One country (names in many languages, currency xref)' },
+  { method: 'get', path: '/v1/countries/{code}', tag: 'countries', summary: 'One country (names in many languages, currency xref); with scopes/profile: the chosen scopes only', query: sel },
   { method: 'get', path: '/v1/countries/{code}/regions', tag: 'regions', summary: 'First- or second-level regions of a country', query: [...page, ...scope, { name: 'level', description: '1 or 2' }] },
   { method: 'get', path: '/v1/countries/{code}/divisions', tag: 'regions', summary: 'Administrative divisions from national sources', query: [...page, ...scope, { name: 'level', description: 'Level within the source' }, { name: 'type', description: 'Common type: state, province, county, municipality, …' }, { name: 'source', description: 'Source id, e.g. nat-fr' }] },
   { method: 'get', path: '/v1/countries/{code}/holidays', tag: 'holidays', summary: 'Public holidays of a country and year', query: [{ name: 'year', description: 'Year (default current)' }, { name: 'region', description: 'Region id for regional holidays' }, { name: 'type', description: 'Holiday type' }] },
@@ -25,6 +33,14 @@ export const OPERATIONS: Op[] = [
   { method: 'get', path: '/v1/regions/{id}/successors', tag: 'regions', summary: 'Confirmed successors and predecessors of a unit across releases (works for ids that no longer exist)' },
   { method: 'post', path: '/v1/review-items/{id}/resolve', tag: 'admin', summary: 'Accept or dismiss a review item (accepting a successor suggestion records the relation)', admin: true },
   { method: 'get', path: '/v1/review-items', tag: 'admin', summary: 'Open source conflicts for review', admin: true, query: [{ name: 'status', description: 'open, accepted_a, accepted_b, dismissed' }, { name: 'limit', description: 'Max results' }] },
+  { method: 'get', path: '/v1/scopes', tag: 'scopes', summary: 'Scope catalog (what each selectable slice of country information contains)' },
+  { method: 'get', path: '/v1/scopes/{id}', tag: 'scopes', summary: 'One scope as a JSON-Schema-style document (fields, sources, license verdicts)' },
+  { method: 'get', path: '/v1/schema', tag: 'scopes', summary: 'Global metadata: catalog with world coverage; with countries=…: metadata of those countries (mode=intersect keeps fields present in all)', query: [{ name: 'countries', description: 'Comma-separated ISO alpha-2 (max 50)' }, ...sel] },
+  { method: 'get', path: '/v1/schema/countries/{code}', tag: 'scopes', summary: 'Country metadata: only the fields that actually carry data for this country', query: sel },
+  { method: 'get', path: '/v1/profile', tag: 'scopes', summary: 'Composed data of several countries for the chosen scopes (union or intersection)', query: [{ name: 'countries', description: 'Comma-separated ISO alpha-2 (max 50), or taken from the profile' }, ...sel] },
+  { method: 'post', path: '/v1/scope-profiles', tag: 'scopes', summary: 'Save a named scope selection (scopes, countries, mode, locale); a database API key owns its profiles, optionally as the key default' },
+  { method: 'get', path: '/v1/scope-profiles', tag: 'scopes', summary: 'List your scope profiles (admin: all)' },
+  { method: 'delete', path: '/v1/scope-profiles/{id}', tag: 'scopes', summary: 'Remove a scope profile' },
   { method: 'get', path: '/v1/sources', tag: 'provenance', summary: 'Sources with license, attribution, freshness and class' },
   { method: 'get', path: '/v1/status', tag: 'provenance', summary: 'Health of the data pipeline (stale or failing sources)' },
   { method: 'get', path: '/v1/snapshots', tag: 'changes', summary: 'Published snapshots' },

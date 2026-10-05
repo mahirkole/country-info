@@ -1,0 +1,113 @@
+import type pg from 'pg';
+import { CATALOG, SCHEMA_VERSION, scopeById, type FieldDef, type ScopeDef } from './catalog.js';
+import { getPath, hasValue, pruneToPaths, resolveScopes, validateScopes, type ResolveOpts, type Resolved } from './resolve.js';
+
+export type Mode = 'union' | 'intersect';
+const JSON_SCHEMA = 'https://json-schema.org/draft/2020-12/schema';
+
+type SrcInfo = Record<string, { source_class: string | null; license_verdict: string | null }>;
+async function sourceInfo(pool: pg.Pool): Promise<SrcInfo> {
+  return Object.fromEntries((await pool.query('SELECT id, source_class, license_verdict FROM sources')).rows.map((r) => [r.id, { source_class: r.source_class, license_verdict: r.license_verdict }]));
+}
+
+/** Nested JSON-Schema `properties` from dotted field paths. */
+function toProperties(fields: (FieldDef & { present_in?: string[]; coverage?: number })[], src: SrcInfo): Record<string, unknown> {
+  const root: Record<string, any> = {};
+  for (const fd of fields) {
+    const keys = fd.path.split('.');
+    let node = root;
+    keys.forEach((k, i) => {
+      if (i < keys.length - 1) { node = (node[k] ??= { type: 'object', properties: {} }).properties; return; }
+      node[k] = {
+        type: fd.type, description: fd.description, ...(fd.format ? { format: fd.format } : {}), 'x-source': fd.source_id,
+        'x-source-class': src[fd.source_id]?.source_class ?? null, 'x-license-verdict': src[fd.source_id]?.license_verdict ?? null,
+        ...(fd.present_in ? { 'x-present-in': fd.present_in, 'x-coverage': fd.coverage } : {}),
+      };
+    });
+  }
+  return root;
+}
+
+const scopeHeader = (s: ScopeDef) => ({ title: s.title, description: s.description, 'x-applies-to': s.applies_to, 'x-default': s.default, 'x-availability': s.availability });
+
+/** Catalog as a document (no data needed). */
+export async function catalogDocument(pool: pg.Pool): Promise<unknown> {
+  const src = await sourceInfo(pool);
+  return {
+    $schema: JSON_SCHEMA, schema_version: SCHEMA_VERSION,
+    default_scopes: CATALOG.filter((s) => s.default).map((s) => s.id),
+    scopes: Object.fromEntries(CATALOG.map((s) => [s.id, { ...scopeHeader(s), type: 'object', properties: toProperties(s.fields, src) }])),
+  };
+}
+
+/** Fields of a scope that are populated, with presence per country; mode selects the union or the intersection over the known countries. */
+function presence(resolved: Resolved, scope: ScopeDef, ccs: string[], mode: Mode) {
+  const known = ccs.filter((c) => resolved.data[c]);
+  const fields = scope.fields.map((fd) => {
+    const present_in = known.filter((c) => hasValue(getPath(resolved.data[c]![scope.id], fd.path)));
+    return { ...fd, present_in, coverage: known.length ? Math.round((present_in.length / known.length) * 1000) / 1000 : 0 };
+  });
+  const kept = fields.filter((fd) => (mode === 'intersect' ? known.length > 0 && fd.present_in.length === known.length : fd.present_in.length > 0));
+  return { known, kept };
+}
+
+/**
+ * Metadata of the chosen scopes for one or several countries: only fields that actually carry data are listed;
+ * `mode=intersect` keeps the fields present in every country, `union` the fields present in any (each with `x-present-in`).
+ */
+export async function schemaFor(pool: pg.Pool, countries: string[], scopes: string[], mode: Mode, opts: ResolveOpts = {}) {
+  const resolved = await resolveScopes(pool, countries, scopes, opts);
+  const src = await sourceInfo(pool);
+  const ccs = [...new Set(countries.map((c) => c.toUpperCase()))];
+  const out: Record<string, unknown> = {};
+  for (const id of scopes) {
+    const def = scopeById(id)!;
+    const { kept } = presence(resolved, def, ccs, mode);
+    out[id] = { ...scopeHeader(def), type: 'object', properties: toProperties(kept, src) };
+  }
+  return { $schema: JSON_SCHEMA, schema_version: SCHEMA_VERSION, countries: ccs.filter((c) => resolved.data[c]), unknown_countries: resolved.unknown_countries, mode, scopes: out };
+}
+
+/**
+ * Data of the chosen scopes for several countries. `intersect` removes every field that is missing in at least one country, so all
+ * countries come back with the same shape; `union` keeps all data (missing scopes are `null` and listed in `omitted`).
+ */
+export async function composeProfile(pool: pg.Pool, countries: string[], scopes: string[], mode: Mode, opts: ResolveOpts = {}) {
+  const resolved = await resolveScopes(pool, countries, scopes, opts);
+  const ccs = [...new Set(countries.map((c) => c.toUpperCase()))];
+  const known = ccs.filter((c) => resolved.data[c]);
+  const data: Record<string, Record<string, unknown>> = Object.fromEntries(known.map((c) => [c, {}]));
+  for (const id of scopes) {
+    const def = scopeById(id)!;
+    const keep = new Set(presence(resolved, def, ccs, mode).kept.map((f) => f.path));
+    for (const c of known) data[c]![id] = mode === 'intersect' ? pruneToPaths(resolved.data[c]![id], keep) ?? null : resolved.data[c]![id];
+  }
+  return { schema_version: SCHEMA_VERSION, mode, scopes, countries: known, unknown_countries: resolved.unknown_countries, data, omitted: resolved.notes };
+}
+
+let coverageCache: { at: number; value: unknown } | null = null;
+/** Global metadata: the catalog plus how many countries carry each scope/field (cached for 10 minutes). */
+export async function globalSchema(pool: pg.Pool, now = Date.now()): Promise<unknown> {
+  if (coverageCache && now - coverageCache.at < 600_000) return coverageCache.value;
+  const all = (await pool.query(`SELECT code FROM entities WHERE kind = 'country' ORDER BY code`)).rows.map((r) => r.code as string);
+  const cheap = CATALOG.filter((s) => !['divisions', 'holidays'].includes(s.id)).map((s) => s.id);
+  const resolved = await resolveScopes(pool, all, cheap);
+  const src = await sourceInfo(pool);
+  const doc = (await catalogDocument(pool)) as { scopes: Record<string, any> };
+  const scopes: Record<string, unknown> = {};
+  for (const s of CATALOG) {
+    if (cheap.includes(s.id)) {
+      const { kept, known } = presence(resolved, s, all, 'union');
+      const all_ = s.fields.map((fd) => { const p = kept.find((k) => k.path === fd.path); return p ?? { ...fd, present_in: [] as string[], coverage: 0 }; });
+      scopes[s.id] = { ...doc.scopes[s.id], 'x-countries-with-data': known.filter((c) => Object.values(resolved.data[c]![s.id] ?? {}).length).length, properties: toProperties(all_, src) };
+    } else {
+      const n = (await pool.query(s.id === 'divisions' ? `SELECT count(DISTINCT country_code)::int AS n FROM entities WHERE kind IN ('admin1','admin2')` : `SELECT count(DISTINCT country_code)::int AS n FROM entities WHERE kind = 'holiday'`)).rows[0].n;
+      scopes[s.id] = { ...doc.scopes[s.id], 'x-countries-with-data': n };
+    }
+  }
+  const value = { ...doc, countries_total: all.length, scopes };
+  coverageCache = { at: now, value };
+  return value;
+}
+export const resetSchemaCache = () => { coverageCache = null; };
+export { validateScopes };

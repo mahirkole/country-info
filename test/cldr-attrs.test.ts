@@ -33,8 +33,9 @@ describe('cldr attributes', () => {
     const fr = parseFractions(S('currencyData', { fractions: { DEFAULT: { _rounding: '0', _digits: '2' }, JPY: { _rounding: '0', _digits: '0' }, AMD: { _rounding: '0', _digits: '2', _cashDigits: '0' } } }));
     expect(fr.get('JPY')).toEqual({ digits: 0, rounding: 0 });
     expect(fr.get('AMD')!.cash_digits).toBe(0);
-    const l = parseLikely(S('likelySubtags', { 'und-TR': 'tr-Latn-TR', 'und-CH': 'de-Latn-CH' }));
+    const l = parseLikely(S('likelySubtags', { und: 'en-Latn-US', 'und-TR': 'tr-Latn-TR', 'und-CH': 'de-Latn-CH' }));
     expect(l('CH')).toEqual({ language: 'de', script: 'Latn', locale: 'de' });
+    expect(l('US')).toEqual({ language: 'en', script: 'Latn', locale: 'en' });
     expect(l('XX')).toBeUndefined();
   });
   it('locale formats', () => {
