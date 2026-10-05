@@ -27,6 +27,9 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | nat-ie | 🟢 | CC BY 4.0; veri ince (31 il/şehir, resmi kod yok) |
 | nat-pt | 🟢 | DGT CAOP CC BY 4.0; freguesia kodu INE'ye ait |
 | nat-cz | 🟢 | ČÚZK/ČSÚ CC BY 4.0 (atıf + metaveri + değişiklik belirtme) |
+| **wikidata** | 🟢 | Yapılandırılmış veri CC0 (ticari, yeniden dağıtım serbest, atıf gerekmez). Sınırlar: User-Agent zorunlu, 60 sn sorgu zaman aşımı, IP başına 5 paralel sorgu, 429 yönetimi; büyük çekimler için dump. Topluluk verisidir (resmi değil). Üçüncü taraf kökenli içerik CC0 ile temizlenmiş olmaz |
+| ocha-cod-ab | 🟡 (ülkeye göre) | CC BY-IGO ticari kullanıma izin verir ama **TR 🔴** (metodoloji: "shared… for humanitarian use only"), PL 🟡 (UNHCR "from OSM PRG": ODbL olasılığı), BR 🟡 (IBGE kendi lisansı okunmadı) → **Türkiye için kullanılmaz** |
+| cldr | 🟡 | Unicode License V3: ticari, satış, değiştirme serbest (bildirim korunur). Yerelleştirilmiş ülke adları ve `currencyData` 🟢; `territoryInfo` (nüfus/GSYH/dil) World Bank/CIA/Ethnologue kökenli tahmin 🟡; `territoryContainment` "UNM49 tabanlı" → BM M49 🔴 zincirine takılır |
 | official-holidays | 🟡 | 8 ülkede (AT, CZ, DE, ES, HU, IT, PL, SE) mevzuat telif dışı/yeniden kullanım okundu; LV/HR işaretli; 12 ülke okunamadı |
 | nat-ca | 🟢 | Statistics Canada Open Licence: kullanım, satış, katma değerli ürün, alt-lisans açıkça serbest; yalnızca atıf metni + onay izlenimi yasağı. Açık nokta: SGC sayfalarında lisans işareti yok ("most" veri ürünleri) |
 | nat-jp | 🟢 | MIC: 公共データ利用規約 1.0 (CC BY 4.0 uyumlu), ticari kullanım açık; atıf + "değiştirildi" notu şart; xlsx dosya kimliği kararsız URL |
