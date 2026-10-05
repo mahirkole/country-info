@@ -148,6 +148,18 @@ d('database', () => {
     await app.close();
   });
 
+  it('canonical=true hides the lower-priority side of a link (official over GeoNames) without deleting it', async () => {
+    await ingest(pool, { id: 'geonames', authority: 'GeoNames' }, [E('country:DE', 'country', 'DE', 'Germany', null), E('gn:2', 'admin1', 'DE', 'Hamburg', 'country:DE')], { kinds: KINDS });
+    await ingest(pool, { id: 'gisco-nuts', authority: 'x' }, [E('nuts:DE6', 'nuts1', 'DE', 'Hamburg', 'country:DE', { name_latin: 'Hamburg' })], { kinds: ['nuts1'] });
+    await linkRegions(pool);
+    expect((await pool.query("SELECT id, priority FROM sources WHERE id IN ('geonames','gisco-nuts') ORDER BY id")).rows).toEqual([{ id: 'geonames', priority: 10 }, { id: 'gisco-nuts', priority: 30 }]);
+    const app = await buildApp(pool, { adminToken: 'tok', exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    const ids = async (u: string) => (await app.inject(u)).json().data.map((r: { id: string }) => r.id).sort();
+    expect(await ids('/v1/search?q=hamburg')).toEqual(['gn:2', 'nuts:DE6']);
+    expect(await ids('/v1/search?q=hamburg&canonical=true')).toEqual(['nuts:DE6']);
+    await app.close();
+  });
+
   it('filters by source class (official_only) and exposes names and xrefs on a region', async () => {
     await ingest(pool, SRC, [E('country:DE', 'country', 'DE', 'Germany', null), E('gn:1', 'admin1', 'DE', 'Istanbul', 'country:DE')], { kinds: KINDS });
     await ingest(pool, { id: 'gisco-nuts', authority: 'x' }, [E('nuts:DE6', 'nuts1', 'DE', 'Hamburg', 'country:DE')], { kinds: ['nuts1'] });

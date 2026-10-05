@@ -11,7 +11,19 @@ const MAX_LIMIT = 1000;
 
 /** `?official_only=true` keeps only records of sources whose class is `official` (community sources such as GeoNames/Wikidata are left out). */
 const OFFICIAL = "source_id IN (SELECT id FROM sources WHERE source_class = 'official')";
-const officialOnly = (q: { official_only?: string }) => (q.official_only === 'true' || q.official_only === '1' ? `AND ${OFFICIAL}` : '');
+const flag = (v?: string) => v === 'true' || v === '1';
+/**
+ * `?canonical=true` drops a record when it is linked (entity_links) to a record from a source with a higher priority,
+ * so each linked place appears once, as its best-sourced version.
+ */
+const CANONICAL = `NOT EXISTS (
+  SELECT 1 FROM entity_links l
+  JOIN entities o ON o.id = CASE WHEN l.a_id = entities.id THEN l.b_id ELSE l.a_id END
+  JOIN sources so ON so.id = o.source_id
+  JOIN sources sm ON sm.id = entities.source_id
+  WHERE (l.a_id = entities.id OR l.b_id = entities.id) AND so.priority > sm.priority)`;
+type Scope = { official_only?: string; canonical?: string };
+const officialOnly = (q: Scope) => `${flag(q.official_only) ? `AND ${OFFICIAL}` : ''} ${flag(q.canonical) ? `AND ${CANONICAL}` : ''}`;
 
 function page(q: { limit?: string; after?: string }) {
   const limit = Math.min(Math.max(parseInt(q.limit ?? '100', 10) || 100, 1), MAX_LIMIT);
@@ -51,7 +63,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     return { ...r.rows[0], names, xrefs };
   });
 
-  app.get<{ Params: { code: string }; Querystring: { level?: string; limit?: string; after?: string; official_only?: string } }>(
+  app.get<{ Params: { code: string }; Querystring: { level?: string; limit?: string; after?: string; official_only?: string; canonical?: string } }>(
     '/v1/countries/:code/regions',
     async (req, reply) => {
       const cc = req.params.code.toUpperCase();
@@ -121,7 +133,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
    * Administrative divisions from national sources, any level and local type.
    * `source` limits to one source id (e.g. nat-fr); `level` is 1 = first level below the country.
    */
-  app.get<{ Params: { code: string }; Querystring: { level?: string; type?: string; source?: string; limit?: string; after?: string; official_only?: string } }>(
+  app.get<{ Params: { code: string }; Querystring: { level?: string; type?: string; source?: string; limit?: string; after?: string; official_only?: string; canonical?: string } }>(
     '/v1/countries/:code/divisions',
     async (req) => {
       const { limit, after } = page(req.query);
@@ -161,13 +173,13 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     ).rows,
   }));
 
-  app.get<{ Params: { id: string }; Querystring: { limit?: string; after?: string; official_only?: string } }>('/v1/regions/:id/children', async (req) => {
+  app.get<{ Params: { id: string }; Querystring: { limit?: string; after?: string; official_only?: string; canonical?: string } }>('/v1/regions/:id/children', async (req) => {
     const { limit, after } = page(req.query);
     const rows = (await pool.query(`SELECT ${COLS} FROM entities WHERE parent_id = $1 AND id > $2 ${officialOnly(req.query)} ORDER BY id LIMIT $3`, [req.params.id, after, limit + 1])).rows;
     return paged(rows, limit, 'id');
   });
 
-  app.get<{ Querystring: { q?: string; country?: string; kind?: string; limit?: string; official_only?: string } }>('/v1/search', async (req, reply) => {
+  app.get<{ Querystring: { q?: string; country?: string; kind?: string; limit?: string; official_only?: string; canonical?: string } }>('/v1/search', async (req, reply) => {
     const q = (req.query.q ?? '').trim();
     if (q.length < 2) return reply.code(400).send({ error: 'q must be at least 2 characters' });
     const { limit } = page(req.query);

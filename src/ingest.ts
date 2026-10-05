@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import type pg from 'pg';
 import type { EntityInput, SourceMeta } from './model.js';
 import { enqueueDeliveries } from './webhooks.js';
+import { sourcePriority } from './sources/priority.js';
 
 export interface IngestResult {
   snapshotId: number;
@@ -96,10 +97,10 @@ export async function ingest(pool: pg.Pool, source: SourceMeta, input: EntityInp
     await client.query('SELECT pg_advisory_xact_lock($1)', [ADVISORY_LOCK]);
 
     await client.query(
-      `INSERT INTO sources (id, authority, url, license, version, attribution, retrieved_at) VALUES ($1, $2, $3, $4, $5, $6, now())
+      `INSERT INTO sources (id, authority, url, license, version, attribution, priority, retrieved_at) VALUES ($1, $2, $3, $4, $5, $6, $7, now())
        ON CONFLICT (id) DO UPDATE SET authority = EXCLUDED.authority, url = EXCLUDED.url, license = EXCLUDED.license,
          version = EXCLUDED.version, attribution = EXCLUDED.attribution, retrieved_at = now()`,
-      [source.id, source.authority, source.url ?? null, source.license ?? null, source.version ?? null, source.attribution ?? null],
+      [source.id, source.authority, source.url ?? null, source.license ?? null, source.version ?? null, source.attribution ?? null, sourcePriority(source.id)],
     );
 
     const existing = new Map<string, { hash: string; kind: string }>();

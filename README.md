@@ -46,7 +46,7 @@ GET  /v1/countries/:iso2/regions?level=1|2
 GET  /v1/countries/:iso2/divisions?level=&type=&source=   # ulusal kaynaklı idari birimler
 GET  /v1/regions/:id            GET /v1/regions/:id/children
 GET  /v1/search?q=ist&country=TR&kind=admin1&official_only=true
-                                 (official_only: yalnızca source_class=official kaynakların kayıtları; children/divisions/regions/search'te geçerli)
+                                 (official_only: yalnızca source_class=official kaynakların kayıtları; canonical=true: bağlı kayıtlardan yalnızca en yüksek öncelikli kaynağınki (resmi > wd-* > GeoNames); children/divisions/regions/search'te geçerli)
                                  /v1/regions/:id yanıtı: names{lang:ad} (Wikidata), xrefs (QID), links
 GET  /v1/countries/:iso2/holidays?year=&region=<entity id>&type=   # region verilmezse yalnızca ülke geneli
 GET  /v1/holidays?date=YYYY-MM-DD&country=

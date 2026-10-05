@@ -6,6 +6,7 @@ import { EU27 } from './sources/eu.js';
 import { GEONAMES, loadGeoNames } from './sources/geonames.js';
 import { GISCO_LAU, GISCO_NUTS, loadLau, loadNuts } from './sources/gisco.js';
 import { NATIONAL } from './sources/national/index.js';
+import { sourcePriority } from './sources/priority.js';
 import { WD_COUNTRIES, wikidataLoader, wikidataMeta } from './sources/wikidata-countries.js';
 import { HOLIDAYS_SOURCE, loadHolidayFiles } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
@@ -114,10 +115,10 @@ export function sourceClassOf(id: string): 'official' | 'community' {
 export async function syncTargetMetadata(pool: pg.Pool, targets: RefreshTarget[]): Promise<void> {
   for (const t of targets) {
     await pool.query(
-      `INSERT INTO sources (id, authority, url, license, version, attribution, cadence, expected_min, expected_max, license_verdict, commercial_use, source_class)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-       ON CONFLICT (id) DO UPDATE SET cadence = $7, expected_min = $8, expected_max = $9, license_verdict = $10, commercial_use = $11, source_class = $12`,
-      [t.meta.id, t.meta.authority, t.meta.url ?? null, t.meta.license ?? null, null, t.meta.attribution ?? null, t.cadence, t.expectedRows[0], t.expectedRows[1], t.licenseVerdict, t.commercialUse, sourceClassOf(t.meta.id)],
+      `INSERT INTO sources (id, authority, url, license, version, attribution, cadence, expected_min, expected_max, license_verdict, commercial_use, source_class, priority)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+       ON CONFLICT (id) DO UPDATE SET cadence = $7, expected_min = $8, expected_max = $9, license_verdict = $10, commercial_use = $11, source_class = $12, priority = $13`,
+      [t.meta.id, t.meta.authority, t.meta.url ?? null, t.meta.license ?? null, null, t.meta.attribution ?? null, t.cadence, t.expectedRows[0], t.expectedRows[1], t.licenseVerdict, t.commercialUse, sourceClassOf(t.meta.id), sourcePriority(t.meta.id)],
     );
   }
 }
