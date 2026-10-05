@@ -7,6 +7,7 @@ import { mapNorway } from '../src/sources/national/no.js';
 import { mapSweden, pickLatestTable } from '../src/sources/national/se.js';
 import { parseCzso } from '../src/sources/national/cz.js';
 import { parseGv } from '../src/sources/national/de.js';
+import { parseAustria } from '../src/sources/national/at.js';
 import { parseCsvRows } from '../src/sources/csv.js';
 import { readXlsx, columnIndex } from '../src/sources/xlsx.js';
 import { zipSync, strToU8 } from 'fflate';
@@ -197,5 +198,21 @@ describe('DE adapter', () => {
   });
   it('fails loudly if the layout changes', () => {
     expect(() => parseGv([['x']])).toThrow(/layout changed/);
+  });
+});
+
+describe('AT adapter', () => {
+  const pol = 'Politische Bezirke, Gebietsstand 2026;;;;\nErstellt am:;01.10.2026 08:15:30;;;\nBundeslandkennziffer;Bundesland;Kennziffer pol. Bezirk;Politischer Bezirk;Politischer Bez. Code\n1;Burgenland;101;Eisenstadt(Stadt);101\n1;Burgenland;103;Eisenstadt-Umgebung;103\n9;Wien;900;Wien(Stadt);900\n9;Wien;900;Wien  1.,Innere Stadt;901\nQuelle: STATISTIK AUSTRIA. erstellt am 01.10.2026\n';
+  const gem = 'Gemeindeliste sortiert nach Gemeindekennziffer, Gebietsstand 2026;;;;;\nErstellt am:;01.10.2026;;;;\nGemeindekennziffer;Gemeindename;Gemeindecode;Status;PLZ des Gem.Amtes;weitere Postleitzahlen\n10101;Eisenstadt;10101;SR;7000;\n10301;Breitenbrunn am Neusiedler See;10301;M;7091;\n90001;Wien;90001;SR;1010;\n';
+  it('builds Bundesland > Bezirk > Gemeinde; the Gemeindebezirke of Vienna hang below Gemeinde Wien; no postal codes kept', () => {
+    const { entities: e, asOf } = parseAustria(pol, gem);
+    expect(asOf).toBe('2026');
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual([
+      'div:AT:land-1<country:AT', 'div:AT:bez-101<div:AT:land-1', 'div:AT:bez-103<div:AT:land-1', 'div:AT:land-9<country:AT', 'div:AT:bez-900<div:AT:land-9', 'div:AT:bez-901<div:AT:gem-90001',
+      'div:AT:gem-10101<div:AT:bez-101', 'div:AT:gem-10301<div:AT:bez-103', 'div:AT:gem-90001<div:AT:bez-900',
+    ]);
+    expect(e.find((x) => x.id === 'div:AT:gem-10101')).toMatchObject({ name: 'Eisenstadt', data: { type_local: 'Statutarstadt', status: 'SR' } });
+    expect(JSON.stringify(e)).not.toContain('7000');
+    expect(() => parseAustria('x', gem)).toThrow(/layout changed/);
   });
 });
