@@ -23,7 +23,7 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | nat-be | ⚪ | Statbel CAPTCHA, metin okunamadı → insan okuması |
 | nat-fi | 🟢 | Tilastokeskus CC BY 4.0, sınıflandırma API'si (308 belediye) |
 | nat-dk | 🟡 | DAWA kapandı (410); DAGI CC BY 4.0 ama hesap/kararsız uç nokta |
-| nat-pl | 🟡 | TERYT ücretsiz; lisans adı yok, CC BY yalnızca dane.gov.pl'de |
+| nat-pl | 🟢 | GUS BDL API CC BY 4.0 (GUS kendi sayfasında; TERYT yerine BDL kullanılıyor) |
 | nat-ie | 🟢 | CC BY 4.0; veri ince (31 il/şehir, resmi kod yok) |
 | nat-pt | 🟢 | DGT CAOP CC BY 4.0; freguesia kodu INE'ye ait |
 | nat-cz | 🟢 | ČÚZK/ČSÚ CC BY 4.0 (atıf + metaveri + değişiklik belirtme) |

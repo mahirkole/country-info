@@ -36,3 +36,9 @@
 - **🟡 şartlı** — gerekçe: TERYT TERC/SIMC ücretsiz ve herkese açık, API "podmiotom komercyjnym" için de; GUS genel sitesi kaynak göstererek kopyalamaya itiraz etmiyor; dane.gov.pl meta verisi CC BY 4.0 diyor. Ancak GUS'un kendi TERYT sayfalarında resmi bir lisans adı/ticari yeniden dağıtım/türev veritabanı satışı cümlesi YOK (okunan metin gayriresmi "nie ma zastrzeżeń"); CC BY etiketi ikincil kaynaktan.
 - Açık sorular / yayıncıya yazılacak teyit: GUS'a (teryt_ws1@stat.gov.pl / Centrum Informatyki Statystycznej): TERC/SIMC verisinin CC BY 4.0 ile mi sunulduğu, ticari yeniden dağıtım ve API satışı izni, hız limiti, indirme için sabit URL.
 - Okuyan: Claude (alt-ajan, curl + python) Bağımsız ikinci geçiş yapıldı mı: hayır (2026-10-04)
+
+## Güncelleme 2026-10-05 (alternatif kaynak: GUS Bank Danych Lokalnych API — lisans çözüldü)
+- GUS kendi sayfasında lisansı yazıyor (üretici okudu): https://api.stat.gov.pl/Home/BdlApi — "Dane są możliwe do wykorzystywania w oparciu o licencję międzynarodową Creative Commons by 4.0 – Uznanie autorstwa" (https://creativecommons.org/licenses/by/4.0/legalcode.pl); BDL sitesi (https://bdl.stat.gov.pl/bdl/start) altbilgisinde: "Licencja międzynarodowa Creative Commons BY 4.0 – Uznanie autorstwa". TERYT'teki lisans boşluğu bu kaynakla aşıldı; **TERYT kullanılmıyor.**
+- Atıf: "Źródło: Główny Urząd Statystyczny (GUS), Bank Danych Lokalnych (CC BY 4.0)". Anonim API kotası 100 çağrı / 15 dk (429 yanıtı "Retry-After: N sek").
+- Teknik: `/units?level=…` tarihsel birimleri de döker (2.692 gmina, 382 powiat); güncel birimler için `data/by-variable/72305` (nüfus) son yıl değeri olan birimler alınır → 380 powiat, 2.479 gmina (resmî 2.477 civarı). Gmina türü id'nin son hanesinden (1 kentsel, 2 kırsal, 3 kent-kır; 4/5/8 gmina değil).
+- Karar: **🟢 satışa uygun** (CC BY 4.0, GUS beyanı). İkinci çalıştırma "unchanged" doğrulaması kota nedeniyle yapılmadı.
