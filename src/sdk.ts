@@ -147,7 +147,7 @@ export interface ProfileResult { schema_version: number; mode: string; scopes: s
 export type WebhookEvent = 'snapshot.completed' | 'release.published' | 'release.retracted';
 export interface Webhook { id: number; url: string; events: WebhookEvent[] | null; countries: string[] | null; kinds: string[] | null; active: boolean }
 export interface Delivery { id: number; event: string; snapshot_id: number | null; status: 'pending' | 'delivered' | 'failed'; attempts: number; last_error: string | null; payload: Record<string, unknown> }
-export interface ReleaseNote { id: number; snapshot_id: number; source_id: string; vintage: string | null; title: string; totals: { inserted: number; updated: number; deleted: number }; countries: Record<string, number>; highlight: boolean; retracted: boolean; created_at: string }
+export interface ReleaseNote { id: number; snapshot_id: number | null; kind: 'data' | 'attributes'; source_id: string; vintage: string | null; title: string; totals: { inserted: number; updated: number; deleted: number }; countries: Record<string, number>; highlight: boolean; retracted: boolean; created_at: string }
 export interface BundleFile { url: string; sha256: string; bytes: number }
 export interface ExportBundle { profile: string; snapshot_id: number; from_seq: number; to_seq: number; files: Record<string, BundleFile>; snapshots: { snapshot_id: number; from_seq: number; to_seq: number; delta_only: boolean; delta: BundleFile }[]; retracted: number[] }
 

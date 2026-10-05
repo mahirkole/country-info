@@ -61,6 +61,52 @@ export async function createReleaseNote(db: pg.Pool, snapshotId: number, extra: 
   return id;
 }
 
+export interface AttributeDiff {
+  source: string;
+  authority: string;
+  verdict: string | null;
+  vintageFrom: string | null;
+  vintageTo: string;
+  /** Country → attribute groups whose content changed (added, changed or removed). */
+  changed: Record<string, string[]>;
+  localeChanges: number;
+}
+
+/** Release note for a change in the CLDR-derived country attributes (no snapshot: these are not part of the change feed). */
+export async function createAttributeReleaseNote(db: pg.Pool, d: AttributeDiff): Promise<number | null> {
+  const countries = Object.keys(d.changed).sort();
+  if (countries.length === 0 && d.localeChanges === 0) return null;
+  const vintage = d.vintageFrom !== null && d.vintageFrom !== d.vintageTo;
+  const groups: Record<string, number> = {};
+  for (const g of Object.values(d.changed).flat()) groups[g] = (groups[g] ?? 0) + 1;
+  const title = `${d.authority.split(' – ')[0]}: country attributes ${vintage ? `updated to ${d.vintageTo}` : 'changed'} (${countries.length} countries)`;
+  const body = [
+    `# ${title}`,
+    '',
+    `Source: \`${d.source}\` · ${vintage ? `${d.vintageFrom} → ${d.vintageTo}` : d.vintageTo}`,
+    vintage ? `\n**New release (vintage change).** Formats and conventions (currency, date/time, week, measurement, units, locale) may differ.` : '',
+    '',
+    '## Attribute groups changed (countries)',
+    ...Object.entries(groups).sort((a, b) => b[1] - a[1]).map(([g, n]) => `- ${g}: ${n}`),
+    d.localeChanges ? `\n${d.localeChanges} locale format sets changed (date, time and number patterns).` : '',
+    '\n## Countries',
+    countries.slice(0, 40).join(', ') + (countries.length > 40 ? `, … and ${countries.length - 40} more` : ''),
+    '\nRead the current values with `GET /v1/profile` (scopes currency, datetime, numbers, measurement, locale); these attributes are not part of `GET /v1/changes`.',
+  ].filter((l) => l !== '').join('\n');
+  const isPublic = d.verdict === 'green' || d.verdict === 'amber';
+  const cmap = Object.fromEntries(countries.map((c) => [c, d.changed[c]!.length]));
+  const r = await db.query(
+    `INSERT INTO release_notes (snapshot_id, kind, source_id, vintage, reason, title, body_md, totals, countries, public, highlight)
+     VALUES (NULL, 'attributes', $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+    [d.source, d.vintageTo, vintage ? `vintage_change: ${d.vintageTo}` : null, title, body, JSON.stringify({ inserted: 0, updated: countries.length, deleted: 0 }), JSON.stringify(cmap), isPublic, vintage],
+  );
+  const id = Number(r.rows[0].id);
+  if (isPublic) {
+    await enqueueEvent(db, 'release.published', { release_id: id, snapshot_id: null, kind: 'attributes', source_ids: [d.source], vintage: d.vintageTo, reason: vintage ? `vintage_change: ${d.vintageTo}` : null, title, totals: { inserted: 0, updated: countries.length, deleted: 0 }, changes_by_country: cmap, release_url: `/v1/releases/${id}` }, { countries });
+  }
+  return id;
+}
+
 /** Mark a release as withdrawn (bad data was published) and tell subscribers. */
 export async function retractRelease(db: pg.Pool, id: number): Promise<boolean> {
   const r = await db.query('UPDATE release_notes SET retracted = true WHERE id = $1 AND NOT retracted RETURNING snapshot_id, public, source_id, countries', [id]);

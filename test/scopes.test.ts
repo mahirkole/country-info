@@ -163,6 +163,8 @@ describe.skipIf(!url)('scopes, metadata and profiles', () => {
 });
 
 import { exportSnapshot } from '../src/export.js';
+import { createAttributeReleaseNote } from '../src/release-notes.js';
+import { diffAttributes } from '../src/sources/cldr-attrs.js';
 import { readFile } from 'node:fs/promises';
 describe.skipIf(!url)('attribute export', () => {
   const pool = new pg.Pool({ connectionString: url });
@@ -185,5 +187,35 @@ describe.skipIf(!url)('attribute export', () => {
     await exportSnapshot(pool, dir, 1, { commercialOnly: true });
     expect(await readFile(join(dir, 'latest', 'attributes.ndjson'), 'utf8')).toBe('');
     expect(await readFile(join(dir, 'latest', 'locale_formats.ndjson'), 'utf8')).toBe('');
+  });
+});
+
+describe.skipIf(!url)('attribute release notes', () => {
+  const pool = new pg.Pool({ connectionString: url });
+  afterAll(() => pool.end());
+  it('diffs by content (key order irrelevant) and reports added, changed and removed groups', () => {
+    const d = diffAttributes(
+      [{ code: 'TR', grp: 'week', data: { a: 1, b: 2 } }, { code: 'TR', grp: 'time', data: { h: 'h23' } }, { code: 'DE', grp: 'week', data: { x: 1 } }],
+      [{ code: 'TR', grp: 'week', data: { b: 2, a: 1 } }, { code: 'TR', grp: 'time', data: { h: 'h12' } }, { code: 'FR', grp: 'week', data: { x: 1 } }],
+    );
+    expect(d).toEqual({ TR: ['time'], DE: ['week'], FR: ['week'] });
+  });
+  it('creates a snapshot-less release note, queues release.published for matching subscribers, nothing for an empty diff', async () => {
+    await migrate(pool);
+    await pool.query('TRUNCATE webhook_deliveries, webhook_subscriptions, release_notes, sources RESTART IDENTITY CASCADE');
+    await pool.query(`INSERT INTO sources (id, authority, url, license, attribution, source_class, license_verdict) VALUES ('cldr','Unicode CLDR – names','u','l','a','community','green')`);
+    await pool.query(`INSERT INTO webhook_subscriptions (url, secret, countries, events) VALUES ('https://x.test/h', 's', ARRAY['TR'], ARRAY['release.published']), ('https://y.test/h', 's', ARRAY['FR'], NULL)`);
+    const base = { source: 'cldr', authority: 'Unicode CLDR – names', verdict: 'green', vintageTo: 'CLDR 49', localeChanges: 0 };
+    expect(await createAttributeReleaseNote(pool, { ...base, vintageFrom: 'CLDR 48', changed: {} })).toBeNull();
+    const id = await createAttributeReleaseNote(pool, { ...base, vintageFrom: 'CLDR 48', changed: { TR: ['time', 'week'], DE: ['week'] }, localeChanges: 3 });
+    const n = (await pool.query('SELECT * FROM release_notes WHERE id = $1', [id])).rows[0];
+    expect(n).toMatchObject({ snapshot_id: null, kind: 'attributes', public: true, highlight: true, vintage: 'CLDR 49' });
+    expect(n.body_md).toContain('CLDR 48 → CLDR 49');
+    expect(n.body_md).toContain('- week: 2');
+    const d = (await pool.query('SELECT s.url, d.payload FROM webhook_deliveries d JOIN webhook_subscriptions s ON s.id = d.subscription_id')).rows;
+    expect(d.map((r) => r.url)).toEqual(['https://x.test/h']); // the FR-only subscriber is not told about TR/DE
+    expect(d[0].payload).toMatchObject({ event: 'release.published', kind: 'attributes', snapshot_id: null });
+    const same = await createAttributeReleaseNote(pool, { ...base, vintageTo: 'CLDR 48', vintageFrom: 'CLDR 48', changed: { TR: ['week'] } });
+    expect((await pool.query('SELECT highlight FROM release_notes WHERE id = $1', [same])).rows[0].highlight).toBe(false);
   });
 });

@@ -473,7 +473,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   app.get<{ Querystring: { limit?: string; before?: string } }>('/v1/releases', async (req) => {
     const limit = Math.min(Math.max(parseInt(req.query.limit ?? '30', 10) || 30, 1), 100);
     const before = /^\d+$/.test(req.query.before ?? '') ? req.query.before! : '9223372036854775807';
-    const rows = (await pool.query('SELECT id, snapshot_id, source_id, vintage, reason, title, totals, countries, highlight, retracted, created_at FROM release_notes WHERE public AND id < $1 ORDER BY id DESC LIMIT $2', [before, limit + 1])).rows;
+    const rows = (await pool.query('SELECT id, snapshot_id, kind, source_id, vintage, reason, title, totals, countries, highlight, retracted, created_at FROM release_notes WHERE public AND id < $1 ORDER BY id DESC LIMIT $2', [before, limit + 1])).rows;
     const more = rows.length > limit;
     const data = more ? rows.slice(0, limit) : rows;
     return { data, has_more: more, next_before: more ? data[data.length - 1]!.id : null };
@@ -502,7 +502,7 @@ ${entries}
 `);
   });
   app.get<{ Params: { id: string } }>('/v1/releases/:id', async (req, reply) => {
-    const r = /^\d+$/.test(req.params.id) ? await pool.query('SELECT id, snapshot_id, source_id, vintage, reason, title, body_md, totals, countries, highlight, retracted, created_at FROM release_notes WHERE public AND id = $1', [req.params.id]) : null;
+    const r = /^\d+$/.test(req.params.id) ? await pool.query('SELECT id, snapshot_id, kind, source_id, vintage, reason, title, body_md, totals, countries, highlight, retracted, created_at FROM release_notes WHERE public AND id = $1', [req.params.id]) : null;
     return r?.rows[0] ?? reply.code(404).send({ error: 'not_found' });
   });
   app.post<{ Body: { email?: string; frequency?: string } }>('/v1/release-subscribers', { preHandler: requireAdmin }, async (req, reply) => {

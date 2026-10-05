@@ -1,6 +1,7 @@
 import type pg from 'pg';
 import { fetchText } from './fetch.js';
 import { CLDR_BASE } from './cldr.js';
+import { createAttributeReleaseNote, type AttributeDiff } from '../release-notes.js';
 
 /** CLDR files that are keyed by territory; `001` is the world default. */
 type Terr<T> = Record<string, T>;
@@ -164,7 +165,24 @@ export const ATTR_FILES = {
  * Write the country attribute groups and per-locale formats (tables entity_attributes / locale_formats, source `cldr`).
  * Everything is read from CLDR at every run; nothing is typed into the code. `currentCurrencies` is the already-parsed tender list per territory.
  */
-export async function enrichCldrAttributes(pool: pg.Pool, cacheDir: string, currentCurrencies: Map<string, string[]>, extraLocales: string[] = []): Promise<{ attributes: number; locales: number; vintage: string }> {
+/** JSON with sorted keys, so equal content compares equal whatever the key order. */
+const canon = (v: unknown): string => JSON.stringify(v, (_k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.entries(x as object).sort(([a], [b]) => a.localeCompare(b))) : x));
+
+/** Countries/groups whose attributes differ between the stored rows and the new ones (empty when nothing was stored before: first load). */
+export function diffAttributes(old: { code: string; grp: string; data: unknown }[], next: { code: string; grp: string; data: unknown }[]): Record<string, string[]> {
+  const key = (r: { code: string; grp: string }) => `${r.code}:${r.grp}`;
+  const o = new Map(old.map((r) => [key(r), canon(r.data)]));
+  const n = new Map(next.map((r) => [key(r), canon(r.data)]));
+  const out: Record<string, Set<string>> = {};
+  for (const k of new Set([...o.keys(), ...n.keys()])) {
+    if (o.get(k) === n.get(k)) continue;
+    const [code, grp] = k.split(':') as [string, string];
+    (out[code] ??= new Set()).add(grp);
+  }
+  return Object.fromEntries(Object.entries(out).map(([c, g]) => [c, [...g].sort()]));
+}
+
+export async function enrichCldrAttributes(pool: pg.Pool, cacheDir: string, currentCurrencies: Map<string, string[]>, extraLocales: string[] = []): Promise<{ attributes: number; locales: number; vintage: string; release_note: number | null }> {
   const get = async (path: string, name: string) => JSON.parse(await fetchText(`${CLDR_BASE}/${path}`, name, cacheDir)) as unknown;
   const raw = Object.fromEntries(await Promise.all(Object.entries(ATTR_FILES).map(async ([k, p]) => [k, await get(p, `cldr_${k}.json`)] as const)));
   const vintage = cldrVersion(raw.week);
@@ -202,6 +220,8 @@ export async function enrichCldrAttributes(pool: pg.Pool, cacheDir: string, curr
       console.warn(`CLDR locale ${loc} skipped: ${(e as Error).message}`); // locale not in cldr-json (404): its countries have no locale formats
     }
   }
+  const oldAttrs = (await pool.query(`SELECT e.code, a.grp, a.data, a.vintage FROM entity_attributes a JOIN entities e ON e.id = a.entity_id WHERE a.source = 'cldr'`)).rows as { code: string; grp: string; data: unknown; vintage: string | null }[];
+  const oldLocales = (await pool.query(`SELECT locale AS code, 'formats' AS grp, data FROM locale_formats WHERE source = 'cldr'`)).rows as { code: string; grp: string; data: unknown }[];
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -216,5 +236,15 @@ export async function enrichCldrAttributes(pool: pg.Pool, cacheDir: string, curr
   } finally {
     client.release();
   }
-  return { attributes: rows.length, locales: formats.size, vintage };
+  // A change against a previous load becomes a release note (the first load has nothing to compare with).
+  let note: number | null = null;
+  if (oldAttrs.length) {
+    const codeOf = new Map(countries.map((c) => [c.id, c.code]));
+    const changed = diffAttributes(oldAttrs, rows.map((r) => ({ code: codeOf.get(r.id)!, grp: r.grp, data: r.data })));
+    const localeChanges = Object.keys(diffAttributes(oldLocales, [...formats].map(([code, data]) => ({ code, grp: 'formats', data })))).length;
+    const src = (await pool.query(`SELECT authority, license_verdict FROM sources WHERE id = 'cldr'`)).rows[0];
+    const diff: AttributeDiff = { source: 'cldr', authority: src?.authority ?? 'Unicode CLDR', verdict: src?.license_verdict ?? null, vintageFrom: oldAttrs[0]!.vintage, vintageTo: vintage, changed, localeChanges };
+    note = await createAttributeReleaseNote(pool, diff).catch((e) => { console.error('release note:', (e as Error).message); return null; });
+  }
+  return { attributes: rows.length, locales: formats.size, vintage, release_note: note };
 }

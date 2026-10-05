@@ -64,7 +64,7 @@ export function parseUnMembers(json: unknown): Set<string> {
 }
 
 /** Write localized country names (`entity_names`, source cldr) and the current currency (`entity_xrefs` scheme `currency`) and the UN status (scheme `un_status`: `member` or `other`) for country entities. */
-export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_LANGS): Promise<{ names: number; currencies: number; un_members: number; attributes: number; locales: number; pinned: string; newer_release: string | null }> {
+export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_LANGS): Promise<{ names: number; currencies: number; un_members: number; attributes: number; locales: number; pinned: string; newer_release: string | null; release_note: number | null }> {
   const get = async (path: string, name: string) => JSON.parse(await fetchText(`${CLDR_BASE}/${path}`, name, cacheDir)) as unknown;
   const names = new Map<string, Map<string, string>>();
   for (const l of langs) names.set(l, parseTerritories(await get(`cldr-localenames-full/main/${l}/territories.json`, `cldr_terr_${l}.json`), l));
@@ -110,7 +110,7 @@ export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_L
   }
   const attrs = await enrichCldrAttributes(pool, cacheDir, currencies, langs);
   const latest = await cldrLatest(cacheDir);
-  return { names: n, currencies: c, un_members: um, attributes: attrs.attributes, locales: attrs.locales, pinned: CLDR_VERSION, newer_release: newerThanPinned(latest) ? latest : null };
+  return { names: n, currencies: c, un_members: um, attributes: attrs.attributes, locales: attrs.locales, pinned: CLDR_VERSION, newer_release: newerThanPinned(latest) ? latest : null, release_note: attrs.release_note };
 }
 
 /**
