@@ -17,3 +17,6 @@
 - Bakanlar Kurulu'nun başka günleri resmi tatil ilan etme yetkisi – okunmadı.
 - Hristiyan Paskalya takvimi: Ortodoks (`calendar: orthodox`) kabul edildi; yasa metni "в съответната година определени" diyor, takvim türünü ben okumadım.
 - Not: Easter -2/-1/0/+1 ofsetleri günlerin adından türetildi.
+
+## Not (2026-10-05, ikinci deneme)
+Resmî ana makamın kopyası bulundu: Adalet Bakanlığı normatif belge sayfası `https://www.justice.government.bg/home/normdoc/1594373121` (Кодекс на труда) — konteynerden 503/bağlantı hatası verdi, **okunamadı**. Bir arama özeti (resmî okuma sayılmaz) art. 154(1)'de ayrıca 1 Kasım "Ден на народните будители" (yalnızca okullar için neprisästven) ve hafta sonuna denk gelen tatiller için "ilk iki iş günü neprisästven" kuralını belirtiyor; bunlar kuralda yok/modellenmedi ve **doğrulanmadı**. Doğrulama için bu URL'ye erişimi olan bir ağdan metin okunmalı.
