@@ -23,6 +23,7 @@
     "export": "tsx src/cli.ts export",
     "publish": "tsx src/cli.ts publish",
     "digest": "tsx src/cli.ts digest",
+    "prune": "tsx src/cli.ts prune",
     "deliver": "tsx src/cli.ts deliver",
     "serve": "tsx src/cli.ts serve",
     "test": "vitest run",

@@ -20,6 +20,7 @@ import { buildApp } from './api.js';
 import { enrichCldr } from './sources/cldr.js';
 import { join } from 'node:path';
 import { pruneArchive } from './sources/fetch.js';
+import { prune } from './prune.js';
 import { formatSummary, holidayGaps, notify, summarizeCycle } from './notify.js';
 import { createStore, publish, PROFILES, rollback, type Profile } from './publish.js';
 import { retractRelease, runDigest, webhookMailer } from './release-notes.js';
@@ -206,6 +207,12 @@ async function main() {
       console.log('digests sent:', await runDigest(pool, webhookMailer(config.mailWebhookUrl, config.mailFrom)));
       break;
     }
+    case 'prune': {
+      // prune: remove old delivered webhook deliveries, usage rows (2 years), stale rate-limit windows and old run history.
+      await migrate(pool);
+      console.table(await prune(pool));
+      break;
+    }
     case 'notify': {
       // notify [text]: send an operations alert (used by scripts/cron/run-cycle.sh); without text a test message.
       const text = process.argv.slice(3).join(' ') || 'country-info: test notification';
@@ -224,7 +231,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | notify [text] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | prune | notify [text] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

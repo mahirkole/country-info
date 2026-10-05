@@ -33,6 +33,7 @@ if [ "$(date -u +%d)" = "01" ] || [ -n "${FORCE_MONTHLY:-}" ]; then
 fi
 step publish        npm run -s publish
 step digest         npm run -s digest
+step prune          npm run -s prune
 
 if [ -n "${failed:-}" ]; then
   npm run -s cli -- notify "country-info cycle: failed steps:${failed} (host $(hostname))" || true

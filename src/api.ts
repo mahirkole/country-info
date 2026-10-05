@@ -300,7 +300,8 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     ).rows;
     const attention = rows.filter((r) => r.status !== 'ok' || r.stale).map((r) => ({ id: r.id, status: r.status, stale: r.stale }));
     const lastRun = (await pool.query('SELECT source_id, status, finished_at FROM source_runs ORDER BY id DESC LIMIT 1')).rows[0] ?? null;
-    return { ok: attention.length === 0, sources: rows.length, attention, last_run: lastRun };
+    const review = (await pool.query("SELECT count(*)::int AS n, count(*) FILTER (WHERE field LIKE 'successor:%')::int AS successors FROM review_items WHERE status = 'open'")).rows[0];
+    return { ok: attention.length === 0, sources: rows.length, attention, last_run: lastRun, open_review_items: review.n, open_successor_suggestions: review.successors };
   });
 
   // ---- snapshots & deltas ---------------------------------------------

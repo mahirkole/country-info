@@ -39,7 +39,7 @@ npm run enrich:cldr                      # CLDR (Unicode License v3): ülke adla
 ## Zamanlama (üretim)
 Zamanlanmış çalıştırma **üretim ortamında, API'nin yanında** yapılır (veritabanı internete açılmaz; GitHub Actions'ın 6 saat sınırı yok — PL kotası ve Wikidata uzun sürebilir). Tek giriş: `scripts/cron/run-cycle.sh`:
 
-`migrate` → `check:licenses` → `refresh --due` → (ayın 1'i) `enrich:wikidata`, `enrich:cldr`, `link` → `publish` → `digest`. Adımlar birbirini durdurmaz; her adımın çıkış kodu toplanır, başarısız adım `NOTIFY_WEBHOOK_URL`'e bildirilir. `flock` ile aynı anda tek döngü. Webhook teslimatını çalışan `serve` süreci yapar (15 sn'de bir; birden çok örnekte bile bir teslimat bir kez gider).
+`migrate` → `check:licenses` → `refresh --due` → (ayın 1'i) `enrich:wikidata`, `enrich:cldr`, `link` → `publish` → `digest` → `prune` (eski teslimat/kullanım/çalıştırma kayıtları: 90 gün / 2 yıl / 1 yıl; bekleyen teslimatlar ve her kaynağın son 20 çalıştırması silinmez). Adımlar birbirini durdurmaz; her adımın çıkış kodu toplanır, başarısız adım `NOTIFY_WEBHOOK_URL`'e bildirilir. `flock` ile aynı anda tek döngü. Webhook teslimatını çalışan `serve` süreci yapar (15 sn'de bir; birden çok örnekte bile bir teslimat bir kez gider).
 
 ```
 # /etc/cron.d/country-info  (günlük 03:17 UTC; ortam değişkenleri /etc/country-info.env)
@@ -65,8 +65,10 @@ Sıklıklar: GeoNames haftalık; GISCO NUTS/LAU, US, NL yıllık; FR, IT, NO, ta
 - **Ardıl önerileri:** bir yayında hem silinen hem eklenen birim varsa `refresh` aynı üst birim altında ad benzerliğine göre `review_items` (`field = successor:replaced_by | successor:merged_into`, `b_value.to`, `confidence`) yazar ve sonuç ayrıntısında sayıyı bildirir; `GET /v1/review-items` (admin) ile görünür. Öneriler **hiçbir zaman otomatik uygulanmaz**: admin `POST /v1/review-items/:id/resolve {"action":"accept"|"dismiss"}` ile onaylar (onay `entity_successors` tablosuna yazar, migration 007) veya reddeder; onaylanan ilişki `GET /v1/regions/:id/successors` ile (silinmiş kimlikler için de) okunur.
 - **`license_changed`:** yayıncının lisans sayfasını **oku**, `docs/licenses/<id>.md` dossier'ini güncelle, uygunsa `npm run license:ack -- <id>`; uygun değilse kaynağı devre dışı bırak ve müşterilere etki analizi yap.
 - **`failed`:** URL/şema değişmiş olabilir; `npm run check:sources` ile yeniden üret, adaptörü düzelt (kontrat testi ekle).
-- **İzleme:** `GET /v1/status` → `ok:false` ve `attention[]` (needs_review/failed/license_changed/stale). `GET /v1/sources` kaynak başına `last_checked_at`, `last_changed_at`, `next_due_at`, `stale`.
+- **İzleme:** `GET /v1/status` → `ok:false` ve `attention[]` (needs_review/failed/license_changed/stale); `open_review_items` ve `open_successor_suggestions` bekleyen inceleme sayısını verir. `GET /v1/sources` kaynak başına `last_checked_at`, `last_changed_at`, `next_due_at`, `stale`.
 - **Geri alma:** değişiklik günlüğü (`changes`) önceki/sonraki değerleri tutar; ciddi bir kötü uygulamada veritabanı yedeğinden dönün (günlük `pg_dump` önerilir) ve bozuk kaynağı `--force` ile yeniden çalıştırın.
 
 ## Sıra (tam kurulum)
 `ingest` (geonames) → `refresh --source gisco-nuts,gisco-lau,nat-*` → `ingest:holidays` → `link` → `export`. `refresh` hepsini kapsar; `link` ve `export` ayrı çalıştırılır.
+
+**Gerçek S3 doğrulaması:** `scripts/dev/s3-e2e.sh` imzayı denetleyen bağımsız bir S3 uygulamasına (moto) karşı `S3Store`'u dener; presigned imza boto3 çıktısıyla aynı ürettiği için doğrulanır. Üretimde ilk yayından önce kendi depolamanıza karşı `npm run publish -- --profile commercial` + `GET /v1/exports/latest` ile bir kez deneyin.
