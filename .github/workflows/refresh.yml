@@ -24,6 +24,16 @@ jobs:
       - run: npm run check:licenses
       # 2. Refresh what is due. Exit code 1 means a source failed or needs review (see docs/OPERATIONS.md).
       - run: npm run refresh -- ${{ github.event.inputs.args || '--due' }}
+      # 3. Monthly (1st of the month, or on manual runs): Wikidata QIDs/names, CLDR names/currencies, then QID links.
+      #    Incremental; failures here must not hide the refresh result above, so they are reported but not fatal.
+      - name: Enrich (monthly)
+        if: ${{ github.event_name == 'workflow_dispatch' || format('{0}', github.event.schedule) != '' }}
+        run: |
+          if [ "$(date -u +%d)" = "01" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            npm run enrich:wikidata || echo "::warning::enrich:wikidata failed"
+            npm run enrich:cldr || echo "::warning::enrich:cldr failed"
+            npm run link || echo "::warning::link failed"
+          fi
       - name: Status
         if: always()
         run: |

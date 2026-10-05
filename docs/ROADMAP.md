@@ -84,7 +84,7 @@ Hedef: her ülkenin kendi resmi verisinden tüm idari seviyeler (şehir, il, il�
 2. Küçük ülkeler (CY, EE, LV, LT, LU, MT): resmi sayı küçük (≤80, CY 615 topluluk) → ulusal istatistik sitesinin lisansı okunur; yoksa Wikidata sınıfı + band.
 3. Çıkış ölçütü: AB27'nin 27'si kapsanır → `gisco-lau` için `DISABLE_SOURCES` + bilinçli toplu silme (`maxDeleteRatio`) ve `export --commercial` farkı raporu; `entity_links` ile NUTS3 bağları.
 
-**6-C. Model ve kalite** (2026-10-05: kaynak önceliği + `?canonical=true` yapıldı — `sources.priority` (migration 006, `src/sources/priority.ts`); kalanlar aşağıda)
+**6-C. Model ve kalite** (2026-10-05: kaynak önceliği + `?canonical=true` yapıldı — `sources.priority` (migration 006, `src/sources/priority.ts`); kalanlar aşağıda; aylık enrich zinciri `refresh.yml`'e eklendi)
 - `src/sources/priority.ts`: resmi > Wikidata > GeoNames; `canonical` bayrağı `entity_links`/QID üzerinden (kayıt silinmez); API `?canonical=true`.
 - `replaced_by`/`split_from` ardıllığı: yıllık vintage farklarından (IT Sardinya, FR COG) otomatik öneri → `review_items`.
 - ETag/If-Modified-Since + ham içerik arşivi (`.cache/raw/<sha256>`).
