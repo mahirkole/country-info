@@ -16,13 +16,14 @@ import { ES } from './es.js';
 import { PT } from './pt.js';
 import { JP } from './jp.js';
 import { PL } from './pl.js';
+import { LV } from './lv.js';
 
 /**
  * One adapter per country, each reading that country's own official data.
  * To add a country: read the publisher's license first (docs/LICENSES.md), write
  * `src/sources/national/<cc>.ts` exporting a NationalSource, register it here, add a test.
  */
-export const NATIONAL: Record<string, NationalSource> = { US, FR, IT, NL, NO, SE, CZ, DE, AT, CA, CH, AU, GB, ES, PT, JP, PL };
+export const NATIONAL: Record<string, NationalSource> = { US, FR, IT, NL, NO, SE, CZ, DE, AT, CA, CH, AU, GB, ES, PT, JP, PL, LV };
 
 export class LicenseNotEstablished extends Error {}
 

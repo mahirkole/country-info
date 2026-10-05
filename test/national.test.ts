@@ -358,3 +358,20 @@ describe('PL adapter', () => {
     expect(() => mapBdl(v, p.slice(0, 20), g)).toThrow(/layout changed/);
   });
 });
+
+import { mapAtvk, pickAtvk } from '../src/sources/national/lv.js';
+describe('LV adapter', () => {
+  it('picks the newest ATVK file and builds local governments with towns and parishes, skipping expired codes', () => {
+    expect(pickAtvk([{ name: 'ATVK_2021_30062024', url: 'a' }, { name: 'ATVK_2021_22082026', url: 'b' }, { name: 'ATVK_2017.csv', url: 'c' }]).url).toBe('b');
+    expect(() => pickAtvk([{ name: 'x', url: 'y' }])).toThrow(/layout changed/);
+    const row = (Code: string, Name: string, ParentCode = '', ValidTo = '') => ({ Code, Name, ParentCode, ValidTo });
+    const rows = [row('0001000', 'Rīga'), row('0055000', 'Varakļānu novads', '', '2024-06-30')];
+    for (let i = 0; i < 41; i++) rows.push(row(`01${String(i).padStart(2, '0')}000`, `N${i} novads`));
+    for (let i = 0; i < 500; i++) rows.push(row(`01${String(i % 41).padStart(2, '0')}${String(i % 9 + 1).padStart(1, '0')}${String(Math.floor(i / 41)).padStart(2, '0')}`.slice(0, 7), i % 2 ? `P${i} pagasts` : `Town${i}`, `01${String(i % 41).padStart(2, '0')}000`));
+    const e = mapAtvk(rows);
+    expect(e.some((x) => x.code === '0055000')).toBe(false);
+    expect(e.find((x) => x.code === '0001000')).toMatchObject({ parent_id: 'country:LV', data: { level: 1, type_local: 'valstspilsētas pašvaldība' } });
+    expect(e.filter((x) => x.data.level === 1)).toHaveLength(42);
+    expect(() => mapAtvk([row('1', 'A', 'MISSING')])).toThrow(/unknown parent/);
+  });
+});
