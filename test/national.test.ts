@@ -301,3 +301,19 @@ describe('ES adapter', () => {
     expect(() => mapIne(ccaa, prov, [['a']])).toThrow(/layout changed/);
   });
 });
+
+import { mapCaop } from '../src/sources/national/pt.js';
+describe('PT adapter', () => {
+  it('builds distrito > município > freguesia from DICO codes and rejects orphans', () => {
+    const d = Array.from({ length: 15 }, (_, i) => ({ dt: String(i + 1).padStart(2, '0'), distrito: `D${i}` }));
+    const m = Array.from({ length: 250 }, (_, i) => ({ dtmn: `${String((i % 15) + 1).padStart(2, '0')}${String(Math.floor(i / 15) + 1).padStart(2, '0')}`, municipio: `M${i}`, nuts3_cod: '191', area_ha: '1234' }));
+    const f = Array.from({ length: 2600 }, (_, i) => ({ dtmnfr: `${m[i % 250]!.dtmn}${String(Math.floor(i / 250) + 1).padStart(2, '0')}`, freguesia: `F${i}` }));
+    f.push({ dtmnfr: '990101', freguesia: 'orphan' }, { dtmnfr: '0101FA', freguesia: 'União das freguesias X' });
+    const e = mapCaop(d, m, f);
+    expect(e.find((x) => x.id === 'div:PT:mn-0101')).toMatchObject({ parent_id: 'div:PT:dt-01', data: { level: 2, area_km2: 12.34 } });
+    expect(e.find((x) => x.id === 'div:PT:fr-010101')!.parent_id).toBe('div:PT:mn-0101');
+    expect(e.some((x) => x.name === 'orphan')).toBe(false);
+    expect(e.find((x) => x.id === 'div:PT:fr-0101FA')!.parent_id).toBe('div:PT:mn-0101');
+    expect(() => mapCaop([], [], [])).toThrow(/layout changed/);
+  });
+});
