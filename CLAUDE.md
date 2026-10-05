@@ -2,7 +2,7 @@
 
 Ülkeler/idari bölgeler/tatiller için sürümlü veri servisi (TypeScript, Fastify, PostgreSQL). Ayrıntı: `README.md`, `docs/DESIGN.md`.
 
-**Oturuma başlarken önce `docs/ROADMAP.md` dosyasını okuyun** (kalan işler ve ağ gerektirenler orada) ve bitirdiğiniz işi oradan güncelleyin.
+**Oturuma başlarken önce `docs/PROGRESS.md` (özet) ve `docs/ROADMAP.md` dosyalarını okuyun** (kalan işler ve ağ gerektirenler orada) ve bitirdiğiniz işi oradan güncelleyin.
 
 ## Değişmez kurallar
 - **Veri kaynağı eklemeden önce lisansını kaynak sayfasından okuyun** ve `docs/LICENSES.md`'ye yazın. Lisansı belirsiz/ticari kısıtlı kaynaktan (PTT, NVİ, TÜİK, GISCO "administrative units", OSM şart kontrolü olmadan) veri almayın.

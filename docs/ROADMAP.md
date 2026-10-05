@@ -1,6 +1,6 @@
 # Yol haritası ve kalan işler (sonraki oturumlar için)
 
-Son güncelleme: 2026-10-05 (Faz 6 planı en altta). Dal: `claude/country-info-mvp` (PR açılmadı). Her maddeyi bitirince burayı güncelleyin.
+Son güncelleme: 2026-10-05 (Faz 6 planı en altta; özet kayıt: docs/PROGRESS.md). Dal: `claude/country-info-mvp` (PR açılmadı). Her maddeyi bitirince burayı güncelleyin.
 
 ## Tamamlandı
 - MVP: GeoNames ülke/admin1/admin2 ingest, snapshot/delta/webhook, dosya dışa aktarım.
