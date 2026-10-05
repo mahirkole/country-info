@@ -53,6 +53,19 @@ export const WD_COUNTRIES: WdCountry[] = [
     ],
   },
   {
+    // Official: 60 municipalities (43 district + 7 city + 10 other); counties (Wikidata 39 incl. historical) are not loaded.
+    cc: 'LT', country: 'Q37', langs: ['lt'],
+    levels: [{ key: 'savivaldybė', classes: ['Q17301072', 'Q17166803', 'Q1363145'], level: 1, type: 'municipality', typeLocal: 'savivaldybė', expected: [60, 60] }],
+  },
+  {
+    // Statistics Estonia lists 78 local governments from September 2026 (79 before); 15 counties.
+    cc: 'EE', country: 'Q191', langs: ['et'],
+    levels: [
+      { key: 'maakond', classes: ['Q189672'], level: 1, type: 'county', typeLocal: 'maakond', expected: [15, 15] },
+      { key: 'omavalitsus', classes: ['Q28122896', 'Q21583365'], level: 2, type: 'municipality', typeLocal: 'vald / linn', expected: [78, 79] },
+    ],
+  },
+  {
     cc: 'LU', country: 'Q32', langs: ['lb', 'fr', 'de'],
     levels: [
       { key: 'canton', classes: ['Q1146429'], level: 1, type: 'canton', typeLocal: 'kanton / canton', expected: [12, 12] },
