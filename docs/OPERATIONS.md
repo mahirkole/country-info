@@ -28,6 +28,8 @@ npm run enrich:cldr                      # CLDR (Unicode License v3): ülke adla
 ```
 Çıkış kodu 1: en az bir kaynak `failed`/`needs_review` (veya lisans `changed`/`error`).
 
+**Dışa aktarım:** `regions.ndjson` country/holiday dışındaki tüm kayıtları (division, NUTS, GeoNames bölge/şehir) içerir; her kayıt `source_id` taşır (atıf metni için `ATTRIBUTION.md` / `/v1/sources`).
+
 **Aylık zincir:** `refresh.yml` her ayın 1'inde (ve elle çalıştırmada) `enrich:wikidata`, `enrich:cldr`, `link` çalıştırır; hata bu adımlarda uyarı olarak raporlanır, refresh sonucunu gizlemez.
 
 **Wikidata zenginleştirme:** `enrich:wikidata` `entity_xrefs` (QID; `value` NULL = arandı, tekil eşleşme yok) ve `entity_names` (çok dilli ad) tablolarını doldurur; ≤1 istek/sn, 429'da `Retry-After`. Aylık çalıştırılır; zincir ayrıca `wd-*` katman QID'lerini xref'e yazar, `link` ile QID bağlarını yeniler ve ISO 3166-2 kodlarını (P300) ekler (ilk tam çalıştırma ≈ 112 bin sorgu kalemi, birkaç dakika). Wikidata topluluk verisidir (`source_class=community`, CC0); resmi kaynağın alanlarını ezmez, ayrı tabloda tutulur. Ardından `link` QID üzerinden GeoNames↔NUTS↔ulusal bağları ekler.

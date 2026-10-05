@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile, appendFile, cp, rm } from 'node:fs/promises
 import { join } from 'node:path';
 import type pg from 'pg';
 
-const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data';
+const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data, source_id';
 
 const csvCell = (v: unknown): string => {
   if (v === null || v === undefined) return '';
