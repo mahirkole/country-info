@@ -366,4 +366,15 @@ d('database', () => {
     expect((await app.inject({ method: 'DELETE', url: `/v1/api-keys/${id}`, headers: admin })).statusCode).toBe(404);
     await app.close();
   });
+
+  it('shares rate-limit counters through Postgres across app instances', async () => {
+    await pool.query('TRUNCATE rate_limits');
+    const mk = async () => buildApp(pool, { adminToken: 'tok', apiKeys: ['k1'], rateLimitPerMin: 3, rateLimitStore: 'postgres', exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    const [a, b] = [await mk(), await mk()]; // two "instances" on one database
+    const hit = (app: typeof a) => app.inject({ url: '/v1/countries', headers: { 'x-api-key': 'k1' } });
+    const codes = [(await hit(a)).statusCode, (await hit(b)).statusCode, (await hit(a)).statusCode, (await hit(b)).statusCode];
+    expect(codes).toEqual([200, 200, 200, 429]); // the 4th request is over the shared limit even though each instance saw only two
+    await a.close();
+    await b.close();
+  });
 });

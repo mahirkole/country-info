@@ -4,6 +4,8 @@ export const config = {
   adminToken: process.env.ADMIN_TOKEN ?? '',
   /** Comma-separated API keys; empty = open API. */
   apiKeys: (process.env.API_KEYS ?? '').split(',').map((k) => k.trim()).filter(Boolean),
+  /** 'postgres' shares rate-limit counters between API instances (default: per-process memory). */
+  rateLimitStore: process.env.RATE_LIMIT_STORE ?? 'memory',
   /** Require an API key on /v1/* even without API_KEYS (keys then come from the admin API). */
   requireApiKey: (process.env.REQUIRE_API_KEY ?? 'false') === 'true',
   /** Requests per key (or IP) per minute; 0 = unlimited. */

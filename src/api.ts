@@ -37,7 +37,7 @@ declare module 'fastify' {
   interface FastifyInstance { routeList: Set<string> }
 }
 
-export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; exportDir?: string; apiKeys?: string[]; rateLimitPerMin?: number; requireApiKey?: boolean } = {}): Promise<FastifyInstance> {
+export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; exportDir?: string; apiKeys?: string[]; rateLimitPerMin?: number; requireApiKey?: boolean; rateLimitStore?: string } = {}): Promise<FastifyInstance> {
   const adminToken = opts.adminToken ?? config.adminToken;
   const app = Fastify({ logger: false });
   const routes = new Set<string>();
@@ -47,6 +47,13 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   const sha = (k: string) => createHash('sha256').update(k).digest('hex');
   installAccessControl(app, {
     apiKeys: opts.apiKeys ?? config.apiKeys, perWindow: opts.rateLimitPerMin ?? config.rateLimitPerMin, adminToken, requireKey: opts.requireApiKey ?? config.requireApiKey,
+    store: (opts.rateLimitStore ?? config.rateLimitStore) === 'postgres'
+      ? async (bucket, start) => {
+          const r = await pool.query('INSERT INTO rate_limits (bucket, window_start, count) VALUES ($1, $2, 1) ON CONFLICT (bucket, window_start) DO UPDATE SET count = rate_limits.count + 1 RETURNING count', [bucket, start]);
+          if (Math.random() < 0.01) void pool.query('DELETE FROM rate_limits WHERE window_start < $1', [start - 300]).catch(() => undefined); // drop stale windows now and then
+          return r.rows[0].count as number;
+        }
+      : undefined,
     // Database-managed keys: looked up by hash, cached for 30 s so revocation takes effect quickly without a query per request.
     resolveKey: async (key) => {
       const h = sha(key);

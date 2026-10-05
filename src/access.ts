@@ -11,6 +11,8 @@ export interface AccessOptions {
   now?: () => number;
   /** Looks up a presented key that is not in `apiKeys` (e.g. database-managed keys); returns its id and own rate limit. */
   resolveKey?: (key: string) => Promise<{ id: string; ratePerMin: number | null } | null>;
+  /** Shared counter store (several API instances); default is per-process memory. Returns the count in the current window after incrementing. */
+  store?: (bucket: string, windowStartSec: number) => Promise<number>;
   /** Require a key on /v1/* even when `apiKeys` is empty (all keys then come from `resolveKey`). */
   requireKey?: boolean;
 }
@@ -44,15 +46,24 @@ export function installAccessControl(app: FastifyInstance, o: AccessOptions): vo
     if (limit <= 0) return;
     id = id || `ip:${req.ip}`;
     const t = now();
-    let b = buckets.get(id);
-    if (!b || t - b.start >= windowMs) {
-      b = { start: t, count: 0 };
-      buckets.set(id, b);
-      if (buckets.size > 10_000) for (const [k, v] of buckets) if (t - v.start >= windowMs) buckets.delete(k);
+    let count: number;
+    let reset: number;
+    if (o.store) {
+      const startSec = Math.floor(t / windowMs) * (windowMs / 1000);
+      count = await o.store(id, startSec);
+      reset = Math.max(1, Math.ceil(startSec + windowMs / 1000 - t / 1000));
+    } else {
+      let b = buckets.get(id);
+      if (!b || t - b.start >= windowMs) {
+        b = { start: t, count: 0 };
+        buckets.set(id, b);
+        if (buckets.size > 10_000) for (const [k, v] of buckets) if (t - v.start >= windowMs) buckets.delete(k);
+      }
+      b.count++;
+      count = b.count;
+      reset = Math.ceil((b.start + windowMs - t) / 1000);
     }
-    b.count++;
-    const reset = Math.ceil((b.start + windowMs - t) / 1000);
-    reply.header('x-ratelimit-limit', limit).header('x-ratelimit-remaining', Math.max(0, limit - b.count)).header('x-ratelimit-reset', reset);
-    if (b.count > limit) return reply.code(429).header('retry-after', reset).send({ error: 'rate_limited', retry_after_seconds: reset });
+    reply.header('x-ratelimit-limit', limit).header('x-ratelimit-remaining', Math.max(0, limit - count)).header('x-ratelimit-reset', reset);
+    if (count > limit) return reply.code(429).header('retry-after', reset).send({ error: 'rate_limited', retry_after_seconds: reset });
   });
 }
