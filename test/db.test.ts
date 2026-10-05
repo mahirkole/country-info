@@ -286,4 +286,34 @@ d('database', () => {
     expect(await readFile(join(out, 'latest/ATTRIBUTION.md'), 'utf8')).toMatch(/## t\n- Authority: test[\s\S]*Credit: Credit line for t/);
     expect((await readFile(join(out, 'latest/delta.ndjson'), 'utf8')).trim().split('\n')).toHaveLength(4);
   });
+
+  it('documents every /v1 route in the OpenAPI spec and nothing else', async () => {
+    const app = await buildApp(pool, { adminToken: 'tok', exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    await app.ready();
+    const spec = (await app.inject('/openapi.json')).json() as { paths: Record<string, Record<string, unknown>> };
+    const documented = new Set(Object.entries(spec.paths).flatMap(([p, ms]) => Object.keys(ms).map((m) => `${m} ${p.replace(/\{(\w+)\}/g, ':$1')}`)));
+    const registered = new Set([...app.routeList].filter((r) => r.split(' ')[1]!.startsWith('/v1/')));
+    expect([...registered].filter((r) => !documented.has(r))).toEqual([]);
+    expect([...documented].filter((r) => !registered.has(r))).toEqual([]);
+    await app.close();
+  });
+
+  it('enforces API keys and rate limits on /v1 only, accepts the admin token, and reports limit headers', async () => {
+    const app = await buildApp(pool, { adminToken: 'tok', apiKeys: ['k1'], rateLimitPerMin: 3, exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    expect((await app.inject('/v1/countries')).statusCode).toBe(401);
+    expect((await app.inject({ url: '/v1/countries', headers: { 'x-api-key': 'wrong' } })).statusCode).toBe(401);
+    const ok = await app.inject({ url: '/v1/countries', headers: { 'x-api-key': 'k1' } });
+    expect(ok.statusCode).toBe(200);
+    expect(ok.headers['x-ratelimit-limit']).toBe('3');
+    expect(ok.headers['x-ratelimit-remaining']).toBe('2');
+    expect((await app.inject({ url: '/v1/countries', headers: { authorization: 'Bearer k1' } })).statusCode).toBe(200);
+    expect((await app.inject({ url: '/v1/countries', headers: { 'x-api-key': 'k1' } })).statusCode).toBe(200);
+    const limited = await app.inject({ url: '/v1/countries', headers: { 'x-api-key': 'k1' } });
+    expect(limited.statusCode).toBe(429);
+    expect(Number(limited.headers['retry-after'])).toBeGreaterThan(0);
+    expect((await app.inject({ url: '/v1/review-items', headers: { authorization: 'Bearer tok' } })).statusCode).toBe(200); // admin token is a valid key and its own bucket
+    expect((await app.inject('/healthz')).statusCode).toBe(200);
+    expect((await app.inject('/openapi.json')).statusCode).toBe(200);
+    await app.close();
+  });
 });

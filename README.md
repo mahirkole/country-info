@@ -54,6 +54,10 @@ GET  /v1/holidays/coverage       # ülke başına doğrulanmış/doğrulanmamı�
 GET  /v1/review-items            # (admin) belirsiz eşlemeler
 GET  /v1/snapshots
 GET  /v1/changes?since=<seq>&until=&country=TR,DE&kind=&limit=   # delta akışı
+GET  /openapi.json              (OpenAPI 3 açıklaması; her /v1 rotası test ile belgede zorunlu)
+
+Erişim: `API_KEYS=k1,k2` ayarlanırsa `/v1/*` için `x-api-key` (veya `Authorization: Bearer <anahtar>`) gerekir; boşsa API açıktır. `RATE_LIMIT_PER_MIN` (varsayılan 600, 0 = sınırsız) anahtar (yoksa IP) başına dakikalık sınır; yanıtlarda `X-RateLimit-*`, aşımda `429` + `Retry-After`. Sınırlayıcı süreç içidir (çok örnekte önüne paylaşımlı sınırlayıcı koyun). `ADMIN_TOKEN` her zaman geçerli anahtardır.
+
 POST /v1/webhooks   {url, countries?, kinds?}   (Authorization: Bearer $ADMIN_TOKEN; secret yalnızca yanıtta görünür)
 GET/DELETE /v1/webhooks[/:id]
 GET  /files/manifest.json, /files/latest/*, /files/snapshots/<id>/*

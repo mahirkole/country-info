@@ -5,6 +5,8 @@ import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type pg from 'pg';
 import { config } from './config.js';
+import { installAccessControl } from './access.js';
+import { openApiSpec } from './openapi.js';
 
 const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data, source_id, updated_seq';
 const MAX_LIMIT = 1000;
@@ -30,15 +32,24 @@ function page(q: { limit?: string; after?: string }) {
   return { limit, after: q.after ?? '' };
 }
 
-export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; exportDir?: string } = {}): Promise<FastifyInstance> {
+declare module 'fastify' {
+  interface FastifyInstance { routeList: Set<string> }
+}
+
+export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; exportDir?: string; apiKeys?: string[]; rateLimitPerMin?: number } = {}): Promise<FastifyInstance> {
   const adminToken = opts.adminToken ?? config.adminToken;
   const app = Fastify({ logger: false });
+  const routes = new Set<string>();
+  app.addHook('onRoute', (r) => { for (const m of [r.method].flat()) if (m !== 'HEAD' && m !== 'OPTIONS') routes.add(`${m.toLowerCase()} ${r.url}`); });
+  app.decorate('routeList', routes);
+  installAccessControl(app, { apiKeys: opts.apiKeys ?? config.apiKeys, perWindow: opts.rateLimitPerMin ?? config.rateLimitPerMin, adminToken });
 
   const requireAdmin = async (req: { headers: Record<string, unknown> }, reply: { code: (n: number) => { send: (b: unknown) => unknown } }) => {
     if (!adminToken || req.headers['authorization'] !== `Bearer ${adminToken}`) return reply.code(401).send({ error: 'unauthorized' });
   };
 
   app.get('/healthz', async () => ({ ok: true }));
+  app.get('/openapi.json', async () => openApiSpec());
 
   // ---- countries -------------------------------------------------------
   app.get<{ Querystring: { limit?: string; after?: string; un_status?: string; continent?: string } }>('/v1/countries', async (req) => {
