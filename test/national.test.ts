@@ -340,3 +340,19 @@ describe('JP adapter', () => {
     expect(() => parseMic([{ name: 'x', rows: [['bad']] }, { name: 'y', rows: [] }])).toThrow(/header changed/);
   });
 });
+
+import { mapBdl, type BdlUnit } from '../src/sources/national/pl.js';
+describe('PL adapter', () => {
+  const u = (id: string, name: string, parentId: string, level: number, kind?: string): BdlUnit => ({ id, name, parentId, level, kind });
+  it('builds województwo > powiat > gmina, drops parts of urban-rural gminas and rejects a broken layout', () => {
+    const v = Array.from({ length: 16 }, (_, i) => u(`${String(i + 1).padStart(2, '0')}${String(i + 1).padStart(2, '0')}00000000`, `WOJ${i}`, '010000000000', 2));
+    const p = Array.from({ length: 380 }, (_, i) => u(`${v[i % 16]!.id.slice(0, 4)}${String(i).padStart(3, '0')}001000`.slice(0, 12), `Powiat ${i}`, v[i % 16]!.id, 5, i === 0 ? '2' : '1'));
+    const g = Array.from({ length: 2500 }, (_, i) => u(`${p[i % 380]!.id.slice(0, 9)}${String(i % 900).padStart(3, '0')}`, `G${i}`, p[i % 380]!.id, 6, '2'));
+    g.push(u('x1', 'Łazy - miasto', g[0]!.id, 6, '4'), u('x2', 'Bielany - dzielnica', g[0]!.id, 6, '8'));
+    const e = mapBdl(v, p, g);
+    expect(e.find((x) => x.id === `div:PL:woj-${v[0]!.id}`)).toMatchObject({ name: 'Woj0', parent_id: 'country:PL' });
+    expect(e.find((x) => x.id === `div:PL:pow-${p[0]!.id}`)).toMatchObject({ parent_id: `div:PL:woj-${v[0]!.id}`, data: { type_local: 'miasto na prawach powiatu' } });
+    expect(e.some((x) => x.name.includes('miasto') || x.name.includes('dzielnica'))).toBe(false);
+    expect(() => mapBdl(v, p.slice(0, 20), g)).toThrow(/layout changed/);
+  });
+});
