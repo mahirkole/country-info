@@ -1,11 +1,12 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import fastifyStatic from '@fastify/static';
-import { randomBytes } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type pg from 'pg';
 import { config } from './config.js';
 import { installAccessControl } from './access.js';
+
 import { openApiSpec } from './openapi.js';
 
 const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data, source_id, updated_seq';
@@ -36,13 +37,28 @@ declare module 'fastify' {
   interface FastifyInstance { routeList: Set<string> }
 }
 
-export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; exportDir?: string; apiKeys?: string[]; rateLimitPerMin?: number } = {}): Promise<FastifyInstance> {
+export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; exportDir?: string; apiKeys?: string[]; rateLimitPerMin?: number; requireApiKey?: boolean } = {}): Promise<FastifyInstance> {
   const adminToken = opts.adminToken ?? config.adminToken;
   const app = Fastify({ logger: false });
   const routes = new Set<string>();
   app.addHook('onRoute', (r) => { for (const m of [r.method].flat()) if (m !== 'HEAD' && m !== 'OPTIONS') routes.add(`${m.toLowerCase()} ${r.url}`); });
   app.decorate('routeList', routes);
-  installAccessControl(app, { apiKeys: opts.apiKeys ?? config.apiKeys, perWindow: opts.rateLimitPerMin ?? config.rateLimitPerMin, adminToken });
+  const keyCache = new Map<string, { at: number; v: { id: string; ratePerMin: number | null } | null }>();
+  const sha = (k: string) => createHash('sha256').update(k).digest('hex');
+  installAccessControl(app, {
+    apiKeys: opts.apiKeys ?? config.apiKeys, perWindow: opts.rateLimitPerMin ?? config.rateLimitPerMin, adminToken, requireKey: opts.requireApiKey ?? config.requireApiKey,
+    // Database-managed keys: looked up by hash, cached for 30 s so revocation takes effect quickly without a query per request.
+    resolveKey: async (key) => {
+      const h = sha(key);
+      const hit = keyCache.get(h);
+      if (hit && Date.now() - hit.at < 30_000) return hit.v;
+      const row = (await pool.query('SELECT id, rate_per_min FROM api_keys WHERE key_hash = $1 AND active', [h])).rows[0];
+      const v = row ? { id: String(row.id), ratePerMin: row.rate_per_min as number | null } : null;
+      keyCache.set(h, { at: Date.now(), v });
+      if (v) void pool.query('UPDATE api_keys SET last_used_at = now() WHERE id = $1', [row.id]).catch(() => undefined);
+      return v;
+    },
+  });
 
   const requireAdmin = async (req: { headers: Record<string, unknown> }, reply: { code: (n: number) => { send: (b: unknown) => unknown } }) => {
     if (!adminToken || req.headers['authorization'] !== `Bearer ${adminToken}`) return reply.code(401).send({ error: 'unauthorized' });
@@ -286,6 +302,26 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     const last = data[data.length - 1];
     const head = Number((await pool.query('SELECT COALESCE(max(seq),0) AS s FROM changes')).rows[0].s);
     return { data, has_more: more, next_seq: last ? Number(last.seq) : since, head_seq: head };
+  });
+
+  // ---- API keys (admin) ------------------------------------------------
+  app.post<{ Body: { name?: string; rate_per_min?: number } }>('/v1/api-keys', { preHandler: requireAdmin }, async (req, reply) => {
+    const name = req.body?.name?.trim();
+    if (!name) return reply.code(400).send({ error: 'name is required' });
+    const rate = req.body.rate_per_min;
+    if (rate !== undefined && (!Number.isInteger(rate) || rate < 0)) return reply.code(400).send({ error: 'rate_per_min must be a non-negative integer (0 = unlimited)' });
+    const key = `ci_${randomBytes(24).toString('hex')}`;
+    const row = (await pool.query('INSERT INTO api_keys (name, key_hash, rate_per_min) VALUES ($1, $2, $3) RETURNING id, name, rate_per_min, created_at', [name, sha(key), rate ?? null])).rows[0];
+    return reply.code(201).send({ ...row, id: Number(row.id), key }); // the key is shown only here
+  });
+  app.get('/v1/api-keys', { preHandler: requireAdmin }, async () => ({
+    data: (await pool.query('SELECT id, name, rate_per_min, active, created_at, last_used_at FROM api_keys ORDER BY id')).rows,
+  }));
+  app.delete<{ Params: { id: string } }>('/v1/api-keys/:id', { preHandler: requireAdmin }, async (req, reply) => {
+    const r = await pool.query('UPDATE api_keys SET active = false WHERE id = $1 AND active RETURNING key_hash', [req.params.id]);
+    if (!r.rowCount) return reply.code(404).send({ error: 'not_found' });
+    keyCache.delete(r.rows[0].key_hash);
+    return { ok: true };
   });
 
   // ---- webhooks (admin) -----------------------------------------------

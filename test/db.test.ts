@@ -340,4 +340,30 @@ d('database', () => {
     await expect(new CountryInfo({ baseUrl: 'http://x', apiKey: 'bad', fetchFn: via }).country('TR')).rejects.toBeInstanceOf(ApiError);
     await app.close();
   });
+
+  it('manages API keys through the admin API: create once, per-key limit, revoke, require-key mode', async () => {
+    await pool.query('TRUNCATE api_keys RESTART IDENTITY');
+    const app = await buildApp(pool, { adminToken: 'tok', requireApiKey: true, rateLimitPerMin: 1000, exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    const admin = { authorization: 'Bearer tok' };
+    expect((await app.inject('/v1/countries')).statusCode).toBe(401); // require-key mode, no key
+    expect((await app.inject({ method: 'POST', url: '/v1/api-keys', payload: { name: 'x' } })).statusCode).toBe(401);
+    expect((await app.inject({ method: 'POST', url: '/v1/api-keys', headers: admin, payload: {} })).statusCode).toBe(400);
+    const created = await app.inject({ method: 'POST', url: '/v1/api-keys', headers: admin, payload: { name: 'acme', rate_per_min: 2 } });
+    expect(created.statusCode).toBe(201);
+    const { id, key } = created.json();
+    expect(key).toMatch(/^ci_[0-9a-f]{48}$/);
+    const stored = (await pool.query('SELECT key_hash FROM api_keys')).rows[0].key_hash as string;
+    expect(stored).not.toContain(key); // only the hash is stored
+    const use = () => app.inject({ url: '/v1/countries', headers: { 'x-api-key': key } });
+    expect((await use()).headers['x-ratelimit-limit']).toBe('2'); // the key's own limit
+    expect((await use()).statusCode).toBe(200);
+    expect((await use()).statusCode).toBe(429);
+    const listed = (await app.inject({ url: '/v1/api-keys', headers: admin })).json().data;
+    expect(listed).toMatchObject([{ name: 'acme', active: true }]);
+    expect(JSON.stringify(listed)).not.toContain(key);
+    expect((await app.inject({ method: 'DELETE', url: `/v1/api-keys/${id}`, headers: admin })).statusCode).toBe(200);
+    expect((await use()).statusCode).toBe(401); // revoked (cache entry dropped)
+    expect((await app.inject({ method: 'DELETE', url: `/v1/api-keys/${id}`, headers: admin })).statusCode).toBe(404);
+    await app.close();
+  });
 });

@@ -9,6 +9,10 @@ export interface AccessOptions {
   /** The admin token is always accepted as a key. */
   adminToken?: string;
   now?: () => number;
+  /** Looks up a presented key that is not in `apiKeys` (e.g. database-managed keys); returns its id and own rate limit. */
+  resolveKey?: (key: string) => Promise<{ id: string; ratePerMin: number | null } | null>;
+  /** Require a key on /v1/* even when `apiKeys` is empty (all keys then come from `resolveKey`). */
+  requireKey?: boolean;
 }
 
 interface Bucket { start: number; count: number }
@@ -28,11 +32,17 @@ export function installAccessControl(app: FastifyInstance, o: AccessOptions): vo
     if (!req.url.startsWith('/v1/')) return;
     const bearer = typeof req.headers['authorization'] === 'string' ? /^Bearer (.+)$/.exec(req.headers['authorization'])?.[1] : undefined;
     const presented = (typeof req.headers['x-api-key'] === 'string' ? req.headers['x-api-key'] : undefined) ?? bearer;
-    if (o.apiKeys.length > 0 && !(presented && keys.has(presented))) {
+    let id = presented && keys.has(presented) ? `key:${presented}` : '';
+    let limit = o.perWindow;
+    if (!id && presented && o.resolveKey) {
+      const k = await o.resolveKey(presented);
+      if (k) { id = `dbkey:${k.id}`; if (k.ratePerMin !== null) limit = k.ratePerMin; }
+    }
+    if ((o.apiKeys.length > 0 || o.requireKey) && !id) {
       return reply.code(401).send({ error: 'unauthorized', detail: 'send an API key in the x-api-key header or as a Bearer token' });
     }
-    if (o.perWindow <= 0) return;
-    const id = presented && keys.has(presented) ? `key:${presented}` : `ip:${req.ip}`;
+    if (limit <= 0) return;
+    id = id || `ip:${req.ip}`;
     const t = now();
     let b = buckets.get(id);
     if (!b || t - b.start >= windowMs) {
@@ -42,7 +52,7 @@ export function installAccessControl(app: FastifyInstance, o: AccessOptions): vo
     }
     b.count++;
     const reset = Math.ceil((b.start + windowMs - t) / 1000);
-    reply.header('x-ratelimit-limit', o.perWindow).header('x-ratelimit-remaining', Math.max(0, o.perWindow - b.count)).header('x-ratelimit-reset', reset);
-    if (b.count > o.perWindow) return reply.code(429).header('retry-after', reset).send({ error: 'rate_limited', retry_after_seconds: reset });
+    reply.header('x-ratelimit-limit', limit).header('x-ratelimit-remaining', Math.max(0, limit - b.count)).header('x-ratelimit-reset', reset);
+    if (b.count > limit) return reply.code(429).header('retry-after', reset).send({ error: 'rate_limited', retry_after_seconds: reset });
   });
 }
