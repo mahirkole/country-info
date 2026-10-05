@@ -7,10 +7,13 @@ cd "$(dirname "$0")/../.."
 exec 9>"${CYCLE_LOCK:-/tmp/country-info-cycle.lock}"
 flock -n 9 || { echo "another cycle is running"; exit 0; }
 
+# Test/ops knobs: REFRESH_ARGS (default "--due"), SKIP_STEPS (space-separated step names to leave out, e.g. "check-licenses enrich").
 status=0
+skip() { [[ " ${SKIP_STEPS:-} " == *" $1 "* ]]; }
 # refresh and check-licenses alert for themselves (exit 1 = sources need attention); a crash (exit >= 2) or any other failing step is alerted below.
 step() { # step <name> <command...>: run, remember failure, keep going
   local name=$1; shift
+  if skip "$name"; then echo "::: $name (skipped)"; return; fi
   echo "::: $name"
   "$@"; local rc=$?
   if [ $rc -ne 0 ]; then
@@ -21,12 +24,12 @@ step() { # step <name> <command...>: run, remember failure, keep going
 
 step migrate        npm run -s migrate
 step check-licenses npm run -s check:licenses
-step refresh        npm run -s refresh -- --due
-if [ "$(date -u +%d)" = "01" ]; then
+step refresh        npm run -s refresh -- ${REFRESH_ARGS:---due}
+if [ "$(date -u +%d)" = "01" ] || [ -n "${FORCE_MONTHLY:-}" ]; then
   # Incremental; a failure here is reported but does not stop publishing.
   step enrich-wikidata npm run -s enrich:wikidata
   step enrich-cldr     npm run -s enrich:cldr
-  step link            npm run -s link
+  step link            npm run -s link  # skip all three with SKIP_STEPS="enrich-wikidata enrich-cldr link"
 fi
 step publish        npm run -s publish
 step digest         npm run -s digest
