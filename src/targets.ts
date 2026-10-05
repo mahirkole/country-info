@@ -32,7 +32,7 @@ const NUTS_COUNTRIES = [...EU27, 'TR'];
 const nationalTargets = (): RefreshTarget[] => {
   const info: Record<string, { cadence: Cadence; rows: [number, number]; licenseUrls: string[]; verdict: Verdict; commercial: string }> = {
     US: { cadence: 'annual', rows: [3000, 3600], licenseUrls: ['https://www.census.gov/about/policies/open-gov/open-data.html'], verdict: 'amber', commercial: 'federal government work (17 U.S.C. § 105); page statement not located' },
-    FR: { cadence: 'monthly', rows: [30000, 40000], licenseUrls: ['https://api.gouv.fr/les-api/api-geo'], verdict: 'amber', commercial: 'Open Data per api.gouv.fr; INSEE licence text not located' },
+    FR: { cadence: 'monthly', rows: [35000, 41000], licenseUrls: ['https://www.insee.fr/fr/information/2008466'], verdict: 'green', commercial: 'Licence Ouverte 2.0 (INSEE): commercial reuse allowed with "Source : Insee" + last-update date, no alteration of meaning; docs/licenses/nat-fr.md' },
     IT: { cadence: 'monthly', rows: [7500, 8600], licenseUrls: ['https://www.istat.it/note-legali/'], verdict: 'green', commercial: 'CC BY 4.0 (ISTAT Note legali)' },
     NL: { cadence: 'annual', rows: [300, 420], licenseUrls: ['https://www.cbs.nl/en-gb/about-us/website/copyright'], verdict: 'amber', commercial: 'CC BY 4.0 for website content; table-specific text not located' },
     SE: { cadence: 'annual', rows: [300, 330], licenseUrls: ['https://www.scb.se/en/services/open-data-api/', 'https://statistikdatabasen.scb.se/api/v2/config'], verdict: 'green', commercial: 'CC0 (SCB open data): use, disseminate and sell without attribution; see docs/licenses/nat-se.md' },

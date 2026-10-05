@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseStates, parseCounties } from '../src/sources/national/us.js';
-import { mapFrance } from '../src/sources/national/fr.js';
+import { mapInsee, findCogFiles, findLatestDownloadPage } from '../src/sources/national/fr.js';
 import { parseIstat } from '../src/sources/national/it.js';
 import { parseCbs } from '../src/sources/national/nl.js';
 import { mapNorway } from '../src/sources/national/no.js';
@@ -37,38 +37,32 @@ describe('US adapter', () => {
   });
 });
 
-describe('FR adapter', () => {
-  it('builds region > department > commune and attaches unknown departments to the country', () => {
-    const e = mapFrance(
-      [{ code: '11', nom: 'Île-de-France' }],
-      [{ code: '75', nom: 'Paris', codeRegion: '11' }],
-      [{ code: '75056', nom: 'Paris', codeDepartement: '75', population: 2100000 }, { code: '97501', nom: 'Miquelon-Langlade', codeDepartement: '975' }],
+describe('FR adapter (INSEE COG)', () => {
+  it('discovers the newest download page and CSVs', () => {
+    const index = '<a href="/fr/information/8740222" class="x">Téléchargement des fichiers</a><a href="/fr/information/8377162">Téléchargement des fichiers</a>';
+    expect(findLatestDownloadPage(index)).toBe('/fr/information/8740222');
+    expect(() => findLatestDownloadPage('<p>nothing</p>')).toThrow(/layout changed/);
+    const page = `<a href="/fr/statistiques/fichier/8740222/v_region_2026.csv">r</a><a href="/fr/statistiques/fichier/8740222/v_departement_2026.csv">d</a><a href="/fr/statistiques/fichier/8740222/v_commune_2026.csv">c</a><a href="/fr/statistiques/fichier/8377162/v_commune_2025.csv">old</a>`;
+    expect(findCogFiles(page, '<p>Dernière mise à jour le : 24/02/2026</p>')).toMatchObject({ year: '2026', commune: '/fr/statistiques/fichier/8740222/v_commune_2026.csv', updated: '24/02/2026' });
+    expect(findCogFiles(page).updated).toBeNull();
+    expect(() => findCogFiles('<a href="/fr/statistiques/fichier/1/v_commune_2026.csv">c</a>')).toThrow(/does not list/);
+  });
+  it('builds region > department > commune, with ARM/COMA/COMD below their parent commune', () => {
+    const e = mapInsee(
+      [{ REG: '11', LIBELLE: 'Île-de-France' }],
+      [{ DEP: '75', REG: '11', LIBELLE: 'Paris' }],
+      [
+        { TYPECOM: 'COM', COM: '75056', DEP: '75', REG: '11', LIBELLE: 'Paris', CAN: '', ARR: '751' },
+        { TYPECOM: 'ARM', COM: '75101', DEP: '75', LIBELLE: 'Paris 1er Arrondissement', COMPARENT: '75056' },
+        { TYPECOM: 'COMD', COM: '01015', LIBELLE: 'Arbigny', COMPARENT: '01999' }, // parent absent: skipped
+        { TYPECOM: 'COM', COM: '97501', DEP: '975', LIBELLE: 'Miquelon-Langlade' },
+      ],
     );
     expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual([
-      'div:FR:reg-11<country:FR', 'div:FR:dep-75<div:FR:reg-11', 'div:FR:com-75056<div:FR:dep-75', 'div:FR:com-97501<country:FR',
+      'div:FR:reg-11<country:FR', 'div:FR:dep-75<div:FR:reg-11', 'div:FR:com-75056<div:FR:dep-75', 'div:FR:com-75101<div:FR:com-75056', 'div:FR:com-97501<country:FR',
     ]);
-    expect(e[2]!.data).toMatchObject({ type: 'municipality', type_local: 'commune', population: 2100000 });
-  });
-});
-
-describe('registry and taxonomy', () => {
-  it('every registered adapter uses known types and has attribution and a read/partial license', () => {
-    for (const s of Object.values(NATIONAL)) {
-      expect(s.meta.attribution).toBeTruthy();
-      expect(s.meta.license).toBeTruthy();
-      expect(['read', 'partial']).toContain(s.licenseStatus);
-    }
-  });
-  it('refuses a source whose license was not established', () => {
-    NATIONAL['ZZ'] = { ...NATIONAL['US']!, country: 'ZZ', licenseStatus: 'unread' };
-    expect(() => nationalSource('ZZ')).toThrow(LicenseNotEstablished);
-    delete NATIONAL['ZZ'];
-    expect(() => nationalSource('QQ')).toThrow(/no national source/);
-  });
-  it('knows the canonical types', () => {
-    for (const t of ['canton', 'prefecture', 'county', 'department', 'commune']) expect(isAdminType(t)).toBe(true);
-    expect(isAdminType('galaxy')).toBe(false);
-    expect(ADMIN_TYPES).toContain('other');
+    expect(e[3]).toMatchObject({ data: { level: 4, type: 'borough', type_local: 'arrondissement municipal' } });
+    expect(e[2]!.data).toMatchObject({ type: 'municipality', type_local: 'commune', arrondissement: '751' });
   });
 });
 

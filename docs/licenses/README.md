@@ -10,7 +10,7 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | **un-m49** | **🔴** | BM şartları: ticari olmayan, yeniden satış/türev yok → **izin gelmeden kullanılmaz** |
 | iana-tld | 🟡 | CC0 beyanı TLD listesini kapsamıyor → yazışma |
 | nat-us | 🟡 | Federal eser (17 U.S.C. § 105); FTP için açık ticari cümle yok |
-| nat-fr | 🟡 | INSEE Licence Ouverte 2.0 (ticari serbest) ajan tarafından okundu, ben etalab metnini bağımsız doğrulayamadım; **INSEE'den doğrudan alma** önerisi |
+| nat-fr | 🟢 | **INSEE COG CSV'leri** (Licence Ouverte 2.0; INSEE sayfası + Etalab metni bağımsız okundu): ticari serbest, "Source : Insee" + güncelleme tarihi; geo.api.gouv.fr bırakıldı |
 | nat-it | 🟢 | ISTAT CC BY 4.0. **Veri tazeliği:** CSV bayat (Ocak 2024), xlsx kullanılıyor |
 | nat-nl | 🟡 | CBS tablo metaverisi "mits CBS als bron"; CC BY 4.0 site geneli |
 | nat-no | 🟢 | CC BY 4.0 (veri seti kayıtları); API kaydı "Arkivert"; yeni host api.kartverket.no |

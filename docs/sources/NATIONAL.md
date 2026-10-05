@@ -9,7 +9,7 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 | Ülke | Kaynak | Seviyeler | Erişim | Lisans | Durum |
 |---|---|---|---|---|---|
 | US | Census Bureau ANSI/FIPS codes 2020 | state, county (+parish, borough, independent city, municipio) | ✅ | partial (17 U.S.C. § 105; sayfada açık "public domain" ifadesi bulunamadı) | **Yüklü: 3.292 birim** |
-| FR | INSEE COG via geo.api.gouv.fr | region, department, commune | ✅ (proxy'de kesintili, yeniden deneme var) | partial ("Toutes les données… Open Data"; INSEE lisans metni bulunamadı; API OSM ortağını da listeliyor, yalnızca INSEE adları/kodları/nüfusu alınıyor) | **Yüklü: 35.088 birim** |
+| FR | INSEE Code officiel géographique 2026 (CSV; en yeni sayfa otomatik keşfedilir) | région, département, commune (+ arrondissement municipal, commune associée/déléguée) | ✅ | **read** (Licence Ouverte 2.0) | **Yüklü: 37.031** (18 / 101 / 34.875 / alt: 1.521 déléguée, 471 associée, 45 ARM) |
 | CH | BFS Amtliches Gemeindeverzeichnis (`agvchapp.bfs.admin.ch/api/communes/snapshot`) | canton, district, municipality (hiyerarşi içinde) | ✅ | **unread:** opendata.swiss paket metaverisinde lisans alanı boş; 4 kullanım şartından hangisi olduğu okunamadı | **Bloklu** (lisans) |
 | IT | ISTAT Elenco dei comuni italiani (**xlsx**, güncel; CSV bayat) | region, province/UTS, comune (+ NUTS 2024) | ✅ | **read** (CC BY 4.0) | **Yüklü: 8.024** (20 / 110 / 7.894; 21.02.2026 durumu, Sardinya yeniden yapılanması delta olarak yakalandı) |
 | JP | MIC/Soumu 全国地方公共団体コード (xlsx) | prefecture, municipality | ✅ | okunmadı | Sırada (xlsx ayrıştırıcı gerekir) |
