@@ -10,7 +10,7 @@ flock -n 9 || { echo "another cycle is running"; exit 0; }
 # Test/ops knobs: REFRESH_ARGS (default "--due"), SKIP_STEPS (space-separated step names to leave out, e.g. "check-licenses enrich").
 status=0
 skip() { [[ " ${SKIP_STEPS:-} " == *" $1 "* ]]; }
-# refresh and check-licenses alert for themselves (exit 1 = sources need attention); a crash (exit >= 2) or any other failing step is alerted below.
+# refresh, check-licenses and check-holiday-law alert for themselves (exit 1 = sources need attention); a crash (exit >= 2) or any other failing step is alerted below.
 step() { # step <name> <command...>: run, remember failure, keep going
   local name=$1; shift
   if skip "$name"; then echo "::: $name (skipped)"; return; fi
@@ -18,7 +18,7 @@ step() { # step <name> <command...>: run, remember failure, keep going
   "$@"; local rc=$?
   if [ $rc -ne 0 ]; then
     echo "!!! $name failed (exit $rc)"; status=1
-    if [ $rc -ge 2 ] || { [ "$name" != refresh ] && [ "$name" != check-licenses ]; }; then failed="${failed:-} $name"; fi
+    if [ $rc -ge 2 ] || { [ "$name" != refresh ] && [ "$name" != check-licenses ] && [ "$name" != check-holiday-law ]; }; then failed="${failed:-} $name"; fi
   fi
 }
 

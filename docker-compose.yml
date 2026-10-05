@@ -1,0 +1,56 @@
+# Production-like stack: PostgreSQL + API + daily update cycle. Configure through .env (see .env.example).
+#   docker compose up -d                                   # API on :3000, cycle at 03:17 UTC
+#   docker compose run --rm -e CYCLE_ONCE=1 -e FORCE_MONTHLY=1 cycle   # first load (all sources are due, enrichment included) or a manual cycle
+x-app: &app
+  build: .
+  restart: unless-stopped
+  env_file: [.env]
+  environment:
+    DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/countryinfo
+    CACHE_DIR: /app/.cache
+    EXPORT_DIR: /app/out
+    PUBLISH_DIR: /app/publish
+  volumes:
+    - cache:/app/.cache
+    - export:/app/out
+    - publish:/app/publish
+  depends_on:
+    db: { condition: service_healthy }
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: countryinfo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d countryinfo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    <<: *app
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/countryinfo
+      CACHE_DIR: /app/.cache
+      EXPORT_DIR: /app/out
+      PUBLISH_DIR: /app/publish
+      PORT: "3000"
+
+  cycle:
+    <<: *app
+    command: ["bash", "scripts/cron/loop.sh"]
+    healthcheck:
+      disable: true
+
+volumes:
+  pgdata:
+  cache:
+  export:
+  publish:

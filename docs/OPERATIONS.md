@@ -74,3 +74,15 @@ Sıklıklar: GeoNames haftalık; GISCO NUTS/LAU, US, NL yıllık; FR, IT, NO, ta
 `ingest` (geonames) → `refresh --source gisco-nuts,gisco-lau,nat-*` → `ingest:holidays` → `link` → `export`. `refresh` hepsini kapsar; `link` ve `export` ayrı çalıştırılır.
 
 **Gerçek S3 doğrulaması:** `scripts/dev/s3-e2e.sh` imzayı denetleyen bağımsız bir S3 uygulamasına (moto) karşı `S3Store`'u dener; presigned imza boto3 çıktısıyla aynı ürettiği için doğrulanır. Üretimde ilk yayından önce kendi depolamanıza karşı `npm run publish -- --profile commercial` + `GET /v1/exports/latest` ile bir kez deneyin.
+
+
+## Kurulum (Docker Compose)
+`Dockerfile` (node:22-slim, TypeScript'i `tsx` ile çalıştırır) ve `docker-compose.yml` üç servis kurar: `db` (PostgreSQL 16, kalıcı `pgdata` hacmi), `api` (`migrate` + `serve`, :3000, `/healthz` sağlık kontrolü, teslimat işçisi de burada çalışır) ve `cycle` (`scripts/cron/loop.sh`: her gün `CYCLE_AT` (UTC, varsayılan 03:17) `run-cycle.sh` çalıştırır; ana makinede cron gerekmez, `flock` aynı anda tek döngüye izin verir). Önbellek, dışa aktarım ve yayın dizinleri adlandırılmış hacimlerdedir.
+```
+cp .env.example .env            # POSTGRES_PASSWORD, ADMIN_TOKEN, FILE_SIGNING_SECRET ... doldurun (.env commit edilmez)
+docker compose up -d --build     # API http://localhost:3000, /openapi.json, /v1/status
+docker compose run --rm -e CYCLE_ONCE=1 -e FORCE_MONTHLY=1 cycle   # ilk yükleme: tüm kaynaklar "due", zenginleştirme dahil (uzun sürer)
+curl -s localhost:3000/v1/status
+```
+Anahtar oluşturma: `POST /v1/api-keys` (Bearer `ADMIN_TOKEN`). Güncelleme: `git pull && docker compose up -d --build` (migration'lar `api` açılışında uygulanır). Günlükler: `docker compose logs -f cycle`. Alarm: `NOTIFY_WEBHOOK_URL`.
+**Doğrulama notu (2026-10-05):** bu geliştirme ortamında Docker daemon çalışmıyor; `docker compose config` ile yapılandırma doğrulandı ve `bash -n`/YAML ayrıştırması yapıldı, ancak **imaj derlenip konteynerler çalıştırılmadı**. İlk gerçek kurulumda `docker compose up --build` ve ilk yükleme ayrıca denenmelidir.
