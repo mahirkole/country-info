@@ -343,16 +343,18 @@ describe('JP adapter', () => {
 
 import { mapBdl, type BdlUnit } from '../src/sources/national/pl.js';
 describe('PL adapter', () => {
-  const u = (id: string, name: string, parentId: string, level: number, kind?: string): BdlUnit => ({ id, name, parentId, level, kind });
-  it('builds województwo > powiat > gmina, drops parts of urban-rural gminas and rejects a broken layout', () => {
-    const v = Array.from({ length: 16 }, (_, i) => u(`${String(i + 1).padStart(2, '0')}${String(i + 1).padStart(2, '0')}00000000`, `WOJ${i}`, '010000000000', 2));
-    const p = Array.from({ length: 380 }, (_, i) => u(`${v[i % 16]!.id.slice(0, 4)}${String(i).padStart(3, '0')}001000`.slice(0, 12), `Powiat ${i}`, v[i % 16]!.id, 5, i === 0 ? '2' : '1'));
-    const g = Array.from({ length: 2500 }, (_, i) => u(`${p[i % 380]!.id.slice(0, 9)}${String(i % 900).padStart(3, '0')}`, `G${i}`, p[i % 380]!.id, 6, '2'));
-    g.push(u('x1', 'Łazy - miasto', g[0]!.id, 6, '4'), u('x2', 'Bielany - dzielnica', g[0]!.id, 6, '8'));
+  const u = (id: string, name: string): BdlUnit => ({ id, name });
+  it('builds województwo > powiat > gmina from current units, reading kind and powiat from the id', () => {
+    const v = Array.from({ length: 16 }, (_, i) => u(`${String(i + 1).padStart(2, '0')}${String(i + 1).padStart(2, '0')}00000000`, `WOJ${i}`));
+    const p = Array.from({ length: 380 }, (_, i) => u(`${v[i % 16]!.id.slice(0, 4)}${String(i).padStart(3, '0')}${String(i % 90).padStart(2, '0')}000`.slice(0, 9) + '000', i === 0 ? 'Powiat m. Kraków' : `Powiat p${i}`));
+    const g = Array.from({ length: 2480 }, (_, i) => u(`${p[i % 380]!.id.slice(0, 9)}${String(i % 90).padStart(2, '0')}${(i % 3) + 1}`, `G${i}`));
+    g.push(u(`${p[0]!.id.slice(0, 9)}994`, 'Łazy - miasto'), u(`${p[0]!.id.slice(0, 9)}998`, 'Bielany - dzielnica'));
     const e = mapBdl(v, p, g);
     expect(e.find((x) => x.id === `div:PL:woj-${v[0]!.id}`)).toMatchObject({ name: 'Woj0', parent_id: 'country:PL' });
-    expect(e.find((x) => x.id === `div:PL:pow-${p[0]!.id}`)).toMatchObject({ parent_id: `div:PL:woj-${v[0]!.id}`, data: { type_local: 'miasto na prawach powiatu' } });
+    expect(e.find((x) => x.id === `div:PL:pow-${p[0]!.id}`)).toMatchObject({ name: 'm. Kraków', data: { type_local: 'miasto na prawach powiatu' } });
+    expect(e.find((x) => x.id === `div:PL:gm-${g[1]!.id}`)).toMatchObject({ parent_id: `div:PL:pow-${p[1]!.id}`, data: { type_local: 'gmina wiejska' } });
     expect(e.some((x) => x.name.includes('miasto') || x.name.includes('dzielnica'))).toBe(false);
+    expect(e.filter((x) => x.data.level === 3)).toHaveLength(2480);
     expect(() => mapBdl(v, p.slice(0, 20), g)).toThrow(/layout changed/);
   });
 });
