@@ -221,6 +221,7 @@ d('license watch (db)', () => {
     const g = (id: string, name: string, parent: string) => ({ id, name, parent_id: parent, country_code: 'TR' });
     expect(suggestSuccessors([g('a', 'Merkez', 'p1')], [g('b', 'Merkez', 'p2')])).toEqual([]);
     expect(suggestSuccessors([g('a', 'Merkez', 'p1')], [g('b', 'Köy', 'p1')])).toEqual([]);
+    expect(suggestSuccessors([g('s', 'Aksu', 'p1')], [g('s1', 'Aksu Kuzey', 'p1'), g('s2', 'Aksu Güney', 'p1')])).toMatchObject([{ from: 's', relation: 'split_into', confidence: 0.6, to: [{ id: 's1' }, { id: 's2' }] }]);
     expect(suggestSuccessors([g('a', 'Aix', 'p1')], [g('b', 'Aix', 'p1')])).toMatchObject([{ from: 'a', relation: 'replaced_by', confidence: 0.9 }]); // new id, same name: the pair
   });
 });

@@ -4,7 +4,7 @@ export interface Gone { id: string; name: string; parent_id: string | null; coun
 export interface Suggestion {
   from: string;
   to: { id: string; name: string }[];
-  relation: 'replaced_by' | 'merged_into';
+  relation: 'replaced_by' | 'merged_into' | 'split_into';
   confidence: number;
 }
 
@@ -17,6 +17,7 @@ const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCa
  *  - same normalised name (id/code changed): replaced_by, 0.9
  *  - one name contains the other (≥ 4 chars, e.g. "Aix" -> "Aix-les-Bains"): replaced_by, 0.6
  *  - a new name that contains the names of ≥ 2 vanished units (a merger): merged_into, 0.6 for each of them
+ *  - a vanished name contained in ≥ 2 new names (a split, e.g. "Aksu" -> "Aksu Kuzey", "Aksu Güney"): split_into, 0.6 with all targets
  */
 export function suggestSuccessors(gone: Gone[], appeared: Gone[]): Suggestion[] {
   const out: Suggestion[] = [];
@@ -40,6 +41,8 @@ export function suggestSuccessors(gone: Gone[], appeared: Gone[]): Suggestion[] 
       const exact = grp.appeared.filter((a) => norm(a.name) === gn && a.id !== g.id);
       if (exact.length === 1) { used.add(g.id); out.push({ from: g.id, to: [{ id: exact[0]!.id, name: exact[0]!.name }], relation: 'replaced_by', confidence: 0.9 }); continue; }
       if (gn.length >= 4) {
+        const splits = grp.appeared.filter((a) => { const an = norm(a.name); return an !== gn && an.includes(gn); });
+        if (splits.length >= 2) { used.add(g.id); out.push({ from: g.id, to: splits.map((a) => ({ id: a.id, name: a.name })), relation: 'split_into', confidence: 0.6 }); continue; }
         const part = grp.appeared.filter((a) => { const an = norm(a.name); return an !== gn && (an.includes(gn) || (an.length >= 4 && gn.includes(an))); });
         if (part.length === 1) { used.add(g.id); out.push({ from: g.id, to: [{ id: part[0]!.id, name: part[0]!.name }], relation: 'replaced_by', confidence: 0.6 }); }
       }

@@ -201,7 +201,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     const item = (await pool.query("SELECT id, entity_id, field, b_value FROM review_items WHERE id = $1 AND status = 'open'", [req.params.id])).rows[0];
     if (!item) return reply.code(404).send({ error: 'not_found_or_closed' });
     if (action === 'accept') {
-      const m = /^successor:(replaced_by|merged_into)$/.exec(item.field);
+      const m = /^successor:(replaced_by|merged_into|split_into)$/.exec(item.field);
       if (!m) return reply.code(400).send({ error: 'only successor suggestions can be accepted' });
       for (const t of (item.b_value?.to ?? []) as { id: string }[]) {
         await pool.query(
