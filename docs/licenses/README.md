@@ -23,6 +23,7 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | nat-be | ⚪ | Statbel CAPTCHA, metin okunamadı → insan okuması |
 | nat-fi | 🟢 | Tilastokeskus CC BY 4.0, sınıflandırma API'si (308 belediye) |
 | nat-dk | 🟡 | DAWA kapandı (410); DAGI CC BY 4.0 ama hesap/kararsız uç nokta |
+| nat-gr | 🟢 | ELSTAT yeniden kullanım politikası: ticari dahil serbest, kaynak belirtme |
 | nat-lv | 🟢 | CSP politikası CC BY 4.0 (metaveri CC0; katı olan uygulanır) |
 | nat-si | 🟢 | SURS telif sayfası: ticari dahil serbest, atıf |
 | nat-hu | 🟢 | KSH CC BY 4.0 (özel talep çıkarımları hariç) |
