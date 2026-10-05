@@ -10,7 +10,8 @@
 | Alt bölgeler: admin1 (~3.9k) ve admin2 (~47k) – GeoNames | ✅ |
 | Ülke nitelikleri: para birimi, diller, telefon kodu, posta kodu biçimi, komşular, TLD | ✅ |
 | Snapshot + değişiklik günlüğü (delta), cursor tabanlı API | ✅ |
-| Webhook (HMAC imzalı, yeniden deneme, ülke filtresi) | ✅ |
+| Webhook (HMAC imzalı, yeniden deneme, ülke/tür/olay filtresi, müşteri başına abonelik, teslimat günlüğü, yeniden gönderme) | ✅ |
+| Sürüm notları, e-posta özeti, imzalı dosya paketleri (S3/yerel), üretim zamanlaması | ✅ |
 | Dosya dışa aktarım (JSON/CSV/NDJSON + manifest + sha256) | ✅ |
 | Çok kaynaklı ingest + provenance (`source_id`, `sources`), kaynaklar birbirini silmez | ✅ |
 | AB27 + Türkiye NUTS/İBBS (1.620 kayıt) ve AB27 LAU (≈95k belediye) – Eurostat GISCO | ✅ |
@@ -64,18 +65,29 @@ Python istemcisi (yalnızca standart kütüphane): `sdk/python/countryinfo` — 
 
 Webhook yükü (`snapshot.completed`): `source`, `source_ids`, `vintage` (kaynağın sürümü), `reason` (sürüm geçişiyse `vintage_change: …`), `from_seq`/`to_seq`, `totals`, `changes_by_country`, `changes_url`.
 
-POST /v1/webhooks   {url, countries?, kinds?}   (Authorization: Bearer $ADMIN_TOKEN; secret yalnızca yanıtta görünür)
+POST /v1/webhooks   {url, countries?, kinds?, events?}   (müşteri: kendi API anahtarıyla; admin: ADMIN_TOKEN ile hepsini yönetir; secret yalnızca yanıtta görünür)
 GET/DELETE /v1/webhooks[/:id]
-GET  /files/manifest.json, /files/latest/*, /files/snapshots/<id>/*
+GET  /v1/webhooks/:id/deliveries        teslimat günlüğü (durum, deneme, hata, yük)
+POST /v1/webhooks/:id/deliveries/:did/replay   teslimatı yeniden gönder
+POST /v1/webhooks/:id/test              webhook.test olayı kuyruğa alır
+GET  /v1/releases[/:id]                 insan okunur sürüm notları (yalnızca satışa uygun kaynaklar)
+GET  /v1/exports/latest                 anahtarın profili için en son dosya paketi + imzalı indirme bağlantıları
+GET  /files/manifest.json, /files/latest/*, /files/snapshots/<id>/*   (EXPORT_DIR'in ham, profilsiz dökümü; müşterilere /v1/exports/latest verin)
 ```
 
 ### Delta nasıl tüketilir
 `/v1/changes?since=0` ile başlayın; yanıttaki `next_seq` değerini saklayıp bir sonrakinde `since` olarak verin. Her kayıt `op` (`insert|update|delete`), `changed_fields` (ör. `name`, `data.population`), `before` ve `after` içerir.
 
 ### Webhook
-Her ingest sonrası değişiklik varsa abonelere `snapshot.completed` bildirimi gider (küçük gövde; veri `changes_url` ile çekilir). Başlıklar: `x-countryinfo-signature: sha256=HMAC(secret, "<timestamp>.<body>")`, `x-countryinfo-timestamp`, `x-countryinfo-delivery`. 2xx dışı yanıtta 30s·2ⁿ ile 8 denemeye kadar tekrar denenir.
+Olaylar: `snapshot.completed` (her ingest sonrası değişiklik varsa; küçük gövde, veri `changes_url` ile çekilir), `release.published` (sürüm notu üretildi: `release_id`, `title`, `totals`, `changes_by_country`, `release_url`), `release.retracted` (yayın geri çekildi), `webhook.test`. Abonelik `events` (varsayılan hepsi), `countries`, `kinds` ile süzülür. Başlıklar: `x-countryinfo-signature: sha256=HMAC(secret, "<timestamp>.<body>")`, `x-countryinfo-timestamp`, `x-countryinfo-delivery`, `x-countryinfo-event`. 2xx dışı yanıtta 30s·2ⁿ ile 8 denemeye kadar tekrar denenir; başarısızlar günlükten `replay` ile yeniden gönderilir. **Webhook yalnızca uyandırıcıdır:** kaçırılan bir teslimat veriyi kaybettirmez — son işlenen `to_seq` ile `/v1/changes?since=` çağırarak telafi edin.
 
-### Dosyalar
+### Sürüm notları ve e-posta
+Her uygulanan güncelleme için Markdown sürüm notu üretilir (ülke/tür sayıları, en çok değişen alanlar, örnek eklenen/silinen kayıtlar, vintage geçişi). `GET /v1/releases` yalnızca satışa uygun (green/amber) kaynakları gösterir. E-posta özeti: admin `POST /v1/release-subscribers {email, frequency: instant|weekly}`; `weekly` abone haftada bir özet alır, vintage geçişi/silme/büyük değişim anında gider (`npm run digest`, `MAIL_WEBHOOK_URL`).
+
+### Dosya paketleri (müşteri dağıtımı)
+`npm run publish` yeni snapshot'ları iki profille dışa aktarıp nesne depolamaya yükler: `commercial` (yalnızca satışa uygun kaynaklar; müşterilere) ve `full` (iç kullanım). Önce dosyalar, **en son** `manifest.json` yüklenir. Her snapshot'ın `delta.ndjson`'ı vardır; tam veri yalnızca en yeni snapshot'ta. Müşteri `GET /v1/exports/latest` ile kısa ömürlü (15 dk) imzalı bağlantıları alır (API anahtarının `export_profile`'ı belirler; `commercial` varsayılan). Depolama: `PUBLISH_STORE=fs` (yerel dizin, API `/dl/…` ile HMAC imzalı bağlantı) veya `s3` (S3 uyumlu: AWS, MinIO, R2; `S3_ENDPOINT/BUCKET/REGION/ACCESS_KEY/SECRET_KEY`). Geri alma: `npm run publish -- --rollback <snapshotId>`.
+
+### Dosyalar (ham dışa aktarım)
 `snapshots/<id>/` altında `countries.json`, `countries.csv`, `regions.ndjson`, `holidays.ndjson`, `holidays.csv`, `delta.ndjson`; `latest/` en son kopya; `manifest.json` boyut ve sha256 içerir.
 
 ## Lisans ve atıf

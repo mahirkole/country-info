@@ -36,8 +36,27 @@ npm run enrich:cldr                      # CLDR (Unicode License v3): ülke adla
 
 **İndirme önbelleği ve ham arşiv:** `refresh` her çalıştırmada yayıncıdan güncel veriyi ister ama koşullu GET kullanır (`If-None-Match` / `If-Modified-Since`; `.cache/<ad>.meta.json`): değişmeyen dosya 304 ile önbellekten gelir. Her çalıştırmanın okuduğu gövdeler içerik-adresli olarak `.cache/raw/<sha256>` altında saklanır (yeniden üretilebilirlik: `source_runs.raw_sha256` aynı gövdelerin birleşik özetidir); refresh sonunda en eski dosyalar `RAW_ARCHIVE_MAX_MB` (varsayılan 2048) sınırına kadar silinir.
 
-## Zamanlama
-`.github/workflows/refresh.yml` günlük çalışır: önce `check:licenses`, sonra `refresh --due`. Gerekli sır: `DATABASE_URL`. `ci.yml` her push'ta `tsc` + testler. Elle tetikleme: Actions → refresh → *Run workflow* (örn. `--source nat-it --force`).
+## Zamanlama (üretim)
+Zamanlanmış çalıştırma **üretim ortamında, API'nin yanında** yapılır (veritabanı internete açılmaz; GitHub Actions'ın 6 saat sınırı yok — PL kotası ve Wikidata uzun sürebilir). Tek giriş: `scripts/cron/run-cycle.sh`:
+
+`migrate` → `check:licenses` → `refresh --due` → (ayın 1'i) `enrich:wikidata`, `enrich:cldr`, `link` → `publish` → `digest`. Adımlar birbirini durdurmaz; her adımın çıkış kodu toplanır, başarısız adım `NOTIFY_WEBHOOK_URL`'e bildirilir. `flock` ile aynı anda tek döngü. Webhook teslimatını çalışan `serve` süreci yapar (15 sn'de bir; birden çok örnekte bile bir teslimat bir kez gider).
+
+```
+# /etc/cron.d/country-info  (günlük 03:17 UTC; ortam değişkenleri /etc/country-info.env)
+17 3 * * * app  set -a; . /etc/country-info.env; set +a; /srv/country-info/scripts/cron/run-cycle.sh >> /var/log/country-info-cycle.log 2>&1
+```
+systemd timer eşdeğeridir. `refresh.yml` artık yalnızca elle tetiklenir (`workflow_dispatch`: `--dry-run`/`check:sources` gibi veritabanı gerektirmeyen denetimler için); zamanlama kaldırıldı. `ci.yml` her push'ta `tsc` + testler.
+
+**Ortam değişkenleri (zincir):** `DATABASE_URL`, `NOTIFY_WEBHOOK_URL` (Slack/Teams uyumlu `{text}`), `MAIL_WEBHOOK_URL` + `MAIL_FROM` (e-posta sağlayıcısı bu URL'nin arkasına bağlanır: `POST {from,to,subject,text}`), `PUBLISH_STORE`/`PUBLISH_DIR`/`PUBLISH_PREFIX`, `S3_*`, `PUBLIC_BASE_URL`, `FILE_SIGNING_SECRET` (fs deposu + birden çok API örneği için zorunlu), `CYCLE_LOCK`.
+
+## Bildirim (operatöre)
+`refresh` sonunda tek özet: başarısız kaynak, ilk kez `needs_review` olan (aynı kaynağın ardışık tekrarı bir daha bildirilmez), lisans sayfası değişen, 7 günden fazla gecikmiş/engelli kaynak, **Eylül'den itibaren** bir sonraki yılı kapsamayan tatil ülkeleri (listeli günler — TR Diyanet bayramları vb. — her yıl elle girilir). Sessiz günde mesaj yok. Çıkış kodları: 1 = kaynak(lar) ilgi bekliyor (zaten bildirildi), 2 = çökme. `npm run cli -- notify "metin"` bildirim kanalını dener.
+
+## Müşterilere yayın
+1. **Webhook** (`snapshot.completed`, `release.published`, `release.retracted`): müşteri kendi API anahtarıyla abone olur (`POST /v1/webhooks`), kendi teslimat günlüğünü görür, `replay`/`test` yapar. Webhook yalnızca uyandırıcıdır; asıl veri `GET /v1/changes?since=<son to_seq>` ile alınır (kaçırılanları telafi eder).
+2. **Dosya paketleri:** `publish` (`commercial` + `full`). Yeni snapshot'lar için delta dosyaları, en yenisi için tam veri; manifest en son yüklenir. Müşteri: `GET /v1/exports/latest` (15 dk'lık imzalı bağlantılar, sha256 ile doğrulanır). `commercial` profil kapıları: kaynak green/amber **ve** `license_changed` değil; yükleme öncesi paket taranır, uygun olmayan kaynak kaydı bulunursa yayın durur.
+3. **Sürüm notu / e-posta:** her uygulanan snapshot için `release_notes`; `GET /v1/releases`; abonelere `digest` (haftalık veya anında). Vintage geçişi, silme içeren veya ≥500 kayıtlı güncellemeler "highlight"tır ve hemen gönderilir.
+**Geri alma:** `npm run publish -- --rollback <snapshotId>` manifest'i eski tam snapshot'a çevirir, sonrasındakileri `retracted` işaretler (dosyalar kalır; verilmiş bağlantılar 404 vermez), ilgili sürüm notlarını geri çeker ve `release.retracted` gönderir. Kaynak veriyi düzeltince yeni snapshot normal akışla yayınlanır. Not: `/files/` yolu `EXPORT_DIR`'in profilsiz ham dökümünü sunar; müşteri dağıtımı için kullanmayın.
 
 Sıklıklar: GeoNames haftalık; GISCO NUTS/LAU, US, NL yıllık; FR, IT, NO, tatiller aylık. Tatil dosyaları depoda olduğundan (`data/holidays/*.json`) değişiklik commit ile gelir; her yıl Eylül'de bir sonraki yılın listeli günleri (TR Diyanet, ES BOE yıllık takvim) güncellenmelidir.
 

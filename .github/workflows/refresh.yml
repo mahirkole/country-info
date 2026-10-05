@@ -1,8 +1,8 @@
 name: refresh
 # Keeps every source up to date. Needs the repository secret DATABASE_URL (the production database).
+# Scheduled updates run in production next to the API (scripts/cron/run-cycle.sh, docs/OPERATIONS.md); this workflow is for manual runs
+# (e.g. a dry run or a forced refresh of one source) and needs a database the runner can reach.
 on:
-  schedule:
-    - cron: '17 3 * * *' # daily; `refresh --due` only touches sources whose cadence has elapsed
   workflow_dispatch:
     inputs:
       args:
@@ -27,7 +27,6 @@ jobs:
       # 3. Monthly (1st of the month, or on manual runs): Wikidata QIDs/names, CLDR names/currencies, then QID links.
       #    Incremental; failures here must not hide the refresh result above, so they are reported but not fatal.
       - name: Enrich (monthly)
-        if: ${{ github.event_name == 'workflow_dispatch' || format('{0}', github.event.schedule) != '' }}
         run: |
           if [ "$(date -u +%d)" = "01" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             npm run enrich:wikidata || echo "::warning::enrich:wikidata failed"

@@ -8,6 +8,12 @@ import { config } from './config.js';
 import { installAccessControl } from './access.js';
 
 import { openApiSpec } from './openapi.js';
+import { WEBHOOK_EVENTS } from './webhooks.js';
+import { createStore, exportLinks, PROFILES, type Profile } from './publish.js';
+import { contentTypeOf, FsStore, type ObjectStore } from './object-store.js';
+import { createReadStream } from 'node:fs';
+import { stat } from 'node:fs/promises';
+
 
 const COLS = 'id, kind, parent_id, country_code::text AS country_code, code, name, name_ascii, lat, lon, data, source_id, updated_seq';
 const MAX_LIMIT = 1000;
@@ -37,7 +43,7 @@ declare module 'fastify' {
   interface FastifyInstance { routeList: Set<string> }
 }
 
-export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; exportDir?: string; apiKeys?: string[]; rateLimitPerMin?: number; requireApiKey?: boolean; rateLimitStore?: string } = {}): Promise<FastifyInstance> {
+export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; exportDir?: string; apiKeys?: string[]; rateLimitPerMin?: number; requireApiKey?: boolean; rateLimitStore?: string; store?: ObjectStore | null } = {}): Promise<FastifyInstance> {
   const adminToken = opts.adminToken ?? config.adminToken;
   const app = Fastify({ logger: false });
   const routes = new Set<string>();
@@ -327,17 +333,19 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   });
 
   // ---- API keys (admin) ------------------------------------------------
-  app.post<{ Body: { name?: string; rate_per_min?: number } }>('/v1/api-keys', { preHandler: requireAdmin }, async (req, reply) => {
+  app.post<{ Body: { name?: string; rate_per_min?: number; export_profile?: string } }>('/v1/api-keys', { preHandler: requireAdmin }, async (req, reply) => {
     const name = req.body?.name?.trim();
     if (!name) return reply.code(400).send({ error: 'name is required' });
     const rate = req.body.rate_per_min;
     if (rate !== undefined && (!Number.isInteger(rate) || rate < 0)) return reply.code(400).send({ error: 'rate_per_min must be a non-negative integer (0 = unlimited)' });
+    const profile = req.body.export_profile ?? 'commercial';
+    if (!PROFILES.includes(profile as Profile)) return reply.code(400).send({ error: `export_profile must be one of ${PROFILES.join(', ')}` });
     const key = `ci_${randomBytes(24).toString('hex')}`;
-    const row = (await pool.query('INSERT INTO api_keys (name, key_hash, rate_per_min) VALUES ($1, $2, $3) RETURNING id, name, rate_per_min, created_at', [name, sha(key), rate ?? null])).rows[0];
+    const row = (await pool.query('INSERT INTO api_keys (name, key_hash, rate_per_min, export_profile) VALUES ($1, $2, $3, $4) RETURNING id, name, rate_per_min, export_profile, created_at', [name, sha(key), rate ?? null, profile])).rows[0];
     return reply.code(201).send({ ...row, id: Number(row.id), key }); // the key is shown only here
   });
   app.get('/v1/api-keys', { preHandler: requireAdmin }, async () => ({
-    data: (await pool.query('SELECT id, name, rate_per_min, active, created_at, last_used_at FROM api_keys ORDER BY id')).rows,
+    data: (await pool.query('SELECT id, name, rate_per_min, export_profile, active, created_at, last_used_at FROM api_keys ORDER BY id')).rows,
   }));
   app.get<{ Querystring: { from?: string; to?: string } }>('/v1/api-keys/usage', { preHandler: requireAdmin }, async (req) => {
     await flushUsage();
@@ -358,8 +366,21 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     return { ok: true };
   });
 
-  // ---- webhooks (admin) -----------------------------------------------
-  app.post<{ Body: { url?: string; countries?: string[]; kinds?: string[] } }>('/v1/webhooks', { preHandler: requireAdmin }, async (req, reply) => {
+  // ---- webhooks (admin, or a customer's own via its database API key) --------
+  // Admin (Bearer ADMIN_TOKEN) sees and manages all subscriptions; a database API key only its own. Env keys have no identity and cannot own any.
+  const who = (req: { headers: Record<string, unknown>; apiKeyId?: string }): { admin: boolean; keyId: number | null } | null => {
+    if (adminToken && req.headers['authorization'] === `Bearer ${adminToken}`) return { admin: true, keyId: null };
+    if (req.apiKeyId?.startsWith('dbkey:')) return { admin: false, keyId: Number(req.apiKeyId.slice(6)) };
+    return null;
+  };
+  type Who = NonNullable<ReturnType<typeof who>>;
+  /** Subscription id the caller may touch, or null. */
+  const ownSub = async (w: Who, id: string): Promise<boolean> =>
+    /^\d+$/.test(id) && !!(await pool.query('SELECT 1 FROM webhook_subscriptions WHERE id = $1 AND ($2::boolean OR api_key_id = $3)', [id, w.admin, w.keyId])).rowCount;
+
+  app.post<{ Body: { url?: string; countries?: string[]; kinds?: string[]; events?: string[]; api_key_id?: number } }>('/v1/webhooks', async (req, reply) => {
+    const w = who(req);
+    if (!w) return reply.code(401).send({ error: 'unauthorized' });
     const url = req.body?.url ?? '';
     try {
       const u = new URL(url);
@@ -367,21 +388,127 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     } catch {
       return reply.code(400).send({ error: 'url must be a valid http(s) URL' });
     }
+    const events = req.body.events ?? null;
+    if (events && (events.length === 0 || events.some((e) => !(WEBHOOK_EVENTS as readonly string[]).includes(e)))) {
+      return reply.code(400).send({ error: `events must be a non-empty subset of ${WEBHOOK_EVENTS.join(', ')}` });
+    }
     const countries = req.body.countries?.map((c) => c.toUpperCase()) ?? null;
     const kinds = req.body.kinds ?? null;
     const secret = randomBytes(24).toString('hex');
-    const r = await pool.query('INSERT INTO webhook_subscriptions (url, secret, countries, kinds) VALUES ($1, $2, $3, $4) RETURNING id, url, countries, kinds, active', [url, secret, countries, kinds]);
+    const owner = w.admin ? (req.body.api_key_id ?? null) : w.keyId;
+    const r = await pool.query('INSERT INTO webhook_subscriptions (url, secret, countries, kinds, events, api_key_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, url, countries, kinds, events, active', [url, secret, countries, kinds, events, owner]);
     return reply.code(201).send({ ...r.rows[0], secret }); // secret is shown only here
   });
 
-  app.get('/v1/webhooks', { preHandler: requireAdmin }, async () => ({
-    data: (await pool.query('SELECT id, url, countries, kinds, active, created_at FROM webhook_subscriptions ORDER BY id')).rows,
-  }));
-
-  app.delete<{ Params: { id: string } }>('/v1/webhooks/:id', { preHandler: requireAdmin }, async (req, reply) => {
-    const r = await pool.query('DELETE FROM webhook_subscriptions WHERE id = $1', [req.params.id]);
-    return r.rowCount ? reply.code(204).send() : reply.code(404).send({ error: 'not_found' });
+  app.get('/v1/webhooks', async (req, reply) => {
+    const w = who(req);
+    if (!w) return reply.code(401).send({ error: 'unauthorized' });
+    return { data: (await pool.query('SELECT id, url, countries, kinds, events, active, api_key_id, created_at FROM webhook_subscriptions WHERE $1::boolean OR api_key_id = $2 ORDER BY id', [w.admin, w.keyId])).rows };
   });
+
+  app.delete<{ Params: { id: string } }>('/v1/webhooks/:id', async (req, reply) => {
+    const w = who(req);
+    if (!w) return reply.code(401).send({ error: 'unauthorized' });
+    if (!(await ownSub(w, req.params.id))) return reply.code(404).send({ error: 'not_found' });
+    await pool.query('DELETE FROM webhook_subscriptions WHERE id = $1', [req.params.id]);
+    return reply.code(204).send();
+  });
+
+  /** Delivery log of one subscription, newest first (so a customer can see what was sent and what failed). */
+  app.get<{ Params: { id: string }; Querystring: { limit?: string; before?: string; status?: string } }>('/v1/webhooks/:id/deliveries', async (req, reply) => {
+    const w = who(req);
+    if (!w) return reply.code(401).send({ error: 'unauthorized' });
+    if (!(await ownSub(w, req.params.id))) return reply.code(404).send({ error: 'not_found' });
+    const limit = Math.min(Math.max(parseInt(req.query.limit ?? '50', 10) || 50, 1), 200);
+    const before = /^\d+$/.test(req.query.before ?? '') ? req.query.before! : '9223372036854775807';
+    const rows = (
+      await pool.query(
+        `SELECT id, event, snapshot_id, status, attempts, last_error, created_at, delivered_at, next_attempt_at, payload
+         FROM webhook_deliveries WHERE subscription_id = $1 AND id < $2 AND ($3::text IS NULL OR status = $3) ORDER BY id DESC LIMIT $4`,
+        [req.params.id, before, req.query.status ?? null, limit + 1],
+      )
+    ).rows;
+    const more = rows.length > limit;
+    const data = more ? rows.slice(0, limit) : rows;
+    return { data, has_more: more, next_before: more ? data[data.length - 1]!.id : null };
+  });
+
+  /** Send a delivery again (a copy, so the original stays in the log). Use after a failed or lost delivery. */
+  app.post<{ Params: { id: string; did: string } }>('/v1/webhooks/:id/deliveries/:did/replay', async (req, reply) => {
+    const w = who(req);
+    if (!w) return reply.code(401).send({ error: 'unauthorized' });
+    if (!(await ownSub(w, req.params.id)) || !/^\d+$/.test(req.params.did)) return reply.code(404).send({ error: 'not_found' });
+    const r = await pool.query(
+      `INSERT INTO webhook_deliveries (subscription_id, snapshot_id, payload, event)
+       SELECT subscription_id, snapshot_id, payload, event FROM webhook_deliveries WHERE id = $1 AND subscription_id = $2 RETURNING id`,
+      [req.params.did, req.params.id],
+    );
+    return r.rowCount ? reply.code(202).send({ id: r.rows[0].id, status: 'pending' }) : reply.code(404).send({ error: 'not_found' });
+  });
+
+  /** Queue a `webhook.test` event so a new endpoint can be checked before real data arrives. */
+  app.post<{ Params: { id: string } }>('/v1/webhooks/:id/test', async (req, reply) => {
+    const w = who(req);
+    if (!w) return reply.code(401).send({ error: 'unauthorized' });
+    if (!(await ownSub(w, req.params.id))) return reply.code(404).send({ error: 'not_found' });
+    const r = await pool.query("INSERT INTO webhook_deliveries (subscription_id, payload, event) VALUES ($1, $2, 'webhook.test') RETURNING id", [req.params.id, JSON.stringify({ event: 'webhook.test', sent_at: new Date().toISOString() })]);
+    return reply.code(202).send({ id: r.rows[0].id, status: 'pending' });
+  });
+
+  // ---- release notes ---------------------------------------------------
+  app.get<{ Querystring: { limit?: string; before?: string } }>('/v1/releases', async (req) => {
+    const limit = Math.min(Math.max(parseInt(req.query.limit ?? '30', 10) || 30, 1), 100);
+    const before = /^\d+$/.test(req.query.before ?? '') ? req.query.before! : '9223372036854775807';
+    const rows = (await pool.query('SELECT id, snapshot_id, source_id, vintage, reason, title, totals, countries, highlight, retracted, created_at FROM release_notes WHERE public AND id < $1 ORDER BY id DESC LIMIT $2', [before, limit + 1])).rows;
+    const more = rows.length > limit;
+    const data = more ? rows.slice(0, limit) : rows;
+    return { data, has_more: more, next_before: more ? data[data.length - 1]!.id : null };
+  });
+  app.get<{ Params: { id: string } }>('/v1/releases/:id', async (req, reply) => {
+    const r = /^\d+$/.test(req.params.id) ? await pool.query('SELECT id, snapshot_id, source_id, vintage, reason, title, body_md, totals, countries, highlight, retracted, created_at FROM release_notes WHERE public AND id = $1', [req.params.id]) : null;
+    return r?.rows[0] ?? reply.code(404).send({ error: 'not_found' });
+  });
+  app.post<{ Body: { email?: string; frequency?: string } }>('/v1/release-subscribers', { preHandler: requireAdmin }, async (req, reply) => {
+    const email = req.body?.email?.trim().toLowerCase() ?? '';
+    const frequency = req.body?.frequency ?? 'weekly';
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return reply.code(400).send({ error: 'a valid email is required' });
+    if (frequency !== 'instant' && frequency !== 'weekly') return reply.code(400).send({ error: 'frequency must be instant or weekly' });
+    // A new subscriber starts after the existing notes: no flood of history.
+    const r = await pool.query(
+      `INSERT INTO release_subscribers (email, frequency, last_sent_note_id) VALUES ($1, $2, coalesce((SELECT max(id) FROM release_notes), 0))
+       ON CONFLICT (email) DO UPDATE SET frequency = $2, active = true RETURNING id, email, frequency, active`,
+      [email, frequency],
+    );
+    return reply.code(201).send(r.rows[0]);
+  });
+  app.get('/v1/release-subscribers', { preHandler: requireAdmin }, async () => ({ data: (await pool.query('SELECT id, email, frequency, active, last_sent_at, created_at FROM release_subscribers ORDER BY id')).rows }));
+  app.delete<{ Params: { id: string } }>('/v1/release-subscribers/:id', { preHandler: requireAdmin }, async (req, reply) => {
+    const r = /^\d+$/.test(req.params.id) ? await pool.query('DELETE FROM release_subscribers WHERE id = $1', [req.params.id]) : null;
+    return r?.rowCount ? reply.code(204).send() : reply.code(404).send({ error: 'not_found' });
+  });
+
+  // ---- published file bundles ------------------------------------------
+  const store = opts.store === undefined ? createStore() : opts.store;
+  /** Latest bundle of the caller's profile (a database key's `export_profile`; env keys and admin get `commercial`, admin may ask `?profile=full`). */
+  app.get<{ Querystring: { profile?: string } }>('/v1/exports/latest', async (req, reply) => {
+    if (!store) return reply.code(503).send({ error: 'exports_not_configured' });
+    const w = who(req);
+    let profile: Profile = 'commercial';
+    if (req.apiKeyId?.startsWith('dbkey:') && !w?.admin) profile = ((await pool.query('SELECT export_profile FROM api_keys WHERE id = $1', [req.apiKeyId.slice(6)])).rows[0]?.export_profile ?? 'commercial') as Profile;
+    else if (w?.admin && req.query.profile && PROFILES.includes(req.query.profile as Profile)) profile = req.query.profile as Profile;
+    const links = await exportLinks(store, profile);
+    return links ?? reply.code(404).send({ error: 'nothing_published' });
+  });
+  // Signed, expiring downloads of the fs store (no API key: the signature is the credential). S3 stores presign their own URLs.
+  if (store instanceof FsStore) {
+    app.get<{ Params: { '*': string }; Querystring: { exp?: string; sig?: string } }>('/dl/*', async (req, reply) => {
+      const key = req.params['*'];
+      if (!store.verifyDownload(key, req.query.exp ?? '', req.query.sig ?? '')) return reply.code(403).send({ error: 'invalid_or_expired_link' });
+      const path = store.localPath(key);
+      if (!path || !(await stat(path).then((s) => s.isFile(), () => false))) return reply.code(404).send({ error: 'not_found' });
+      return reply.header('content-type', contentTypeOf(key)).header('cache-control', 'private, max-age=60').send(createReadStream(path));
+    });
+  }
 
   // ---- exported files --------------------------------------------------
   const dir = resolve(opts.exportDir ?? config.exportDir);

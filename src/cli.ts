@@ -9,7 +9,7 @@ import { linkRegions } from './linking.js';
 import { enrichWikidata, linkByQid, syncLayerQids, enrichIso3166_2 } from './enrich.js';
 import { NATIONAL, nationalSource } from './sources/national/index.js';
 import { allTargets, syncTargetMetadata } from './targets.js';
-import { dueSourceIds, runRefresh } from './refresh.js';
+import { dueSourceIds, runRefresh, type RunResult } from './refresh.js';
 import { ackLicense, checkLicenses } from './license-watch.js';
 import { loadHolidayFiles, HOLIDAYS_SOURCE } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
@@ -20,6 +20,9 @@ import { buildApp } from './api.js';
 import { enrichCldr } from './sources/cldr.js';
 import { join } from 'node:path';
 import { pruneArchive } from './sources/fetch.js';
+import { formatSummary, holidayGaps, notify, summarizeCycle } from './notify.js';
+import { createStore, publish, PROFILES, rollback, type Profile } from './publish.js';
+import { retractRelease, runDigest, webhookMailer } from './release-notes.js';
 
 const cmd = process.argv[2];
 /** `ALLOW_BULK_DELETE=1` disables the ingest delete guard for an intentional large removal. */
@@ -101,13 +104,24 @@ async function main() {
       }
       if (chosen.length === 0) console.log('nothing to do');
       let bad = 0;
+      const results: RunResult[] = [];
       for (const t of chosen) {
         const r = await runRefresh(pool, t, { cacheDir: config.cacheDir, force: flag('--force'), dryRun: flag('--dry-run') });
         console.log(`${r.status.padEnd(12)} ${r.source.padEnd(20)} rows=${r.rows ?? '-'} +${r.inserted ?? 0} ~${r.updated ?? 0} -${r.deleted ?? 0} ${r.detail ?? ''}`);
+        results.push(r);
         if (r.status === 'failed' || r.status === 'needs_review') bad++;
       }
       const pruned = await pruneArchive(join(config.cacheDir, 'raw'), config.rawArchiveMaxMb * 1024 * 1024);
       if (pruned) console.log(`raw archive: pruned ${pruned} oldest file(s)`);
+      if (!flag('--dry-run')) {
+        // Tell the operator what needs a person (quiet days send nothing).
+        const summary = await summarizeCycle(pool, results);
+        summary.attention.push(...(await holidayGaps(pool)));
+        if (summary.attention.length || summary.changes.length) {
+          const sent = await notify(config.notifyUrl, formatSummary(summary));
+          console.log(formatSummary(summary) + (config.notifyUrl ? (sent ? '\n(notification sent)' : '\n(notification FAILED)') : ''));
+        }
+      }
       if (bad) process.exitCode = 1;
       break;
     }
@@ -118,7 +132,11 @@ async function main() {
       const only = process.argv[3];
       const res = await checkLicenses(pool, only ? targets.filter((t) => t.meta.id === only) : targets, config.cacheDir);
       for (const r of res) console.log(`${r.status.padEnd(10)} ${r.source} ${r.detail ?? ''}`);
-      if (res.some((r) => r.status === 'changed' || r.status === 'error')) process.exitCode = 1;
+      const flagged = res.filter((r) => r.status === 'changed' || r.status === 'error');
+      if (flagged.length) {
+        process.exitCode = 1;
+        await notify(config.notifyUrl, ['country-info license watch', ...flagged.map((r) => `⚖️ ${r.source}: ${r.status} ${r.detail ?? ''}`)].join('\n'));
+      }
       break;
     }
     case 'license-ack': {
@@ -152,6 +170,48 @@ async function main() {
       console.log(await exportSnapshot(pool, config.exportDir, idArg ? Number(idArg) : undefined, { commercialOnly: process.argv.includes('--commercial') }));
     }
       break;
+    case 'publish': {
+      // publish [--profile commercial|full] [--rollback <snapshotId>]: export what is new and upload it (manifest last); see docs/OPERATIONS.md.
+      await migrate(pool);
+      const store = createStore();
+      if (!store) throw new Error('storage is not configured (PUBLISH_STORE=s3 needs S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY)');
+      const args = process.argv.slice(3);
+      const val = (n: string) => args[args.indexOf(n) + 1];
+      const profiles = args.includes('--profile') ? ([val('--profile')] as Profile[]) : PROFILES;
+      if (profiles.some((p) => !PROFILES.includes(p))) throw new Error(`profile must be one of ${PROFILES.join(', ')}`);
+      if (args.includes('--rollback')) {
+        const to = Number(val('--rollback'));
+        for (const p of profiles) {
+          const retracted = await rollback(store, p, to);
+          // Withdraw the matching release notes too (subscribers get release.retracted).
+          for (const id of retracted) {
+            const n = (await pool.query('SELECT id FROM release_notes WHERE snapshot_id = $1', [id])).rows[0];
+            if (n) await retractRelease(pool, Number(n.id));
+          }
+          console.log(`${p}: rolled back to snapshot ${to}, retracted ${retracted.join(', ') || 'none'}`);
+        }
+        break;
+      }
+      const res = await publish(pool, store, join(config.publishDir, 'work'), { profiles, log: console.log });
+      console.log(res.map((r) => `${r.profile}: ${r.snapshots.length ? `snapshots ${r.snapshots.join(',')}` : 'nothing new'}`).join('\n'));
+      break;
+    }
+    case 'digest': {
+      // Send new release notes to e-mail subscribers (needs MAIL_WEBHOOK_URL).
+      await migrate(pool);
+      if (!config.mailWebhookUrl) {
+        console.log('MAIL_WEBHOOK_URL is not set; digests are not sent');
+        break;
+      }
+      console.log('digests sent:', await runDigest(pool, webhookMailer(config.mailWebhookUrl, config.mailFrom)));
+      break;
+    }
+    case 'notify': {
+      // notify [text]: send an operations alert (used by scripts/cron/run-cycle.sh); without text a test message.
+      const text = process.argv.slice(3).join(' ') || 'country-info: test notification';
+      console.log((await notify(config.notifyUrl, text)) ? 'sent' : 'not sent (NOTIFY_WEBHOOK_URL unset or rejected)');
+      break;
+    }
     case 'deliver':
       console.log('attempted:', await processDeliveries(pool));
       break;
@@ -164,7 +224,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | notify [text] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();
@@ -172,5 +232,5 @@ async function main() {
 
 main().catch((e) => {
   console.error(e);
-  process.exit(1);
+  process.exit(2); // 1 is reserved for "sources need attention" (refresh, check-licenses)
 });

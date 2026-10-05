@@ -11,6 +11,21 @@ export const config = {
   /** Requests per key (or IP) per minute; 0 = unlimited. */
   rateLimitPerMin: Number(process.env.RATE_LIMIT_PER_MIN ?? 600),
   exportDir: process.env.EXPORT_DIR ?? 'out',
+  /** Published file bundles (see docs/OPERATIONS.md "Dağıtım"): 'fs' (local directory, signed /dl links) or 's3' (S3-compatible). */
+  publishStore: process.env.PUBLISH_STORE ?? 'fs',
+  /** Working directory of `publish` (profiles are exported here before upload); with the fs store it is also the storage root. */
+  publishDir: process.env.PUBLISH_DIR ?? 'publish',
+  publishPrefix: process.env.PUBLISH_PREFIX ?? '',
+  /** Public base URL of this API, used in signed download links of the fs store. */
+  publicBaseUrl: process.env.PUBLIC_BASE_URL ?? `http://localhost:${Number(process.env.PORT ?? 3000)}`,
+  /** HMAC key of fs-store download links; set it when several instances serve files (default: random per process). */
+  fileSigningSecret: process.env.FILE_SIGNING_SECRET ?? '',
+  s3: { endpoint: process.env.S3_ENDPOINT ?? '', bucket: process.env.S3_BUCKET ?? '', region: process.env.S3_REGION ?? 'us-east-1', accessKey: process.env.S3_ACCESS_KEY ?? '', secretKey: process.env.S3_SECRET_KEY ?? '' },
+  /** Operations alerts (Slack/Teams-compatible incoming webhook); empty = log only. */
+  notifyUrl: process.env.NOTIFY_WEBHOOK_URL ?? '',
+  /** Release digest mails are POSTed as JSON {from,to,subject,text} to this URL; empty = digests are not sent. */
+  mailWebhookUrl: process.env.MAIL_WEBHOOK_URL ?? '',
+  mailFrom: process.env.MAIL_FROM ?? 'releases@country-info.invalid',
   cacheDir: process.env.CACHE_DIR ?? '.cache',
   /** Size cap of the raw download archive (.cache/raw), oldest files are pruned after a refresh. */
   rawArchiveMaxMb: Number(process.env.RAW_ARCHIVE_MAX_MB ?? 2048),

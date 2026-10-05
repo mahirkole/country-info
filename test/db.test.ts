@@ -342,7 +342,7 @@ d('database', () => {
   });
 
   it('manages API keys through the admin API: create once, per-key limit, revoke, require-key mode', async () => {
-    await pool.query('TRUNCATE api_keys RESTART IDENTITY');
+    await pool.query('TRUNCATE api_keys RESTART IDENTITY CASCADE');
     const app = await buildApp(pool, { adminToken: 'tok', requireApiKey: true, rateLimitPerMin: 1000, exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
     const admin = { authorization: 'Bearer tok' };
     expect((await app.inject('/v1/countries')).statusCode).toBe(401); // require-key mode, no key

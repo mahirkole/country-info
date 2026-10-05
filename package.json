@@ -21,6 +21,9 @@
     "ingest:national": "tsx src/cli.ts ingest-national",
     "check:holidays": "tsx src/cli.ts check-holidays",
     "export": "tsx src/cli.ts export",
+    "publish": "tsx src/cli.ts publish",
+    "digest": "tsx src/cli.ts digest",
+    "deliver": "tsx src/cli.ts deliver",
     "serve": "tsx src/cli.ts serve",
     "test": "vitest run",
     "enrich:cldr": "tsx src/cli.ts enrich-cldr"

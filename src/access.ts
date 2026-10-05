@@ -1,5 +1,9 @@
 import type { FastifyInstance } from 'fastify';
 
+declare module 'fastify' {
+  interface FastifyRequest { /** Id of the authorised key: `dbkey:<id>` for database keys, `key:...` for env keys; unset when none. */ apiKeyId?: string }
+}
+
 export interface AccessOptions {
   /** Accepted API keys. Empty = the API is open (only rate limiting by client IP applies). */
   apiKeys: string[];
@@ -45,7 +49,7 @@ export function installAccessControl(app: FastifyInstance, o: AccessOptions): vo
     if ((o.apiKeys.length > 0 || o.requireKey) && !id) {
       return reply.code(401).send({ error: 'unauthorized', detail: 'send an API key in the x-api-key header or as a Bearer token' });
     }
-    if (id) o.onUse?.(id);
+    if (id) { req.apiKeyId = id; o.onUse?.(id); }
     if (limit <= 0) return;
     id = id || `ip:${req.ip}`;
     const t = now();

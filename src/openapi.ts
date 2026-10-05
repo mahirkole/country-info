@@ -33,9 +33,18 @@ export const OPERATIONS: Op[] = [
   { method: 'get', path: '/v1/api-keys', tag: 'admin', summary: 'List API keys (no secrets)', admin: true },
   { method: 'get', path: '/v1/api-keys/usage', tag: 'admin', summary: 'Requests per API key and day (key_id 0 = env keys / admin token)', admin: true, query: [{ name: 'from', description: 'YYYY-MM-DD' }, { name: 'to', description: 'YYYY-MM-DD' }] },
   { method: 'delete', path: '/v1/api-keys/{id}', tag: 'admin', summary: 'Revoke an API key', admin: true },
-  { method: 'post', path: '/v1/webhooks', tag: 'admin', summary: 'Subscribe a URL to signed change notifications', admin: true },
-  { method: 'get', path: '/v1/webhooks', tag: 'admin', summary: 'List webhook subscriptions', admin: true },
-  { method: 'delete', path: '/v1/webhooks/{id}', tag: 'admin', summary: 'Remove a webhook subscription', admin: true },
+  { method: 'post', path: '/v1/webhooks', tag: 'webhooks', summary: 'Subscribe a URL to signed notifications (events: snapshot.completed, release.published, release.retracted; optional countries/kinds filters). The signing secret is returned once. A database API key owns its subscriptions; the admin token manages all.' },
+  { method: 'get', path: '/v1/webhooks', tag: 'webhooks', summary: 'List your webhook subscriptions (admin: all)' },
+  { method: 'delete', path: '/v1/webhooks/{id}', tag: 'webhooks', summary: 'Remove a webhook subscription' },
+  { method: 'get', path: '/v1/webhooks/{id}/deliveries', tag: 'webhooks', summary: 'Delivery log of a subscription, newest first (status, attempts, last error, payload)', query: [{ name: 'limit', description: 'Page size (1–200)' }, { name: 'before', description: 'Cursor: id of the last item of the previous page' }, { name: 'status', description: 'pending, delivered, failed' }] },
+  { method: 'post', path: '/v1/webhooks/{id}/deliveries/{did}/replay', tag: 'webhooks', summary: 'Send a delivery again (queued as a copy)' },
+  { method: 'post', path: '/v1/webhooks/{id}/test', tag: 'webhooks', summary: 'Queue a webhook.test event to check the endpoint and signature' },
+  { method: 'get', path: '/v1/releases', tag: 'releases', summary: 'Release notes of applied updates (customer-visible sources only), newest first', query: [{ name: 'limit', description: 'Page size' }, { name: 'before', description: 'Cursor: id of the last item of the previous page' }] },
+  { method: 'get', path: '/v1/releases/{id}', tag: 'releases', summary: 'One release note (Markdown body, totals, countries)' },
+  { method: 'get', path: '/v1/exports/latest', tag: 'exports', summary: 'Latest file bundle for your key profile: manifest entry and short-lived signed download links' },
+  { method: 'post', path: '/v1/release-subscribers', tag: 'admin', summary: 'Subscribe an e-mail address to release digests (instant or weekly)', admin: true },
+  { method: 'get', path: '/v1/release-subscribers', tag: 'admin', summary: 'List release-digest subscribers', admin: true },
+  { method: 'delete', path: '/v1/release-subscribers/{id}', tag: 'admin', summary: 'Remove a release-digest subscriber', admin: true },
 ];
 
 export function openApiSpec(): Record<string, unknown> {
@@ -62,7 +71,7 @@ export function openApiSpec(): Record<string, unknown> {
     components: {
       securitySchemes: {
         apiKey: { type: 'apiKey', in: 'header', name: 'x-api-key', description: 'Required when the server is configured with API_KEYS; a Bearer token is accepted too.' },
-        adminToken: { type: 'http', scheme: 'bearer', description: 'ADMIN_TOKEN, for review items and webhook management.' },
+        adminToken: { type: 'http', scheme: 'bearer', description: 'ADMIN_TOKEN, for review items, API keys and release subscribers; also accepted on webhook endpoints (sees all subscriptions).' },
       },
     },
   };

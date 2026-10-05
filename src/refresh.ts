@@ -4,6 +4,7 @@ import { ChangeGuardError, DeleteGuardError, ingest } from './ingest.js';
 import { fetchPolicy, recordFetches } from './sources/fetch.js';
 import { join } from 'node:path';
 import { recordSuccessors } from './successors.js';
+import { createReleaseNote } from './release-notes.js';
 import { syncTargetMetadata, type Cadence, type RefreshTarget } from './targets.js';
 
 export type RunStatus = 'unchanged' | 'success' | 'needs_review' | 'failed' | 'skipped';
@@ -15,6 +16,8 @@ export interface RunResult {
   inserted?: number;
   updated?: number;
   deleted?: number;
+  /** Snapshot created by this run (status success). */
+  snapshot?: number;
 }
 export interface RefreshOptions {
   cacheDir: string;
@@ -126,7 +129,10 @@ async function run(pool: pg.Pool, t: RefreshTarget, o: RefreshOptions): Promise<
       `UPDATE sources SET status = 'ok', content_sha256 = $2, last_checked_at = now(), last_changed_at = CASE WHEN $3 THEN now() ELSE last_changed_at END, next_due_at = $4 WHERE id = $1`,
       [id, raw, changed, nextDue(t.cadence)],
     );
-    return record({ source: id, status: 'success', rows: input.length, inserted: r.inserted, updated: r.updated, deleted: r.deleted, detail: [vintageChanged ? `vintage ${src.version} -> ${t.meta.version}` : '', successors ? `${successors} successor suggestions queued` : ''].filter(Boolean).join('; ') || undefined }, { raw, snapshot: r.snapshotId });
+    const detail = [vintageChanged ? `vintage ${src.version} -> ${t.meta.version}` : '', successors ? `${successors} successor suggestions queued` : ''].filter(Boolean).join('; ');
+    // Human-readable release note and `release.published` webhooks; a failure here must not undo the applied update.
+    if (changed) await createReleaseNote(pool, r.snapshotId, { detail: successors ? detail : undefined }).catch((e) => console.error('release note:', (e as Error).message));
+    return record({ source: id, status: 'success', snapshot: r.snapshotId, rows: input.length, inserted: r.inserted, updated: r.updated, deleted: r.deleted, detail: detail || undefined }, { raw, snapshot: r.snapshotId });
   } catch (e) {
     if (e instanceof DeleteGuardError || e instanceof ChangeGuardError) {
       await setStatus('needs_review');
