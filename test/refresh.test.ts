@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { migrate } from '../src/db.js';
 import { buildApp } from '../src/api.js';
+import { suggestSuccessors } from '../src/successors.js';
 import { orphanParents, runRefresh, dueSourceIds } from '../src/refresh.js';
 import { ackLicense, checkLicenses, licenseExcerpt } from '../src/license-watch.js';
 import { logBody } from '../src/sources/fetch.js';
@@ -180,5 +181,31 @@ d('license watch (db)', () => {
     expect(['geonames', 'wikidata', 'wd-dk'].map(sourceClassOf)).toEqual(['community', 'community', 'community']);
     await syncTargetMetadata(pool, [target({ body: 'x', rows: [] })]);
     expect((await pool.query("SELECT source_class FROM sources WHERE id = 'nat-fake'")).rows[0].source_class).toBe('official');
+  });
+
+  it('suggests successors for renames and mergers after a vintage change and queues them for review (idempotent)', async () => {
+    const cache = await mkdtemp(join(tmpdir(), 'rf-succ-'));
+    const mk = (id: string, name: string): EntityInput => E(id, name);
+    const st = { body: 'v1', version: 'V1', rows: [...many(150), mk('div:TR:old-a', 'Aksu'), mk('div:TR:old-b', 'Bayrak'), mk('div:TR:old-c', 'Cevizli'), mk('div:TR:old-d', 'Duman')] };
+    await runRefresh(pool, target(st), { cacheDir: cache });
+    st.body = 'v2';
+    st.version = 'V2';
+    st.rows = [...many(150), mk('div:TR:new-a', 'Aksu'), mk('div:TR:new-bc', 'Bayrak-Cevizli'), mk('div:TR:new-d', 'Duman Mahallesi')];
+    const r = await runRefresh(pool, target(st), { cacheDir: cache });
+    expect(r).toMatchObject({ status: 'success', deleted: 4, inserted: 3 });
+    const items = (await pool.query("SELECT entity_id, field, b_value FROM review_items WHERE field LIKE 'successor:%' ORDER BY entity_id")).rows;
+    expect(items.map((x) => `${x.entity_id}>${x.field}>${x.b_value.to[0].id}`)).toEqual([
+      'div:TR:old-a>successor:replaced_by>div:TR:new-a',
+      'div:TR:old-b>successor:merged_into>div:TR:new-bc',
+      'div:TR:old-c>successor:merged_into>div:TR:new-bc',
+      'div:TR:old-d>successor:replaced_by>div:TR:new-d',
+    ]);
+  });
+
+  it('suggestSuccessors only pairs units with the same parent and ignores unrelated names', () => {
+    const g = (id: string, name: string, parent: string) => ({ id, name, parent_id: parent, country_code: 'TR' });
+    expect(suggestSuccessors([g('a', 'Merkez', 'p1')], [g('b', 'Merkez', 'p2')])).toEqual([]);
+    expect(suggestSuccessors([g('a', 'Merkez', 'p1')], [g('b', 'Köy', 'p1')])).toEqual([]);
+    expect(suggestSuccessors([g('a', 'Aix', 'p1')], [g('b', 'Aix', 'p1')])).toMatchObject([{ from: 'a', relation: 'replaced_by', confidence: 0.9 }]); // new id, same name: the pair
   });
 });

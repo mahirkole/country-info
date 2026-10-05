@@ -2,6 +2,7 @@ import type pg from 'pg';
 import type { EntityInput } from './model.js';
 import { ChangeGuardError, DeleteGuardError, ingest } from './ingest.js';
 import { fetchPolicy, recordFetches } from './sources/fetch.js';
+import { recordSuccessors } from './successors.js';
 import { syncTargetMetadata, type Cadence, type RefreshTarget } from './targets.js';
 
 export type RunStatus = 'unchanged' | 'success' | 'needs_review' | 'failed' | 'skipped';
@@ -114,11 +115,14 @@ async function run(pool: pg.Pool, t: RefreshTarget, o: RefreshOptions): Promise<
       reason: vintageChanged ? `vintage_change: ${src.version} -> ${t.meta.version}` : undefined,
     });
     const changed = r.inserted + r.updated + r.deleted > 0;
+    // Renames/mergers show up as delete + insert; queue "replaced by" suggestions for review (never applied automatically).
+    let successors = 0;
+    if (r.deleted > 0 && r.inserted > 0) successors = await recordSuccessors(pool, r.snapshotId, id).catch(() => 0);
     await pool.query(
       `UPDATE sources SET status = 'ok', content_sha256 = $2, last_checked_at = now(), last_changed_at = CASE WHEN $3 THEN now() ELSE last_changed_at END, next_due_at = $4 WHERE id = $1`,
       [id, raw, changed, nextDue(t.cadence)],
     );
-    return record({ source: id, status: 'success', rows: input.length, inserted: r.inserted, updated: r.updated, deleted: r.deleted, detail: vintageChanged ? `vintage ${src.version} -> ${t.meta.version}` : undefined }, { raw, snapshot: r.snapshotId });
+    return record({ source: id, status: 'success', rows: input.length, inserted: r.inserted, updated: r.updated, deleted: r.deleted, detail: [vintageChanged ? `vintage ${src.version} -> ${t.meta.version}` : '', successors ? `${successors} successor suggestions queued` : ''].filter(Boolean).join('; ') || undefined }, { raw, snapshot: r.snapshotId });
   } catch (e) {
     if (e instanceof DeleteGuardError || e instanceof ChangeGuardError) {
       await setStatus('needs_review');
