@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import pg from 'pg';
 import { migrate } from '../src/db.js';
-import { enrichWikidata, linkByQid } from '../src/enrich.js';
+import { enrichIso3166_2, enrichWikidata, linkByQid, syncLayerQids } from '../src/enrich.js';
 import { lookupQuery, parseLookup, sparql, type Binding } from '../src/sources/wikidata.js';
 
 const b = (v: string, qid: string, lang?: string, label?: string): Binding => ({
@@ -92,6 +92,21 @@ d('enrichment (db)', () => {
     expect(await linkByQid(pool)).toBe(1);
     expect((await pool.query("SELECT a_id, b_id, method FROM entity_links")).rows).toEqual([{ a_id: 'gn:745044', b_id: 'nuts:TR10', method: 'wikidata_qid' }]);
     expect(await linkByQid(pool)).toBe(1); // idempotent rebuild
+  });
+
+  it('registers layer QIDs as cross references, links them to GeoNames, and stores ISO 3166-2 codes (checked once)', async () => {
+    await pool.query("INSERT INTO sources (id, authority, license_verdict) VALUES ('wd-tr','w','green')");
+    await pool.query("INSERT INTO entities (id, kind, country_code, code, name, data, content_hash, updated_seq, source_id) VALUES ('div:TR:wd-Q406','division','TR','wd-Q406','Istanbul','{\"wikidata\":\"Q406\"}','h',0,'wd-tr')");
+    await pool.query("INSERT INTO entity_xrefs (entity_id, scheme, value, source) VALUES ('gn:745044','wikidata','Q406','wikidata')");
+    expect(await syncLayerQids(pool)).toBe(1);
+    expect(await linkByQid(pool)).toBe(1); // gn:745044 <-> div:TR:wd-Q406
+    const rows = [{ item: { value: 'http://www.wikidata.org/entity/Q406' }, code: { value: 'TR-34' } }] as unknown as Binding[];
+    let calls = 0;
+    const run = async () => (calls++, rows);
+    expect(await enrichIso3166_2(pool, { run })).toEqual({ asked: 2, coded: 2 }); // both entities carry Q406
+    expect((await pool.query("SELECT entity_id, value FROM entity_xrefs WHERE scheme='iso3166-2' ORDER BY entity_id")).rows).toEqual([{ entity_id: 'div:TR:wd-Q406', value: 'TR-34' }, { entity_id: 'gn:745044', value: 'TR-34' }]);
+    expect(await enrichIso3166_2(pool, { run })).toEqual({ asked: 0, coded: 0 });
+    expect(calls).toBe(1);
   });
 });
 

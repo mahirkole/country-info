@@ -6,7 +6,7 @@ import { GEONAMES } from './sources/geonames.js';
 import { GISCO_NUTS, GISCO_LAU, loadNuts, loadLau } from './sources/gisco.js';
 import { EU27 } from './sources/eu.js';
 import { linkRegions } from './linking.js';
-import { enrichWikidata, linkByQid } from './enrich.js';
+import { enrichWikidata, linkByQid, syncLayerQids, enrichIso3166_2 } from './enrich.js';
 import { NATIONAL, nationalSource } from './sources/national/index.js';
 import { allTargets, syncTargetMetadata } from './targets.js';
 import { dueSourceIds, runRefresh } from './refresh.js';
@@ -135,7 +135,9 @@ async function main() {
       const val = (n: string) => args[args.indexOf(n) + 1];
       const res = await enrichWikidata(pool, { specs: args.includes('--spec') ? val('--spec')!.split(',') : undefined, limit: args.includes('--limit') ? Number(val('--limit')) : undefined, langs: args.includes('--langs') ? val('--langs')!.split(',') : undefined });
       console.table(res);
+      console.log('layer QIDs registered:', await syncLayerQids(pool));
       console.log('linked by QID:', await linkByQid(pool));
+      console.log('iso 3166-2:', await enrichIso3166_2(pool));
       break;
     }
     case 'enrich-cldr': {

@@ -153,3 +153,58 @@ export async function linkByQid(pool: pg.Pool): Promise<number> {
     client.release();
   }
 }
+
+/**
+ * Units loaded from Wikidata layers (`wd-*`) carry their QID in `data.wikidata`; register it as a `wikidata` cross reference
+ * so `linkByQid` can tie them to GeoNames and national records of the same place.
+ */
+export async function syncLayerQids(pool: pg.Pool): Promise<number> {
+  const r = await pool.query(
+    `INSERT INTO entity_xrefs (entity_id, scheme, value, source, checked_at)
+     SELECT id, 'wikidata', data->>'wikidata', 'wikidata-layer', now() FROM entities WHERE data ? 'wikidata' AND data->>'wikidata' ~ '^Q[0-9]+$'
+     ON CONFLICT (entity_id, scheme) DO UPDATE SET value = EXCLUDED.value, source = EXCLUDED.source, checked_at = now()
+     WHERE entity_xrefs.value IS NULL OR entity_xrefs.source = 'wikidata-layer'`,
+  );
+  return r.rowCount ?? 0;
+}
+
+/**
+ * ISO 3166-2 subdivision codes (Wikidata P300, CC0) for entities that already have a QID. Stored as the `iso3166-2`
+ * cross reference; entities without a code are recorded as checked (value NULL) and not asked again until stale.
+ */
+export async function enrichIso3166_2(pool: pg.Pool, o: { run?: (q: string) => Promise<Binding[]>; olderThanDays?: number; limit?: number } = {}): Promise<{ asked: number; coded: number }> {
+  const run = o.run ?? ((q: string) => sparql(q));
+  const todo = (
+    await pool.query(
+      `SELECT e.id, x.value AS qid FROM entities e JOIN entity_xrefs x ON x.entity_id = e.id AND x.scheme = 'wikidata' AND x.value IS NOT NULL
+       LEFT JOIN entity_xrefs i ON i.entity_id = e.id AND i.scheme = 'iso3166-2'
+       WHERE e.kind IN ('admin1', 'admin2', 'division') AND (i.entity_id IS NULL OR i.checked_at < now() - make_interval(days => $1))
+       ORDER BY e.id ${o.limit ? 'LIMIT ' + Number(o.limit) : ''}`,
+      [o.olderThanDays ?? 180],
+    )
+  ).rows as { id: string; qid: string }[];
+  let coded = 0;
+  for (let i = 0; i < todo.length; i += BATCH) {
+    const part = todo.slice(i, i + BATCH);
+    const qids = [...new Set(part.map((p) => p.qid))];
+    const rows = await run(`SELECT ?item ?code WHERE { VALUES ?item { ${qids.map((q) => `wd:${q}`).join(' ')} } ?item wdt:P300 ?code }`);
+    const byQid = new Map<string, Set<string>>();
+    for (const r of rows) {
+      const q = r.item?.value.split('/').pop() ?? '';
+      if (!/^Q\d+$/.test(q) || !r.code) continue;
+      (byQid.get(q) ?? byQid.set(q, new Set()).get(q)!).add(r.code.value);
+    }
+    const recs = part.map((p) => {
+      const codes = byQid.get(p.qid);
+      if (codes) coded++;
+      return { entity_id: p.id, value: codes ? [...codes].sort().join(',') : null };
+    });
+    await pool.query(
+      `INSERT INTO entity_xrefs (entity_id, scheme, value, source, checked_at)
+       SELECT entity_id, 'iso3166-2', value, 'wikidata', now() FROM jsonb_to_recordset($1::jsonb) AS r(entity_id text, value text)
+       ON CONFLICT (entity_id, scheme) DO UPDATE SET value = EXCLUDED.value, checked_at = now()`,
+      [JSON.stringify(recs)],
+    );
+  }
+  return { asked: todo.length, coded };
+}
