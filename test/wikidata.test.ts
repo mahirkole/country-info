@@ -94,3 +94,41 @@ d('enrichment (db)', () => {
     expect(await linkByQid(pool)).toBe(1); // idempotent rebuild
   });
 });
+
+import { buildDivisions, levelQuery, reduceLevel, type WdCountry } from '../src/sources/wikidata-divisions.js';
+describe('wikidata divisions', () => {
+  const row = (i: string, lang?: string, label?: string, p?: string): Binding => ({
+    i: { value: `http://www.wikidata.org/entity/${i}` },
+    ...(lang ? { lang: { value: lang }, label: { value: label ?? '' } } : {}),
+    ...(p ? { p: { value: `http://www.wikidata.org/entity/${p}` } } : {}),
+  });
+  const C: WdCountry = {
+    cc: 'XX', country: 'Q1', langs: ['da'],
+    levels: [
+      { key: 'r', classes: ['Q10'], level: 1, type: 'region', typeLocal: 'r', expected: [1, 1], exclude: { Q99: 'merged area' } },
+      { key: 'm', classes: ['Q20'], level: 2, type: 'municipality', typeLocal: 'm', expected: [2, 3] },
+    ],
+  };
+  it('queries current instances of the classes, restricted to the country, with ancestors from the levels above', () => {
+    const q = levelQuery(C, C.levels[1]!, [C.levels[0]!]);
+    expect(q).toContain('VALUES ?cls { wd:Q20 }');
+    expect(q).toContain('wdt:P17 wd:Q1');
+    expect(q).toContain('FILTER NOT EXISTS { ?i wdt:P576 ?end }');
+    expect(q).toContain('VALUES ?pc { wd:Q10 }');
+    expect(levelQuery(C, C.levels[0]!, [])).not.toContain('?pc');
+  });
+  it('prefers the native label, then English, then the QID', () => {
+    const r = reduceLevel([row('Q1', 'en', 'Copenhagen'), row('Q1', 'da', 'København'), row('Q2', 'en', 'Only English'), row('Q3')], ['da']);
+    expect([...r.names]).toEqual([['Q1', 'København'], ['Q2', 'Only English'], ['Q3', 'Q3']]);
+  });
+  it('builds the hierarchy, honours exclusions, skips parentless items and enforces the official bands', () => {
+    const l1 = reduceLevel([row('Q5', 'da', 'Nord'), row('Q99', 'da', 'Øst')], ['da']);
+    const l2 = reduceLevel([row('Q7', 'da', 'A', 'Q5'), row('Q8', 'da', 'B', 'Q5'), row('Q9', 'da', 'C')], ['da']);
+    const skipped: string[] = [];
+    const e = buildDivisions(C, [l1, l2], skipped);
+    expect(e.map((x) => `${x.id}<${x.parent_id}`)).toEqual(['div:XX:wd-Q5<country:XX', 'div:XX:wd-Q7<div:XX:wd-Q5', 'div:XX:wd-Q8<div:XX:wd-Q5']);
+    expect(skipped).toEqual(['m Q9 C']);
+    const few = reduceLevel([row('Q5', 'da', 'Nord'), row('Q6', 'da', 'Syd')], ['da']);
+    expect(() => buildDivisions(C, [few, l2])).toThrow(/official band/);
+  });
+});

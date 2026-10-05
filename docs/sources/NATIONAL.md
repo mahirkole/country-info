@@ -36,6 +36,15 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 ## Dossier sonrası ek adaylar (lisans 🟢, ayrıntı `docs/licenses/README.md`)
 FI (Tilastokeskus sınıflandırma API'si, 308 belediye — **kunta→maakunta eşleme servisi 500 veriyor, hiyerarşi için beklemede**), PT Açores/Madeira (gpkg). CZ yüklendi. 🟡: DK, PL, NL (zaten yüklü). ⚪: BE (CAPTCHA).
 
+## Wikidata bölünme katmanı (topluluk, CC0 — resmi kaynağı kapalı/okunamayan ülkeler)
+Motor: `src/sources/wikidata-divisions.ts`, ülke yapılandırması `src/sources/wikidata-countries.ts` (kaynak kimliği `wd-<cc>`, `source_class=community`, aylık `refresh`). Her seviye için Wikidata sınıfı + **resmi sayı bandı**; band dışı seviye yüklenmez. Sınıflar GeoNames'in bağladığı öğelerin `P31` değerlerinden veya adı bilinen belediyelerden **veriyle** doğrulandı (hafızadaki QID'ler bir kez yanlış çıktı: Q2039348 = Hollanda belediyesi). Üst birim = önceki seviyelerdeki `P131` atası (en derin seviye kazanır); atasız öğe atlanır (>%1 ise hata).
+| CC | Seviyeler | Yüklü |
+|---|---|---|
+| DK | region (5; "Region Østdanmark" dışlandı), kommune (98) | 103 |
+| FI | maakunta (19), kunta (308) | 327 |
+| BE | gewest (3), provincie (10), gemeente (564; Bergen/Mons Q83407 atasız → atlandı) | 577 |
+Sırada (sınıf/sayı doğrulaması gerekir): PL (voivodeship 16 ✓; powiat Wikidata'da 320+67 ≠ resmi 380 → kapıdan geçmez; gmina sınıfı doğrulanmadı), IN, KR, BR, TR (ilçe 1.039≠973 → yüklenmez).
+
 ## Tasarım notları
 - GeoNames (`geonames`) hâlâ dünya geneli taban katman; ulusal kaynaklar `division` olarak **yanına** eklenir, GeoNames'i silmez. "Yalnızca resmi" mod için bkz. `docs/ROADMAP.md`.
 - Ülkelerin düzey adları farklıdır: `type` ortak sözlükten seçilir, yerel ad `type_local`'e gider; karşılığı olmayan kavram için önce sözlüğe tür eklenir.

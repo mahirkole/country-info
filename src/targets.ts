@@ -6,6 +6,7 @@ import { EU27 } from './sources/eu.js';
 import { GEONAMES, loadGeoNames } from './sources/geonames.js';
 import { GISCO_LAU, GISCO_NUTS, loadLau, loadNuts } from './sources/gisco.js';
 import { NATIONAL } from './sources/national/index.js';
+import { WD_COUNTRIES, wikidataLoader, wikidataMeta } from './sources/wikidata-countries.js';
 import { HOLIDAYS_SOURCE, loadHolidayFiles } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { logBody } from './sources/fetch.js';
@@ -59,6 +60,13 @@ export function allTargets(): RefreshTarget[] {
   return everyTarget().filter((t) => !config.disabledSources.includes(t.meta.id));
 }
 
+const wikidataTargets = (): RefreshTarget[] =>
+  WD_COUNTRIES.map((c) => ({
+    meta: wikidataMeta(c), cadence: 'monthly' as Cadence, expectedRows: [c.levels.reduce((n, l) => n + l.expected[0], 0) - 5, c.levels.reduce((n, l) => n + l.expected[1], 0) + 5] as [number, number],
+    scope: { kinds: ['division'], countries: [c.cc] }, load: wikidataLoader(c), licenseUrls: ['https://www.wikidata.org/wiki/Wikidata:Licensing'],
+    licenseVerdict: 'green' as Verdict, commercialUse: 'CC0 1.0: no restrictions; community data, loaded only when counts match official statistics; docs/licenses/wikidata.md',
+  }));
+
 function everyTarget(): RefreshTarget[] {
   const geoKinds = ['country', 'admin1', ...(config.ingestAdmin2 ? ['admin2'] : []), ...(config.ingestCities ? ['city'] : [])];
   return [
@@ -78,6 +86,7 @@ function everyTarget(): RefreshTarget[] {
       licenseUrls: ['https://ec.europa.eu/eurostat/web/main/help/copyright-notice'], licenseVerdict: 'red', commercialUse: 'NOT cleared: LAU download page requires accepting "specific download rules" whose text could not be read; geometry derives from EuroBoundaryMap and the sibling communes dataset is non-commercial (docs/licenses/gisco-lau.md). Do not sell until Eurostat/EuroGeographics confirm in writing.',
     },
     ...nationalTargets(),
+    ...wikidataTargets(),
     {
       meta: HOLIDAYS_SOURCE, cadence: 'monthly', expectedRows: [500, 50_000], scope: { kinds: ['holiday'] },
       async load() {
