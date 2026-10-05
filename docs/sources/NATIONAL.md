@@ -19,7 +19,7 @@ Yeni ülke eklerken sıra: (1) yayıncının lisans metnini oku → `docs/LICENS
 | GB | ONS Open Geography (ArcGIS REST; en yeni vintage arama ile bulunur) | nation, region (yalnız İngiltere), local authority district (county/UA öznitelik) | ✅ | partial 🟡 OGL v3 (dossier) | **Yüklü: 374** (4 / 9 / 361); posta kodu/UPRN alınmaz; atıf "Source: Office for National Statistics licensed under the Open Government Licence v.3.0" |
 | AU | ABS ASGS | state, SA4…SA1 | ✅ | 🟢 yapılar CC BY 4.0 / 🟡 LGA | Sırada (Edition 4) |
 | ES | INE diccionario YY.xlsx (belediye) + INEbase Tempus API (CCAA/il adları, değişken 70/115) | comunidad autónoma, provincia, municipio | ✅ | partial 🟡 (INE yeniden kullanım metni okundu 2026-10-05; belediye adlarının REL kaynaklı olması belirsiz, dossier) | **Yüklü: 8.203** (19 / 52 / 8.132 — resmî sayılarla aynı); atıf "Elaboración propia con datos extraídos del sitio web del INE: www.ine.es" |
-| PT | DGT CAOP2025 OGC API (CSV, geometrisiz) | distrito, município, freguesia (yalnız kıta) | ✅ | partial 🟡 (CC BY 4.0, DGT dados abertos okundu; Açores/Madeira yok) | **Yüklü: 3.345** (18 / 278 / 3.049) |
+| PT | DGT CAOP2025 OGC API (CSV, geometrisiz) | distrito, município, freguesia (yalnız kıta) | ✅ | **read** 🟢 (CC BY 4.0; Açores/Madeira yok) | **Yüklü: 3.345** (18 / 278 / 3.049) |
 | DK | DAWA (`api.dataforsyningen.dk`) | region, municipality | ❌ 410 (adres değişmiş) | – | Yeni adres araştırılacak |
 | CA | Statistics Canada | province, census division, subdivision | ❌ 403 | – | Başka erişim yolu |
 | TR | TÜİK, NVİ (UAVT/MAKS) | il, ilçe, mahalle, sokak | ❌ | – | Kullanıcı ağı gerekir |

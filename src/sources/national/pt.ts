@@ -60,11 +60,11 @@ export const PT: NationalSource = {
     id: 'nat-pt',
     authority: 'Direção-Geral do Território (DGT) – Carta Administrativa Oficial de Portugal (CAOP), OGC API',
     url: 'https://ogcapi.dgterritorio.gov.pt/',
-    license: 'CC BY 4.0 (read 2026-10-05, docs/licenses/nat-pt.md): DGT open-data page states geographic information downloaded from its data centre is under CC-BY 4.0, free use with the sole obligation to credit DGT as owner; dados.gov.pt records the CAOP datasets as cc-by. Partial: the page names the data centre and lists the OGC API alongside; Açores and Madeira are not covered (only Continente is served).',
+    license: 'CC BY 4.0 (read 2026-10-05, docs/licenses/nat-pt.md): DGT open-data page states geographic information downloaded from its data centre is under CC-BY 4.0, free use with the sole obligation to credit DGT as owner; dados.gov.pt records the CAOP datasets as cc-by. Açores and Madeira are not covered (only Continente is served by the OGC API); freguesia codes are assigned by INE (open question in the dossier).',
     version: 'CAOP (latest)',
     attribution: 'Fonte: Direção-Geral do Território (DGT), Carta Administrativa Oficial de Portugal (CAOP). CC BY 4.0',
   },
-  licenseStatus: 'partial',
+  licenseStatus: 'read',
   levels: ['distrito', 'município', 'freguesia'],
   async load(cacheDir) {
     const meta = JSON.parse(await fetchText(`${API}/municipios?f=json`, 'pt_municipios_meta.json', cacheDir, undefined, { accept: 'application/json' })) as { title?: string };

@@ -18,7 +18,6 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | nat-gb | 🟡 | OGL v3 ticari serbest; "Names and Codes" tablolarının OS/Royal Mail kapsamı belirsiz |
 | nat-au | 🟢 / 🟡 | ABS yapıları CC BY 4.0 (🟢); LGA üçüncü taraf mı belirsiz (🟡) |
 | nat-de | 🟢 (koşullu) | Destatis telif sayfası ticari yeniden kullanım serbest (kendi okumam); BKG VG250 dl-de/by-2-0; AdV/ZSGT ürünleri ücretli, kullanılmaz |
-| nat-pt | 🟡 | DGT CC BY 4.0 (dados abertos sayfası okundu 2026-10-05); yalnızca kıta Portekiz (OGC API); atıf DGT |
 | nat-es | 🟡 | INE ticari serbest ama yalnızca kaynağı INE olan içerik; belediye adları Bakanlık REL kaynaklı |
 | nat-at | 🟢 | Statistik Austria CC BY 4.0 + AGB §10; PLZ/sokak dosyaları hariç |
 | nat-be | ⚪ | Statbel CAPTCHA, metin okunamadı → insan okuması |
