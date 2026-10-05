@@ -1,0 +1,26 @@
+name: contracts
+# Weekly check that the live sources still look the way the adapters expect (file layouts, reachability) and that no license page changed.
+# Informational: a red run means a person should look (docs/OPERATIONS.md); it never changes data in production.
+on:
+  schedule:
+    - cron: '41 4 * * 1'
+  workflow_dispatch:
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: countryinfo }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/countryinfo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22.x, check-latest: true, cache: npm }
+      - run: npm ci
+      - run: npm run check:sources
+      - run: npm run check:licenses

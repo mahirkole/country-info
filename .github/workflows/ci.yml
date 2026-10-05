@@ -17,10 +17,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm }
+        with: { node-version: 22.x, check-latest: true, cache: npm }
+      # node:sqlite (GeoPackage reader) needs Node >= 22.13 (package.json engines)
+      - run: node -e "const [a,b]=process.versions.node.split('.').map(Number); if (a<22||(a===22&&b<13)) { console.error('Node '+process.versions.node+' < 22.13'); process.exit(1); }"
       - run: npm ci
       - run: npx tsc --noEmit -p .
+      - run: bash -n scripts/cron/run-cycle.sh scripts/dev/s3-e2e.sh scripts/pg-start.sh
       - run: npm test
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: cd sdk/python && python -m unittest discover -s tests
+
+  # S3 store against moto, an independent S3 implementation that verifies SigV4 signatures (test/s3-e2e.test.ts is skipped without it).
+  s3-e2e:
+    runs-on: ubuntu-latest
+    env:
+      MOTO_VENV: ${{ github.workspace }}/.motoenv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22.x, check-latest: true, cache: npm }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - uses: actions/cache@v4
+        with:
+          path: .motoenv
+          key: motoenv-${{ runner.os }}-py311-v1
+      - run: npm ci
+      - run: bash scripts/dev/s3-e2e.sh
