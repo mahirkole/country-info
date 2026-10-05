@@ -367,7 +367,7 @@ d('distribution', () => {
       const r = await get(de.key);
       expect(r.files).toEqual({}); // restricted key: no global files
       expect(Object.keys(r.by_country)).toEqual(['DE']);
-      expect(Object.keys(r.by_country.DE!.files).sort()).toEqual(['country.json', 'holidays.ndjson', 'regions.ndjson']);
+      expect(Object.keys(r.by_country.DE!.files).sort()).toEqual(['attributes.json', 'country.json', 'holidays.ndjson', 'regions.ndjson']);
       expect(r.snapshots.every((x) => x.delta === undefined)).toBe(true);
       expect(r.by_country.DE!.deltas.map((x) => x.snapshot_id)).not.toContain(fr.snapshotId); // nothing changed in DE in that snapshot
       const dl = await app.inject({ url: new URL(r.by_country.DE!.files['regions.ndjson']!.url).pathname + new URL(r.by_country.DE!.files['regions.ndjson']!.url).search });
