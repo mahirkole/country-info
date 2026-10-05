@@ -22,6 +22,8 @@ export const OPERATIONS: Op[] = [
   { method: 'get', path: '/v1/regions/{id}', tag: 'regions', summary: 'One region with names, cross references and links to other sources' },
   { method: 'get', path: '/v1/regions/{id}/children', tag: 'regions', summary: 'Children of a region', query: [...page, ...scope] },
   { method: 'get', path: '/v1/search', tag: 'regions', summary: 'Search by name prefix', query: [{ name: 'q', description: 'Name prefix', required: true }, { name: 'country', description: 'ISO alpha-2' }, { name: 'kind', description: 'Entity kind' }, { name: 'limit', description: 'Max results' }, ...scope] },
+  { method: 'get', path: '/v1/regions/{id}/successors', tag: 'regions', summary: 'Confirmed successors and predecessors of a unit across releases (works for ids that no longer exist)' },
+  { method: 'post', path: '/v1/review-items/{id}/resolve', tag: 'admin', summary: 'Accept or dismiss a review item (accepting a successor suggestion records the relation)', admin: true },
   { method: 'get', path: '/v1/review-items', tag: 'admin', summary: 'Open source conflicts for review', admin: true, query: [{ name: 'status', description: 'open, accepted_a, accepted_b, dismissed' }, { name: 'limit', description: 'Max results' }] },
   { method: 'get', path: '/v1/sources', tag: 'provenance', summary: 'Sources with license, attribution, freshness and class' },
   { method: 'get', path: '/v1/status', tag: 'provenance', summary: 'Health of the data pipeline (stale or failing sources)' },

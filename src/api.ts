@@ -175,6 +175,36 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     return { ...r.rows[0], names, xrefs, links };
   });
 
+  /**
+   * Confirm or dismiss a successor suggestion (admin). Accepting writes entity_successors rows for every target;
+   * the review item is closed either way. Other kinds of review items are resolved with `dismiss` only.
+   */
+  app.post<{ Params: { id: string }; Body: { action?: string } }>('/v1/review-items/:id/resolve', { preHandler: requireAdmin }, async (req, reply) => {
+    const action = req.body?.action;
+    if (action !== 'accept' && action !== 'dismiss') return reply.code(400).send({ error: "action must be 'accept' or 'dismiss'" });
+    const item = (await pool.query("SELECT id, entity_id, field, b_value FROM review_items WHERE id = $1 AND status = 'open'", [req.params.id])).rows[0];
+    if (!item) return reply.code(404).send({ error: 'not_found_or_closed' });
+    if (action === 'accept') {
+      const m = /^successor:(replaced_by|merged_into)$/.exec(item.field);
+      if (!m) return reply.code(400).send({ error: 'only successor suggestions can be accepted' });
+      for (const t of (item.b_value?.to ?? []) as { id: string }[]) {
+        await pool.query(
+          `INSERT INTO entity_successors (old_id, new_id, relation, confidence, method, snapshot_id) VALUES ($1, $2, $3, $4, 'suggested+confirmed', $5)
+           ON CONFLICT (old_id, new_id) DO NOTHING`,
+          [item.entity_id, t.id, m[1], item.b_value?.confidence ?? 1, item.b_value?.snapshot_id ?? null],
+        );
+      }
+    }
+    await pool.query('UPDATE review_items SET status = $2 WHERE id = $1', [item.id, action === 'accept' ? 'accepted_b' : 'dismissed']);
+    return { ok: true, id: Number(item.id), status: action === 'accept' ? 'accepted_b' : 'dismissed' };
+  });
+
+  /** Confirmed successors of a unit (it was replaced / merged) and predecessors (units it replaced); works for ids that no longer exist. */
+  app.get<{ Params: { id: string } }>('/v1/regions/:id/successors', async (req) => ({
+    successors: (await pool.query('SELECT new_id AS id, relation, confidence, confirmed_at FROM entity_successors WHERE old_id = $1 ORDER BY new_id', [req.params.id])).rows,
+    predecessors: (await pool.query('SELECT old_id AS id, relation, confidence, confirmed_at FROM entity_successors WHERE new_id = $1 ORDER BY old_id', [req.params.id])).rows,
+  }));
+
   app.get<{ Querystring: { status?: string; limit?: string } }>('/v1/review-items', { preHandler: requireAdmin }, async (req) => ({
     data: (
       await pool.query('SELECT id, entity_id, field, a_source, a_value, b_source, b_value, status, created_at FROM review_items WHERE status = $1 ORDER BY id LIMIT $2', [

@@ -200,6 +200,21 @@ d('license watch (db)', () => {
       'div:TR:old-c>successor:merged_into>div:TR:new-bc',
       'div:TR:old-d>successor:replaced_by>div:TR:new-d',
     ]);
+
+    // Confirm one suggestion, dismiss another; the relation becomes queryable even though the old unit is gone.
+    const app = await buildApp(pool, { adminToken: 'tok', exportDir: cache });
+    const auth = { authorization: 'Bearer tok' };
+    const ids = (await pool.query("SELECT id, entity_id FROM review_items WHERE field LIKE 'successor:%' ORDER BY entity_id")).rows;
+    expect((await app.inject({ method: 'POST', url: `/v1/review-items/${ids[0].id}/resolve`, payload: { action: 'accept' } })).statusCode).toBe(401);
+    expect((await app.inject({ method: 'POST', url: `/v1/review-items/${ids[0].id}/resolve`, headers: auth, payload: { action: 'nope' } })).statusCode).toBe(400);
+    expect((await app.inject({ method: 'POST', url: `/v1/review-items/${ids[0].id}/resolve`, headers: auth, payload: { action: 'accept' } })).json()).toMatchObject({ status: 'accepted_b' });
+    expect((await app.inject({ method: 'POST', url: `/v1/review-items/${ids[0].id}/resolve`, headers: auth, payload: { action: 'accept' } })).statusCode).toBe(404); // already closed
+    await app.inject({ method: 'POST', url: `/v1/review-items/${ids[3].id}/resolve`, headers: auth, payload: { action: 'dismiss' } });
+    const old = (await app.inject('/v1/regions/div:TR:old-a/successors')).json();
+    expect(old.successors).toMatchObject([{ id: 'div:TR:new-a', relation: 'replaced_by' }]);
+    expect((await app.inject('/v1/regions/div:TR:new-a/successors')).json().predecessors).toMatchObject([{ id: 'div:TR:old-a' }]);
+    expect((await app.inject('/v1/regions/div:TR:old-d/successors')).json().successors).toEqual([]); // dismissed
+    await app.close();
   });
 
   it('suggestSuccessors only pairs units with the same parent and ignores unrelated names', () => {
