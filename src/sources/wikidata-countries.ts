@@ -29,6 +29,18 @@ export const WD_COUNTRIES: WdCountry[] = [
       { key: 'gemeente', classes: ['Q493522'], level: 3, type: 'municipality', typeLocal: 'gemeente / commune', expected: [560, 566] },
     ],
   },
+  {
+    cc: 'BR', country: 'Q155', langs: ['pt'],
+    levels: [
+      { key: 'unidade federativa', classes: ['Q485258'], level: 1, type: 'state', typeLocal: 'unidade federativa', expected: [27, 27] },
+      { key: 'município', classes: ['Q3184121'], level: 2, type: 'municipality', typeLocal: 'município', expected: [5565, 5575] },
+    ],
+  },
+  {
+    // Districts are not loaded: no official count that Wikidata (798) can be checked against without the closed LGD list.
+    cc: 'IN', country: 'Q668', langs: ['en'],
+    levels: [{ key: 'state / union territory', classes: ['Q12443800', 'Q467745'], level: 1, type: 'state', typeLocal: 'state / union territory', expected: [36, 36] }],
+  },
 ];
 
 export const wikidataMeta = (c: WdCountry): SourceMeta => ({

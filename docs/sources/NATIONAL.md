@@ -43,7 +43,9 @@ Motor: `src/sources/wikidata-divisions.ts`, ülke yapılandırması `src/sources
 | DK | region (5; "Region Østdanmark" dışlandı), kommune (98) | 103 |
 | FI | maakunta (19), kunta (308) | 327 |
 | BE | gewest (3), provincie (10), gemeente (564; Bergen/Mons Q83407 atasız → atlandı) | 577 |
-Sırada (sınıf/sayı doğrulaması gerekir): PL (voivodeship 16 ✓; powiat Wikidata'da 320+67 ≠ resmi 380 → kapıdan geçmez; gmina sınıfı doğrulanmadı), IN, KR, BR, TR (ilçe 1.039≠973 → yüklenmez).
+| BR | unidade federativa (27), município (5.572; band 5.565–5.575, resmi 5.570 + DF) | 5.599 |
+| IN | state / union territory (28+8 = 36); ilçeler yüklenmez (Wikidata 798, doğrulayacak açık resmi sayı yok) | 36 |
+Yüklenmeyenler: PL (voivodeship 16 ✓; powiat Wikidata'da 320+67 ≠ resmi 380; gmina sınıfı doğrulanmadı), KR (üst birimler 6 sınıfa dağılmış; 17'lik resmi yapı için sınıf eşlemesi gerekir), TR (il 81 ✓ ama GeoNames zaten kapsıyor; ilçe 1.052≠973).
 
 ## Tasarım notları
 - GeoNames (`geonames`) hâlâ dünya geneli taban katman; ulusal kaynaklar `division` olarak **yanına** eklenir, GeoNames'i silmez. "Yalnızca resmi" mod için bkz. `docs/ROADMAP.md`.
