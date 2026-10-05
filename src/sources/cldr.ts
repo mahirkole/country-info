@@ -1,7 +1,8 @@
 import type pg from 'pg';
 import { fetchText } from './fetch.js';
+import { enrichCldrAttributes } from './cldr-attrs.js';
 
-const BASE = 'https://raw.githubusercontent.com/unicode-org/cldr-json/main/cldr-json';
+export const CLDR_BASE = 'https://raw.githubusercontent.com/unicode-org/cldr-json/main/cldr-json';
 export const CLDR_LANGS = ['en', 'tr', 'de', 'fr', 'es', 'it', 'pt', 'ru', 'ar', 'zh', 'ja', 'ko', 'nl', 'pl', 'sv', 'da', 'fi', 'nb', 'cs', 'el', 'hu', 'ro', 'uk', 'he', 'fa', 'hi', 'id', 'th', 'vi'];
 
 export const CLDR_SOURCE = {
@@ -49,8 +50,8 @@ export function parseUnMembers(json: unknown): Set<string> {
 }
 
 /** Write localized country names (`entity_names`, source cldr) and the current currency (`entity_xrefs` scheme `currency`) and the UN status (scheme `un_status`: `member` or `other`) for country entities. */
-export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_LANGS): Promise<{ names: number; currencies: number; un_members: number }> {
-  const get = async (path: string, name: string) => JSON.parse(await fetchText(`${BASE}/${path}`, name, cacheDir)) as unknown;
+export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_LANGS): Promise<{ names: number; currencies: number; un_members: number; attributes: number; locales: number }> {
+  const get = async (path: string, name: string) => JSON.parse(await fetchText(`${CLDR_BASE}/${path}`, name, cacheDir)) as unknown;
   const names = new Map<string, Map<string, string>>();
   for (const l of langs) names.set(l, parseTerritories(await get(`cldr-localenames-full/main/${l}/territories.json`, `cldr_terr_${l}.json`), l));
   const currencies = parseCurrencies(await get('cldr-core/supplemental/currencyData.json', 'cldr_currency.json'));
@@ -93,5 +94,6 @@ export async function enrichCldr(pool: pg.Pool, cacheDir: string, langs = CLDR_L
   } finally {
     client.release();
   }
-  return { names: n, currencies: c, un_members: um };
+  const attrs = await enrichCldrAttributes(pool, cacheDir, currencies, langs);
+  return { names: n, currencies: c, un_members: um, attributes: attrs.attributes, locales: attrs.locales };
 }
