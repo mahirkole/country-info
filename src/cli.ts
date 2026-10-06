@@ -11,6 +11,7 @@ import { NATIONAL, nationalSource } from './sources/national/index.js';
 import { allTargets, licenseWatchTargets, syncTargetMetadata } from './targets.js';
 import { dueSourceIds, runRefresh, type RunResult } from './refresh.js';
 import { ackLicense, checkLicenses } from './license-watch.js';
+import { ackCod } from './sources/cod.js';
 import { loadHolidaysWithFeeds, HOLIDAYS_SOURCE } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { diffHolidays, fetchNager } from './holidays/check.js';
@@ -176,6 +177,12 @@ async function main() {
       console.log(done.length ? `acknowledged ${done.length}: ${done.join(', ')}` : 'nothing to acknowledge (usage: holiday-law-ack <url|all>)');
       break;
     }
+    case 'cod-ack': {
+      await migrate(pool);
+      const done = await ackCod(pool, config.cacheDir, process.argv[3] ?? '');
+      console.log(done.length ? `acknowledged ${done.length}: ${done.join(', ')}` : 'nothing to acknowledge (usage: cod-ack <CC,CC|all>; denied countries cannot be acknowledged)');
+      break;
+    }
     case 'license-ack': {
       const t = [...allTargets(), ...licenseWatchTargets()].find((x) => x.meta.id === process.argv[3]);
       if (!t) throw new Error('usage: license-ack <source-id>');
@@ -275,7 +282,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | check-holiday-law | holiday-law-ack <url|all> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | enrich-attributes | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | prune | notify [text] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | cod-ack <CC,CC|all> | check-holiday-law | holiday-law-ack <url|all> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | enrich-attributes | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | prune | notify [text] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

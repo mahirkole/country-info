@@ -94,7 +94,7 @@ async function run(pool: pg.Pool, t: RefreshTarget, o: RefreshOptions): Promise<
   let input: EntityInput[];
   let raw: string;
   try {
-    input = await t.load(o.cacheDir);
+    input = await t.load(o.cacheDir, { pool, dryRun: o.dryRun });
   } catch (e) {
     stop();
     await setStatus('failed', false);

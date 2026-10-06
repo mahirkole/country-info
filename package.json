@@ -18,6 +18,7 @@
     "check:sources": "tsx src/cli.ts refresh --dry-run",
     "check:licenses": "tsx src/cli.ts check-licenses",
     "license:ack": "tsx src/cli.ts license-ack",
+    "cod:ack": "tsx src/cli.ts cod-ack",
     "ingest:national": "tsx src/cli.ts ingest-national",
     "check:holiday-law": "tsx src/cli.ts check-holiday-law",
     "holiday-law:ack": "tsx src/cli.ts holiday-law-ack",

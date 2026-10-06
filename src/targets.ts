@@ -12,6 +12,7 @@ import { HOLIDAYS_SOURCE, loadHolidaysWithFeeds } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { logBody } from './sources/fetch.js';
 import { CLDR_SOURCE } from './sources/cldr.js';
+import { COD_SOURCE, loadCod } from './sources/cod.js';
 import { ATTR_SOURCES, type AttrSourceId } from './sources/attributes.js';
 
 export type Cadence = 'daily' | 'weekly' | 'monthly' | 'annual' | 'event';
@@ -24,7 +25,7 @@ export interface RefreshTarget {
   /** Sanity band for the number of records one run must produce; outside it the run is not applied. */
   expectedRows: [number, number];
   scope: IngestScope;
-  load(cacheDir: string): Promise<EntityInput[]>;
+  load(cacheDir: string, ctx?: { pool: pg.Pool; dryRun?: boolean }): Promise<EntityInput[]>;
   /** Pages whose text defines the license; watched for changes (license drift). */
   licenseUrls: string[];
   licenseVerdict: Verdict;
@@ -113,6 +114,14 @@ function everyTarget(): RefreshTarget[] {
       licenseUrls: ['https://ec.europa.eu/eurostat/web/main/help/copyright-notice'], licenseVerdict: 'red', commercialUse: 'NOT cleared: LAU download page requires accepting "specific download rules" whose text could not be read; geometry derives from EuroBoundaryMap and the sibling communes dataset is non-commercial (docs/licenses/gisco-lau.md). Do not sell until Eurostat/EuroGeographics confirm in writing.',
     },
     ...nationalTargets(),
+    {
+      // BR stays out until IBGE's own licence is read (docs/licenses/ocha-cod-ab.md); TR/PL are refused by the deny filter.
+      meta: COD_SOURCE, cadence: 'monthly', expectedRows: [30_000, 50_000], scope: { kinds: ['division'] }, // the source owns all its own records: a country that is excluded/unacked later is removed (guarded by the delete ratio)
+     
+      load: (dir, ctx) => loadCod(dir, new Set([...Object.keys(NATIONAL), 'BR']), ctx),
+      licenseUrls: ['https://docs.humdata.org/about/data-licenses', 'https://creativecommons.org/licenses/by/3.0/igo/legalcode', 'https://docs.humdata.org/about/hdx-terms-of-service'],
+      licenseVerdict: 'amber', commercialUse: 'CC BY 3.0 IGO (HDX package license_id cc-by-igo): commercial use, adaptation and distribution with attribution and change notice; no sublicensing, no UN/OCHA endorsement; only countries whose upstream is a national publisher (reviewed, cod:ack); docs/licenses/ocha-cod-ab.md',
+    },
     ...wikidataTargets(),
     {
       meta: HOLIDAYS_SOURCE, cadence: 'monthly', expectedRows: [500, 50_000], scope: { kinds: ['holiday'] },
@@ -127,9 +136,9 @@ function everyTarget(): RefreshTarget[] {
   ];
 }
 
-/** official = state/intergovernmental publisher (nat-*, gisco-*, official-holidays); community = GeoNames, Wikidata and other crowd-sourced layers (wd-*). */
+/** official = state/intergovernmental publisher (nat-*, gisco-*, cod-ab, official-holidays); community = GeoNames, Wikidata and other crowd-sourced layers (wd-*). */
 export function sourceClassOf(id: string): 'official' | 'community' {
-  return id.startsWith('nat-') || id.startsWith('gisco-') || id === 'official-holidays' ? 'official' : 'community';
+  return id.startsWith('nat-') || id.startsWith('gisco-') || id === 'cod-ab' || id === 'official-holidays' ? 'official' : 'community';
 }
 
 /** Store the static per-source metadata (cadence, bands, verdict) so the API can show it before the first run. */
