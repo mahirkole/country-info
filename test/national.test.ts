@@ -470,3 +470,21 @@ describe('LU adapter (STATEC LAU workbook)', () => {
     expect(() => parseLuxembourg([{ name: 'S', rows: [...header, ...rows(60)] }])).toThrow(/layout changed/);
   });
 });
+
+import { parseEstonia } from '../src/sources/national/ee.js';
+describe('EE adapter (Maa-amet EHAK WFS)', () => {
+  const f = (code: string, name: string, cc: string, cn: string, lopp: string | null = null) => ({ properties: { ehak_kood: code, omavalitsus: name, tyyp: 'vald', maakond_kood: cc, maakond: cn, vers_lopp: lopp } });
+  const many = Array.from({ length: 78 }, (_, i) => f(String(1000 + i), i === 0 ? 'Haapsalu linn' : `Vald ${i} vald`, String(1 + (i % 15)).padStart(4, '0'), `Maakond ${i % 15}`));
+  it('builds county > municipality, takes the type from the name suffix (the layer says vald for towns), skips ended features', () => {
+    const out = parseEstonia({ features: [...many, f('9999', 'Vana vald', '0001', 'Maakond 0', '2017-01-01')] });
+    expect(out.filter((e) => e.data.type === 'county')).toHaveLength(15);
+    expect(out.find((e) => e.id === 'div:EE:mun-1000')).toMatchObject({ data: { type: 'city', type_local: 'linn' }, parent_id: 'div:EE:cou-0001' });
+    expect(out.some((e) => e.id === 'div:EE:mun-9999')).toBe(false);
+    expect(out.filter((e) => e.data.level === 2)).toHaveLength(78);
+  });
+  it('fails loudly on layout or count changes', () => {
+    expect(() => parseEstonia({})).toThrow(/layout changed/);
+    expect(() => parseEstonia({ features: many.slice(0, 30) })).toThrow(/layout changed/);
+    expect(() => parseEstonia({ features: [{ properties: { ehak_kood: 'x' } }] })).toThrow(/layout changed/);
+  });
+});
