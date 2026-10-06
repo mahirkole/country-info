@@ -35,6 +35,7 @@ export const RESOLVERS: Record<string, Resolver> = {
     return m ? { ...m, units: attr(c, cc, 'units') ?? undefined } : null;
   },
   locale: (c, cc) => attr(c, cc, 'locale') ?? null,
+  postal: (c, cc) => attr(c, cc, 'postal') ?? null,
   timezones: (c, cc) => attr(c, cc, 'timezones') ?? null,
   telephony: (c, cc) => attr(c, cc, 'telephony') ?? null,
   traffic: (c, cc) => (attr(c, cc, 'driving')?.side ? { driving_side: attr(c, cc, 'driving')!.side } : null),

@@ -76,7 +76,7 @@ export const licenseWatchTargets = (): RefreshTarget[] => [
   { meta: CLDR_SOURCE, cadence: 'annual', expectedRows: [0, 0], scope: { kinds: [] }, load: async () => [], licenseUrls: ['https://www.unicode.org/license.txt', 'https://www.unicode.org/copyright.html'], licenseVerdict: 'green', commercialUse: 'Unicode License v3: use, copy, modify, publish, distribute and sell with the copyright notice; docs/licenses/cldr.md (origin of some files unread: amber in the dossier)' },
   ...(Object.keys(ATTR_SOURCES) as AttrSourceId[]).map((id): RefreshTarget => ({
     meta: { id, authority: ATTR_SOURCES[id].authority, url: ATTR_SOURCES[id].url, license: ATTR_SOURCES[id].license, attribution: ATTR_SOURCES[id].attribution }, cadence: 'monthly', expectedRows: [0, 0], scope: { kinds: [] }, load: async () => [],
-    licenseUrls: id === 'iana-tz' ? ['https://data.iana.org/time-zones/tzdb/LICENSE'] : id === 'libphonenumber' ? ['https://raw.githubusercontent.com/google/libphonenumber/master/LICENSE'] : ['https://www.wikidata.org/wiki/Wikidata:Licensing'],
+    licenseUrls: id === 'iana-tz' ? ['https://data.iana.org/time-zones/tzdb/LICENSE'] : id === 'libphonenumber' ? ['https://raw.githubusercontent.com/google/libphonenumber/master/LICENSE'] : id === 'libaddressinput' ? ['https://chromium-i18n.appspot.com/ssl-address'] : ['https://www.wikidata.org/wiki/Wikidata:Licensing'],
     licenseVerdict: ATTR_SOURCES[id].verdict, commercialUse: ATTR_SOURCES[id].commercial,
   })),
 ];

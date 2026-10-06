@@ -19,6 +19,11 @@ export const ATTR_SOURCES = {
     license: 'Apache License 2.0 (file header and repository LICENSE, read): use, reproduce, modify and distribute commercially; keep the license and notices with redistributed copies of the file.',
     attribution: 'Telephone metadata (calling codes and dialling prefixes only) extracted and modified from Google libphonenumber PhoneNumberMetadata.xml, © The Libphonenumber Authors, licensed under the Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0).', verdict: 'green', commercial: 'Apache-2.0 (header, LICENSE incl. section 4 read; no NOTICE file in the repository): commercial use allowed; pass on the license reference and mark modification (docs/licenses/libphonenumber.md)',
   },
+  libaddressinput: {
+    authority: 'Google libaddressinput – Address Data Service (postal code formats, address layout)', url: 'https://chromium-i18n.appspot.com/ssl-address',
+    license: 'CC BY 4.0: the service page states "Copyright 2021 Google LLC. This data is licensed by Google under the CC-BY 4.0 license." and the repository README "Data licensed under the CC-BY 4.0" (both read 2026-10-06).',
+    attribution: 'Postal-code and address-format metadata extracted and reformatted from the Google libaddressinput Address Data Service, © Google LLC, licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).', verdict: 'green', commercial: 'CC BY 4.0: commercial use and redistribution allowed with attribution and an indication of changes (docs/licenses/libaddressinput.md)',
+  },
   'wikidata-driving': {
     authority: 'Wikidata – driving side of countries (P1622)', url: 'https://www.wikidata.org/wiki/Property:P1622',
     license: 'Creative Commons CC0 1.0 (Wikidata:Licensing, read): structured data in the public domain.',
@@ -54,6 +59,47 @@ export function parsePhoneMetadata(xml: string): Map<string, Phone> {
     out.set(a.id, { calling_code: a.countryCode, ...(a.internationalPrefix ? { international_prefix: a.internationalPrefix } : {}), ...(a.nationalPrefix ? { national_prefix: a.nationalPrefix } : {}), ...(a.mainCountryForCode === 'true' ? { main_country_for_code: true } : {}) });
   }
   if (out.size < 200) throw new Error(`libphonenumber: only ${out.size} territories — layout changed`);
+  return out;
+}
+
+export const ADDR_BASE = 'https://chromium-i18n.appspot.com/ssl-address/data';
+
+export interface Postal {
+  postal_code?: { regex?: string; examples?: string[]; name_type?: string; prefix?: string };
+  address_format: { format?: string; required?: string; uppercase?: string; state_name_type?: string; locality_name_type?: string };
+  postal_service_url?: string;
+}
+/** One country record of the Address Data Service (`/data/<CC>`): postal code pattern and examples, address line layout. */
+export function parseAddressRecord(j: Record<string, unknown>, cc: string): Postal {
+  if (j.key !== cc || typeof j.id !== 'string') throw new Error(`libaddressinput data/${cc}: unexpected record — layout changed`);
+  const str = (k: string): string | undefined => (typeof j[k] === 'string' && j[k] !== '' ? (j[k] as string) : undefined);
+  const examples = str('zipex')?.split(',').map((x) => x.trim()).filter(Boolean);
+  return {
+    ...(str('zip') || examples || str('zip_name_type') || str('postprefix') ? { postal_code: { ...(str('zip') ? { regex: str('zip') } : {}), ...(examples ? { examples } : {}), ...(str('zip_name_type') ? { name_type: str('zip_name_type') } : {}), ...(str('postprefix') ? { prefix: str('postprefix') } : {}) } } : {}),
+    address_format: { ...(str('fmt') ? { format: str('fmt') } : {}), ...(str('require') ? { required: str('require') } : {}), ...(str('upper') ? { uppercase: str('upper') } : {}), ...(str('state_name_type') ? { state_name_type: str('state_name_type') } : {}), ...(str('locality_name_type') ? { locality_name_type: str('locality_name_type') } : {}) },
+    ...(str('posturl') ? { postal_service_url: str('posturl') } : {}),
+  };
+}
+
+/** The country list (`/data` → `countries: "AC~AD~..."`). */
+export function parseAddressCountries(j: Record<string, unknown>): string[] {
+  const list = typeof j.countries === 'string' ? j.countries.split('~').filter((c) => /^[A-Z]{2}$/.test(c)) : [];
+  if (list.length < 200) throw new Error(`libaddressinput data: only ${list.length} countries — layout changed`);
+  return list;
+}
+
+async function fetchAddressData(cacheDir: string, only?: string[]): Promise<Map<string, Postal>> {
+  const countries = only ?? parseAddressCountries(JSON.parse(await fetchText(ADDR_BASE, 'addr_countries.json', cacheDir)));
+  const out = new Map<string, Postal>();
+  let next = 0;
+  const worker = async () => {
+    for (;;) {
+      const cc = countries[next++];
+      if (!cc) return;
+      out.set(cc, parseAddressRecord(JSON.parse(await fetchText(`${ADDR_BASE}/${cc}`, `addr_${cc}.json`, cacheDir)), cc));
+    }
+  };
+  await Promise.all(Array.from({ length: 6 }, worker));
   return out;
 }
 
@@ -107,7 +153,7 @@ async function replaceAttributes(pool: pg.Pool, source: AttrSourceId, rows: Row[
   return { rows: rows.length, release_note: note };
 }
 
-export interface ExternalResult { timezones: { rows: number; release_note: number | null; vintage: string }; telephony: { rows: number; release_note: number | null; vintage: string }; driving: { rows: number; release_note: number | null; vintage: string } }
+export interface ExternalResult { postal: { rows: number; release_note: number | null; vintage: string }; timezones: { rows: number; release_note: number | null; vintage: string }; telephony: { rows: number; release_note: number | null; vintage: string }; driving: { rows: number; release_note: number | null; vintage: string } }
 /** Fetch IANA zone.tab, libphonenumber metadata and Wikidata driving sides and write them as country attribute groups `timezones`, `telephony`, `driving`. */
 export async function enrichExternalAttributes(pool: pg.Pool, cacheDir: string, opts: { sparqlFn?: typeof sparql } = {}): Promise<ExternalResult> {
   const countries = (await pool.query(`SELECT id, code FROM entities WHERE kind = 'country'`)).rows as { id: string; code: string }[];
@@ -124,9 +170,12 @@ export async function enrichExternalAttributes(pool: pg.Pool, cacheDir: string, 
   const phoneVintage = 'libphonenumber master'; // a moving branch has no release number; a data change is reported by the content diff
   const tel = await replaceAttributes(pool, 'libphonenumber', countries.flatMap(({ id, code }) => (phones.has(code) ? [{ id, grp: 'telephony', data: phones.get(code)! }] : [])), phoneVintage, codeOf);
 
+  const addr = await fetchAddressData(cacheDir);
+  const post = await replaceAttributes(pool, 'libaddressinput', countries.flatMap(({ id, code }) => (addr.has(code) ? [{ id, grp: 'postal', data: addr.get(code)! }] : [])), 'libaddressinput', codeOf);
+
   const driving = parseDriving(await (opts.sparqlFn ?? sparql)(DRIVING_QUERY));
   const dr = await replaceAttributes(pool, 'wikidata-driving', countries.flatMap(({ id, code }) => (driving.has(code) ? [{ id, grp: 'driving', data: { side: driving.get(code)! } }] : [])), 'wikidata', codeOf);
-  return { timezones: { ...tz, vintage: `tzdb ${tzVersion}` }, telephony: { ...tel, vintage: phoneVintage }, driving: { ...dr, vintage: 'wikidata' } };
+  return { postal: { ...post, vintage: 'libaddressinput' }, timezones: { ...tz, vintage: `tzdb ${tzVersion}` }, telephony: { ...tel, vintage: phoneVintage }, driving: { ...dr, vintage: 'wikidata' } };
 }
 
 /** Contract check for check:sources: fetch and parse all three sources, write nothing. */
@@ -134,5 +183,7 @@ export async function checkExternalContract(cacheDir: string, opts: { sparqlFn?:
   const z = parseZoneTab(await fetchText(`${TZ_BASE}/zone.tab`, 'tz_zone.tab', cacheDir));
   const p = parsePhoneMetadata(await fetchText(PHONE_URL, 'libphonenumber_metadata.xml', cacheDir));
   const d = parseDriving(await (opts.sparqlFn ?? sparql)(DRIVING_QUERY));
-  return `tzdb ${z.size} countries, libphonenumber ${p.size} territories, driving side ${d.size} countries`;
+  parseAddressCountries(JSON.parse(await fetchText(ADDR_BASE, 'addr_countries.json', cacheDir)));
+  const a = await fetchAddressData(cacheDir, ['US', 'TR', 'DE']);
+  return `tzdb ${z.size} countries, libphonenumber ${p.size} territories, driving side ${d.size} countries, address data ok (${a.size} sampled)`;
 }

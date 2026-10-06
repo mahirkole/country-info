@@ -31,6 +31,7 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | nat-ie | 🟢 | CC BY 4.0; veri ince (31 il/şehir, resmi kod yok) |
 | nat-pt | 🟢 | DGT CAOP CC BY 4.0; freguesia kodu INE'ye ait |
 | nat-cz | 🟢 | ČÚZK/ČSÚ CC BY 4.0 (atıf + metaveri + değişiklik belirtme) |
+| **libaddressinput** | 🟢 | Veri CC BY 4.0 (hizmet sayfası + README okundu); posta kodu deseni/örnekleri ve adres düzeni; hizmet ToS okunamadı |
 | **iana-tz** | 🟢 | tzdb kamu malı (LICENSE ve zone.tab başlığı okundu); ülke saat dilimleri (`zone.tab`, "deprecated" ama ülke başına tek satır) |
 | **libphonenumber** | 🟢 | Apache-2.0 (dosya başlığı + LICENSE 4. madde okundu, NOTICE yok); yalnızca arama kodu/önekler; atıf metni lisans URL'si ve değişiklik notunu taşır |
 | **wikidata** | 🟢 | Yapılandırılmış veri CC0 (ticari, yeniden dağıtım serbest, atıf gerekmez). Sınırlar: User-Agent zorunlu, 60 sn sorgu zaman aşımı, IP başına 5 paralel sorgu, 429 yönetimi; büyük çekimler için dump. Topluluk verisidir (resmi değil). Üçüncü taraf kökenli içerik CC0 ile temizlenmiş olmaz |

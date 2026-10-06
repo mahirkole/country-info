@@ -91,6 +91,16 @@ export const CATALOG: ScopeDef[] = [
     fields: [f('calling_code', 'string', 'International calling code without +', 'libphonenumber'), f('international_prefix', 'string', 'International dialling prefix (regex as given by the metadata)', 'libphonenumber'), f('national_prefix', 'string', 'National (trunk) prefix', 'libphonenumber'), f('main_country_for_code', 'boolean', 'The main country of a shared calling code (e.g. US for +1)', 'libphonenumber')],
   },
   {
+    id: 'postal', title: 'Postal codes and address format', description: 'Postal-code pattern and examples, address line layout and required fields (Google libaddressinput, CC BY 4.0).', applies_to: ['country'], default: false, availability: { country: 'full' },
+    fields: [
+      f('postal_code.regex', 'string', 'Postal-code pattern (regular expression of the Address Data Service)', 'libaddressinput'), f('postal_code.examples', 'array', 'Valid example postal codes', 'libaddressinput'),
+      f('postal_code.name_type', 'string', 'What the code is called locally (zip | postal)', 'libaddressinput'), f('postal_code.prefix', 'string', 'Prefix printed before the code (e.g. a country letter)', 'libaddressinput'),
+      f('address_format.format', 'string', 'Address layout with %N name, %O organisation, %A street, %C city, %S region, %Z postal code, %n newline', 'libaddressinput'), f('address_format.required', 'string', 'Required fields as one-letter codes (e.g. ACSZ)', 'libaddressinput'),
+      f('address_format.uppercase', 'string', 'Fields printed in upper case', 'libaddressinput'), f('address_format.state_name_type', 'string', 'What the region is called (state | province | ...)', 'libaddressinput'), f('address_format.locality_name_type', 'string', 'What the locality is called', 'libaddressinput'),
+      f('postal_service_url', 'string', 'Postal service address lookup page', 'libaddressinput'),
+    ],
+  },
+  {
     id: 'traffic', title: 'Road traffic', description: 'Driving side (Wikidata, CC0, community data).', applies_to: ['country'], default: false, availability: { country: 'partial' },
     fields: [f('driving_side', 'string', 'left | right', 'wikidata-driving')],
   },

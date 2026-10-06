@@ -114,7 +114,7 @@ async function main() {
         results.push(r);
         if (r.status === 'failed' || r.status === 'needs_review') bad++;
       }
-      if (flag('--dry-run') || (flag('--source') && (srcArg ?? '').split(',').some((x) => ['cldr', 'iana-tz', 'libphonenumber', 'wikidata-driving'].includes(x)))) {
+      if (flag('--dry-run') || (flag('--source') && (srcArg ?? '').split(',').some((x) => ['cldr', 'iana-tz', 'libphonenumber', 'libaddressinput', 'wikidata-driving'].includes(x)))) {
         // The enrichment sources have no refresh target; their contract (files reachable, layout as expected) is checked here.
         try {
           const c = await checkCldrContract(config.cacheDir);

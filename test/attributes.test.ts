@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { buildApp } from '../src/api.js';
 import { migrate } from '../src/db.js';
-import { parseDriving, parsePhoneMetadata, parseZoneTab } from '../src/sources/attributes.js';
+import { parseAddressCountries, parseAddressRecord, parseDriving, parsePhoneMetadata, parseZoneTab } from '../src/sources/attributes.js';
 import { resetSchemaCache } from '../src/scopes/schema.js';
 
 const many = (f: (i: number) => string, n = 210) => Array.from({ length: n }, (_, i) => f(i)).join('\n');
@@ -40,6 +40,20 @@ describe('attribute source parsers', () => {
   });
 });
 
+describe('libaddressinput parsers', () => {
+  it('country record: postal code pattern, examples, layout; countries without a postal code', () => {
+    const us = parseAddressRecord({ id: 'data/US', key: 'US', fmt: '%N%n%O%n%A%n%C, %S %Z', require: 'ACSZ', upper: 'CS', zip: '(\\d{5})(?:[ \\-](\\d{4}))?', zipex: '95014,22162-1010', zip_name_type: 'zip', state_name_type: 'state', posturl: 'https://tools.usps.com/x', sub_keys: 'AL~AK' }, 'US');
+    expect(us).toEqual({ postal_code: { regex: '(\\d{5})(?:[ \\-](\\d{4}))?', examples: ['95014', '22162-1010'], name_type: 'zip' }, address_format: { format: '%N%n%O%n%A%n%C, %S %Z', required: 'ACSZ', uppercase: 'CS', state_name_type: 'state' }, postal_service_url: 'https://tools.usps.com/x' });
+    expect(parseAddressRecord({ id: 'data/AE', key: 'AE', fmt: '%N%n%O%n%A%n%S' }, 'AE')).toEqual({ address_format: { format: '%N%n%O%n%A%n%S' } });
+    expect(() => parseAddressRecord({ id: 'data/XX', key: 'YY' }, 'XX')).toThrow(/layout changed/);
+  });
+  it('country list', () => {
+    const codes = Array.from({ length: 210 }, (_, i) => cc(i)).join('~');
+    expect(parseAddressCountries({ countries: codes })).toHaveLength(210);
+    expect(() => parseAddressCountries({ countries: 'AC~AD' })).toThrow(/layout changed/);
+  });
+});
+
 const url = process.env.TEST_DATABASE_URL;
 describe.skipIf(!url)('timezones, telephony and traffic scopes', () => {
   const pool = new pg.Pool({ connectionString: url });
@@ -56,6 +70,8 @@ describe.skipIf(!url)('timezones, telephony and traffic scopes', () => {
     await a('TR', 'telephony', { calling_code: '90', national_prefix: '0', international_prefix: '00' }, 'libphonenumber');
     await a('US', 'telephony', { calling_code: '1', national_prefix: '1', international_prefix: '011', main_country_for_code: true }, 'libphonenumber');
     await a('TR', 'driving', { side: 'right' }, 'wikidata-driving');
+    await pool.query(`INSERT INTO sources (id, authority, url, license, attribution, source_class, license_verdict) VALUES ('libaddressinput','G','u','l','a','community','green')`);
+    await a('TR', 'postal', { postal_code: { regex: '^(\\d{5})$', examples: ['34742'], name_type: 'postal' }, address_format: { format: '%N%n%O%n%A%n%Z %C/%S' } }, 'libaddressinput');
   });
   it('serves the three scopes and intersects them', async () => {
     const app = await buildApp(pool, { adminToken: 't', exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
@@ -70,6 +86,9 @@ describe.skipIf(!url)('timezones, telephony and traffic scopes', () => {
     const sch = (await app.inject({ url: '/v1/schema/countries/TR?scopes=telephony,traffic' })).json();
     expect(sch.scopes.telephony.properties.calling_code['x-source']).toBe('libphonenumber');
     expect(sch.scopes.traffic.properties.driving_side['x-license-verdict']).toBe('green');
+    const pc = (await app.inject({ url: '/v1/profile?countries=TR,US&scopes=postal' })).json();
+    expect(pc.data.TR.postal.postal_code.examples).toEqual(['34742']);
+    expect(pc.data.US.postal).toBeNull();
     await app.close();
   });
 });
