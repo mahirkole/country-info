@@ -248,7 +248,7 @@ describe('LT: verified from the consolidated Labour Code (e-seimas, read 2026-10
   it('all 14 days carry the consolidated-edition source, Easter is stated as the Western tradition', async () => {
     const lt = compileHolidays((await loadHolidayFiles()).find((f) => f.country === 'LT')!, 2026, 2026);
     expect(lt).toHaveLength(14);
-    expect(lt.every((x) => x.data.verification === 'verified' && /actualedition/.test(x.data.source.url))).toBe(true);
+    expect(lt.every((x) => x.data.verification === 'verified' && /actualedition/.test((x.data.source as { url: string }).url))).toBe(true);
     expect(lt.find((x) => x.code === 'easter-monday')!.data.date).toBe('2026-04-06');
   });
 });

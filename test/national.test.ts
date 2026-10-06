@@ -488,3 +488,55 @@ describe('EE adapter (Maa-amet EHAK WFS)', () => {
     expect(() => parseEstonia({ features: [{ properties: { ehak_kood: 'x' } }] })).toThrow(/layout changed/);
   });
 });
+
+import { findDkCsvUrl, parseDenmark } from '../src/sources/national/dk.js';
+import { latestEdition, parseFinland } from '../src/sources/national/fi.js';
+describe('DK adapter (Danmarks Statistik classification)', () => {
+  // 5 regions, 11 provinces (3+2+2+2+2), 99 municipalities spread over them
+  const csv = (): string => {
+    const out = ['\uFEFFSEQUENCE;CODE;LEVEL;TITLE;GENERAL_NOTES'];
+    let seq = 1;
+    let kom = 0;
+    for (let r = 0; r < 5; r++) {
+      out.push(`${seq++};"08${r}";1;Region ${r};`);
+      for (let p = 0; p < (r === 0 ? 3 : 2); p++) {
+        out.push(`${seq++};"${r}${p}";2;Province ${r}${p};`);
+        for (let k = 0; k < 9 && kom < 99; k++, kom++) out.push(`${seq++};"${100 + kom}";3;${kom === 0 ? 'København' : `Kommune ${kom}`};`);
+      }
+    }
+    while (kom < 99) out.push(`${seq++};"${100 + kom}";3;Kommune ${kom++};`);
+    return out.join('\r\n');
+  };
+  it('resolves the CSV link from the page and builds region > province > municipality from LEVEL and row order', () => {
+    expect(findDkCsvUrl('<a href="https://www.dst.dk/klassifikationsbilag/5d18d1e0-400b-4505-92ad-6782915980a3csv_en">CSV</a>')).toMatch(/csv_en$/);
+    expect(() => findDkCsvUrl('<html></html>')).toThrow(/layout changed/);
+    const out = parseDenmark(csv());
+    expect(out.filter((e) => e.data.level === 1)).toHaveLength(5);
+    expect(out.filter((e) => e.data.level === 2)).toHaveLength(9 + 2);
+    expect(out.find((e) => e.id === 'div:DK:kom-100')).toMatchObject({ name: 'København', parent_id: 'div:DK:lds-00' });
+    expect(out.find((e) => e.id === 'div:DK:lds-10')).toMatchObject({ parent_id: 'div:DK:reg-081' });
+  });
+  it('fails loudly on a changed layout', () => {
+    expect(() => parseDenmark('A;B\r\n1;2')).toThrow(/layout changed/);
+    expect(() => parseDenmark(csv().split('\r\n').slice(0, 40).join('\r\n'))).toThrow(/layout changed/);
+  });
+});
+describe('FI adapter (Statistics Finland)', () => {
+  const item = (code: string, name: string) => ({ code, classificationItemNames: [{ lang: 'fi', name }] });
+  const kunta = Array.from({ length: 308 }, (_, i) => item(String(i + 1).padStart(3, '0'), `Kunta ${i + 1}`));
+  const maakunta = Array.from({ length: 19 }, (_, i) => item(String(i + 1).padStart(2, '0'), `Maakunta ${i + 1}`));
+  const maps = kunta.map((k, i) => `https://api.stat.fi/x/maps/${k.code}/${String((i % 19) + 1).padStart(2, '0')}`);
+  it('picks the newest edition already in force', () => {
+    const list = ['kunta_1_20250101', 'kunta_1_20260101', 'kunta_1_20270101', 'maakunta_1_20260101'].map((localId) => ({ localId }));
+    expect(latestEdition(list, 'kunta', new Date('2026-10-06'))).toBe('kunta_1_20260101');
+    expect(latestEdition(list, 'maakunta', new Date('2026-10-06'))).toBe('maakunta_1_20260101');
+    expect(() => latestEdition([], 'kunta')).toThrow(/layout changed/);
+  });
+  it('builds maakunta > kunta from the correspondence list; every kunta needs a parent', () => {
+    const out = parseFinland(kunta, maakunta, maps, [{ code: '001', classificationItemNames: [{ lang: 'sv', name: 'Kommun 1' }] }]);
+    expect(out.filter((e) => e.data.level === 1)).toHaveLength(19);
+    expect(out.find((e) => e.id === 'div:FI:kunta-001')).toMatchObject({ parent_id: 'div:FI:mk-01', data: { name_sv: 'Kommun 1' } });
+    expect(() => parseFinland(kunta, maakunta, maps.slice(1))).toThrow(/no maakunta/);
+    expect(() => parseFinland(kunta.slice(0, 100), maakunta, maps)).toThrow(/layout changed/);
+  });
+});

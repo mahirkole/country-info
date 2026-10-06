@@ -1,39 +1,24 @@
-> **Ajan araştırması, 2026-10-04.** Bağımsız ikinci geçiş: 10 URL yeniden çekildi; özgün dildeki alıntı parçalarından 10 tanesi kaynakta bulundu, 8 tanesi bulunamadı (bulunamayanlar çoğunlukla ajanın kendi Türkçe notları/biçim farkları). 
-
 # Lisans dossier'i: nat-dk
 
 > Hukuki görüş değildir. Yalnızca yayıncının sayfasından **okunan** metin alıntılanır; okunamayan alan "OKUNAMADI" yazılır, tahmin edilmez.
 
-- **Okuma tarihi:** 2026-10-04
-- **Yayıncı / veri seti:** Klimadatastyrelsen (Datafordeler.dk üzerinden) — DAGI (Danmarks Administrative Geografiske Inddeling: Region, Landsdel, Kommune, Sogn, Postnummer vb.). Eski DAWA (api.dataforsyningen.dk / dawa.aws.dk) kapandı.
-- **Kullandığımız alanlar / dosyalar:** DAGI'den kommune/region kodları ve adları (geometri alınmaz). DST (Danmarks Statistik) alternatifi OKUNAMADI (aşağıya bkz).
-- **DAWA durumu (kanıt):** `https://api.dataforsyningen.dk/kommuner`, `https://dawa.aws.dk/kommuner`, `https://api.dataforsyningen.dk/regioner` -> HTTP 410: `{ "status": 410, "error": "Gone", "message": "The requested resource is no longer available and will not be available again." }` (sha256 /kommuner: e2ebecd94cc3831507c98728fb477ed2e23b4de42b540a2cf3373c294d5128b2).
-- **Yeni yer:** Datafordeler.dk "Dataoversigt > Danmarks Administrative Geografiske Inddeling (DAGI)": inddelinger "Danmark, Regionsinddeling, Landsdel, Kommuneinddeling, Sogneinddeling, Opstillingskreds, Storkreds, Valglandsdel, Politikreds, Retskreds, Postnummerinddeling, Supplerende Bynavn, Afstemningsområde og Menighedsrådsafstemningsområde". dataforsyningen.dk (veri kataloğu) bir JavaScript SPA'dır; JS'siz içerik okunamadı.
+- **Okuma tarihi:** 2026-10-06 (ajan okuması + bağımsız ikinci geçiş: lisans cümlesi ve CSV yeniden çekildi)
+- **Yayıncı / veri seti:** Danmarks Statistik — sınıflama «Regions, provinces and municipalities» (`NUTS_V1_2007_DK`), sayfa `https://www.dst.dk/en/Statistik/dokumentation/nomenklaturer/nuts`; CSV bağlantısı sayfadan çözülür (`…/klassifikationsbilag/<guid>csv_en`, GUID revizyonla değişebilir).
+- **Kullandığımız alanlar:** `CODE`, `LEVEL`, `TITLE`. Üst birim `LEVEL` + satır sırasından türetilir. 5 bölge, 11 landsdel, 99 belediye düzeyi satırı (98 kommune + Christiansø, devlet idaresinde; sınıflama aynı düzeyde listeler).
 
-| # | Soru | Cevap | Kanıt (birebir alıntı) | URL | Sayfa sha256 |
-|---|---|---|---|---|---|
-| 1 | Lisans adı/sürümü ve lisans metni URL'si | CC BY 4.0 ("frie geografiske data"; DAGI listede). Lisans metni linki sayfada (da/en). | "Nedenstående vilkår gælder for: Danmarks Administrative Geografiske Inddelinger (DAGI) Danmarks Fikspunktregister ..." ; "CC BY 4.0 licens gælder for frie geografiske data Som bruger af Klimadatastyrelsens frie geografiske data er du underlagt CC BY 4.0 licens." | https://datafordeler.dk/vejledning/brugervilkaar/kds-geografiske-data/ | 8004350de1ff42a823d0ae3388fc00effabcf3d56c705533df1fb198dcbe21ae |
-| 2 | Ticari kullanım | evet (CC BY 4.0 üzerinden; Danca sayfa "ticari" kelimesini kullanmıyor, CC deed kullanıyor) | Sayfa: "Som bruger kan du i henhold til licensen frit hente, dele og tilpasse frie geografiske data." CC deed: "for any purpose, even commercially" | kds-geografiske-data ; https://creativecommons.org/licenses/by/4.0/ | 8004350de1ff42a823d0ae3388fc00effabcf3d56c705533df1fb198dcbe21ae ; 8dda1ccec4be91fc80821d4e4fd5c568072b9a3a74b2fdc07c249a27e920ef01 |
-| 3 | Ham veriyi yeniden dağıtma | evet ("dele"), CC BY şartlarıyla | "Som bruger kan du i henhold til licensen frit hente, dele og tilpasse frie geografiske data." | kds-geografiske-data | 8004350de1ff42a823d0ae3388fc00effabcf3d56c705533df1fb198dcbe21ae |
-| 4 | Türetilmiş veritabanı / API satışı | evet ("tilpasse"); veritabanı hakları CC BY 4.0 madde 4 kapsamında | CC: "Section 2(a)(1) grants You the right to extract, reuse, reproduce, and Share all or a substantial portion of the contents of the database" | https://creativecommons.org/licenses/by/4.0/legalcode.en | 58230517b7895aa219ff46a6ed63e67057a1582fb9ea054b16728a8c13525650 |
-| 5 | Alt-lisans / müşteri yeniden dağıtabilir mi | CC BY: evet, ek kısıt yok | "No additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits." | https://creativecommons.org/licenses/by/4.0/ | 8dda1ccec4be91fc80821d4e4fd5c568072b9a3a74b2fdc07c249a27e920ef01 |
-| 6 | Atıf metni ve biçimi | "Klimadatastyrelsen" kredilendirilecek, uygun yerde. Hazır atıf cümlesi OKUNAMADI. | "Du skal kreditere Klimadatastyrelsen på et passende sted." | kds-geografiske-data | 8004350de1ff42a823d0ae3388fc00effabcf3d56c705533df1fb198dcbe21ae |
-| 7 | Share-alike / viral | yok | CC BY deed (ShareAlike yok) | https://creativecommons.org/licenses/by/4.0/ | 8dda1ccec4be91fc80821d4e4fd5c568072b9a3a74b2fdc07c249a27e920ef01 |
-| 8 | Non-commercial / izin (ASK) şartı | Frie geografiske data için yok. Datafordeler'de bazı veriler için "godkendt adgang" (kayıt yetkilisinden onay) var; DAGI'nin hangi erişim türünde olduğu OKUNAMADI. | "Godkendt adgang Adgang til tjenesten kræver, at brugeren anmoder om adgang hos registermyndigheden." | https://datafordeler.dk/vejledning/brugeradgang/adgangstyper/ | 48d23a07719c4a81dce3ce93c436cd81e943b35d655777ca4e582bb5c234ddc7 |
-| 9 | Üçüncü taraf IP istisnaları | OKUNAMADI. Sayfa "øvrige data" (diğer veriler) için ayrı şart olduğunu söylüyor. | "Læs mere om vilkår brug af Klimadatastyrelsens øvrige data." | kds-geografiske-data | 8004350de1ff42a823d0ae3388fc00effabcf3d56c705533df1fb198dcbe21ae |
-| 10 | Marka/logo, onay izlenimi yasağı | OKUNAMADI | — | — | — |
-| 11 | ToS: otomatik indirme / hız limiti / kimlik doğrulama | Datafordeler hizmetleri hesap gerektirebilir: "Kendt adgang": kullanıcı adı/parola veya sertifika. DAGI için hangi tür gerektiği ve hız limiti OKUNAMADI. | "Kendt adgang Adgang til tjenesten kræver, at brugeren er oprettet på Datafordeler med enten brugernavn/adgangskode eller certifikat." | https://datafordeler.dk/vejledning/brugeradgang/adgangstyper/ | 48d23a07719c4a81dce3ce93c436cd81e943b35d655777ca4e582bb5c234ddc7 |
-| 12 | Veritabanı hakkı / ülke özgü kısıt | CC BY 4.0 sui generis'i kapsar; başka ülke özgü kısıt OKUNAMADI | (CC madde 4, yukarıda) | legalcode.en | 58230517b7895aa219ff46a6ed63e67057a1582fb9ea054b16728a8c13525650 |
-| 13 | Kişisel veri | DAGI idari birim verisi; kişisel veri yok (kommune/region). Datafordeler başka kayıtlarda hassas veri içerir (CPR vb.), bizim kullanmayacağımız. | "fordi Datafordeleren udstiller følsomme data, er der begrænsninger på adgangen til bestemte data" | adgangstyper | 48d23a07719c4a81dce3ce93c436cd81e943b35d655777ca4e582bb5c234ddc7 |
-| 14 | Garanti reddi / sorumluluk | OKUNAMADI (DK sayfasında yok); CC BY madde 5 "as-is" | CC: "the Licensor offers the Licensed Material as-is and as-available" | legalcode.en | 58230517b7895aa219ff46a6ed63e67057a1582fb9ea054b16728a8c13525650 |
-| 15 | Şart değişikliği hakkı / sürüm | VAR: Datafordeler ve kayıtlar şartları istediği zaman değiştirebilir. Geografiske data şartlarının sürümü: "(16.05.2024)". | "Datafordeleren og de enkelte registre kan til enhver tid ændre vilkårene for adgang til data på Datafordeleren." ; "Klimadatastyrelsen - vilkår for brug af frie geografiske data (16.05.2024)" | https://datafordeler.dk/vejledning/brugervilkaar/ ; kds-geografiske-data | cee1a8531a981267d1b1032ebc2f3e6c06dc48d4a9ccd562118ed0e61de3b4eb ; 8004350de1ff42a823d0ae3388fc00effabcf3d56c705533df1fb198dcbe21ae |
-| 16 | Yaptırım/ihracat kısıtı | OKUNAMADI | — | — | — |
+| # | Soru | Cevap | Kanıt (birebir alıntı) | URL |
+|---|---|---|---|---|
+| 1 | Lisans | Yayıncının serbest yeniden kullanım beyanı (CC BY adı geçmiyor) | "Du må frit gengive Danmarks Statistiks indhold fra dst.dk og statistikbanken.dk. Det gælder også ved kommerciel brug. Men husk at angive os som kilde." | https://www.dst.dk/da/presse/kildeangivelse |
+| 2–5 | Ticari kullanım, yeniden dağıtım, türev/API satışı, alt-lisans | evet, kaynak gösterilerek ("Det gælder også ved kommerciel brug") | (aynı) | (aynı) |
+| 6 | Atıf | "Source: Danmarks Statistik (dst.dk)"; DST logosu kullanılamaz (aynı sayfa) | — | — |
+| 7–8 | Share-alike / non-commercial | yok | — | — |
+| 9 | Üçüncü taraf | OKUNAMADI | — | — |
+| 11 | ToS / indirme | statik CSV, kimlik yok; hız limiti OKUNAMADI | — | — |
+| 12–16 | Veritabanı hakkı, kişisel veri (yok), garanti, şart değişikliği, ihracat | OKUNAMADI / uygulanmaz | — | — |
 
-## Güncelleme (refresh) bilgisi
-- **Yayın sıklığı** (kaynağın kendi beyanı): OKUNAMADI (DAGI sayfası güncelleme sıklığı vermiyor). **Sürüm/vintage adlandırması:** OKUNAMADI. **Değişim bildirimi:** OKUNAMADI. **Kararlı URL mi:** DAGI kataloğu https://datafordeler.dk/dataoversigt/danmarks-administrative-geografiske-inddeling-dagi/ (sha 1de96add394e6d1e8af7cb5fbc82549a457c7629ebde237e4e1f7268d17cadc4). Gerçek veri uç noktası (REST/WFS/GeoJSON/dosya) ve geometrisiz liste alma yolu doğrulanamadı.
-- **Teknik not:** Biçim/kodlama/satır sayısı OKUNAMADI (veri indirilemedi; Datafordeler hesap/kimlik gerektirebiliyor, denenmedi). dataforsyningen.dk SPA JS gerektirdiğinden katalog sayfaları (data/3908, data/4924) okunamadı. DST Statbank API (https://api.statbank.dk/v1/subjects) erişilebilir (HTTP 200) ama DST'nin yeniden kullanım/lisans sayfası bulunamadı (denenen URL'ler 404: dst.dk/en/OmDS/brug-af-data vb.), bu yüzden DST yolu OKUNAMADI.
+**Resmî sayı kanıtı:** sınıflama sayfası: "Of the 98 municipalities, 32 municipalities retained the same municipal code and title before and after the reform." → 98 kommune (+ Christiansø = 99 satır; adaptör 95–105 bandı).
+**Güncellik:** sınıflama "Valid from: January 1, 2007", bitiş yok (güncel); StatBank FOLK1A tablosu aynı kodları kullanıyor ve 2026-08-10'da güncellenmiş. CSV'nin kendisinde tarih alanı yok.
+**Teknik not:** DAWA (api.dataforsyningen.dk) HTTP 410 "Gone" → kullanılamaz.
 
 ## Karar
-- **🟡 şartlı** — gerekçe: Lisans metni net (DAGI, CC BY 4.0, Klimadatastyrelsen'e atıf), ancak (a) DAWA 410 ile kapalı, (b) DAGI'ye erişim yolu hesap/yetki gerektirebilir ve bu doğrulanmadı, (c) şartlar tek taraflı değiştirilebilir, (d) kod/ad listesini geometrisiz alacak kararlı API okunamadı.
-- Açık sorular / yayıncıya yazılacak teyit: Datafordeler support (33 34 89 77, "Send besked via formular") veya Klimadatastyrelsen: DAGI için "fri" (kayıtsız/kendt adgang) erişim türü, geometrisiz kommune/region listesi için endpoint, hız limiti, DAGI sürüm/yayın sıklığı. Alternatif: Danmarks Statistik'in bölge/kommune kod listesi ve lisans şartı ayrıca okunmalı.
-- Okuyan: Claude (alt-ajan, curl + python) Bağımsız ikinci geçiş yapıldı mı: hayır (2026-10-04)
+**🟢** (serbest ticari yeniden kullanım + kaynak gösterimi). Açık: lisans cümlesi basın/kaynak gösterimi sayfasında (sınıflama sayfasında değil) — kapsamı "dst.dk içeriği" olarak geniş; avukat maddesi.

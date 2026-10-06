@@ -54,6 +54,8 @@ Motor: `src/sources/wikidata-divisions.ts`, ülke yapılandırması `src/sources
 | SK | kraj (8), obec (Wikidata 2.888; resmî 2.890, ŠÚ SR om7023rr; band 2.880–2.895; okresy yüklenmez: Wikidata 82 ≠ 79) | 2.896 |
 | LU | canton (12), commune (100) | 112 |
 | EE | maakond (15), vald/linn (78) | 93 |
+| DK | region (5), landsdel (11), kommune (99) | 115 |
+| FI | maakunta (19), kunta (308) | 327 |
 | LT | savivaldybė (60 = 43 apskrities + 7 miesto + 10 diğer; resmî 60); apskritys yüklenmez | 60 |
 | EE | maakond (15), vald/linn (78; Statistikaamet EHAK 78, 2025'te 79; band 78–79) | 93 |
 | RO | județ (41), comună/oraș/municipiu (3.178; band 3.170–3.190 = Eurostat LAU sayısı 3.181 — INS erişilemedi, resmî sayı okunamadı; București atlandı: il üst birimi yok) | 3.219 |
