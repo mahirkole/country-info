@@ -52,10 +52,11 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   const routes = new Set<string>();
   app.addHook('onRoute', (r) => { for (const m of [r.method].flat()) if (m !== 'HEAD' && m !== 'OPTIONS') routes.add(`${m.toLowerCase()} ${r.url}`); });
   app.decorate('routeList', routes);
-  const keyCache = new Map<string, { at: number; v: { id: string; ratePerMin: number | null } | null }>();
+  const keyCache = new Map<string, { at: number; v: { id: string; ratePerMin: number | null; monthlyQuota?: number | null } | null }>();
   const sha = (k: string) => createHash('sha256').update(k).digest('hex');
   // Usage metering: counts per key and day are kept in memory and flushed to api_usage every 10 s and on close.
   const usage = new Map<string, number>();
+  const monthCache = new Map<string, { at: number; base: number }>();
   const flushUsage = async () => {
     const batch = [...usage];
     usage.clear();
@@ -70,6 +71,15 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   app.addHook('onClose', async () => { clearInterval(flushTimer); await flushUsage(); });
   installAccessControl(app, {
     onUse: (id) => usage.set(id, (usage.get(id) ?? 0) + 1),
+    // Month-to-date requests: database total (refreshed every 15 s) plus what this process has not flushed yet.
+    monthUsed: async (id) => {
+      let hit = monthCache.get(id);
+      if (!hit || Date.now() - hit.at > 15_000) {
+        hit = { at: Date.now(), base: Number((await pool.query(`SELECT coalesce(sum(requests), 0) AS n FROM api_usage WHERE key_id = $1 AND day >= date_trunc('month', now())::date`, [id.slice(6)])).rows[0].n) };
+        monthCache.set(id, hit);
+      }
+      return hit.base + (usage.get(id) ?? 0);
+    },
     apiKeys: opts.apiKeys ?? config.apiKeys, perWindow: opts.rateLimitPerMin ?? config.rateLimitPerMin, adminToken, requireKey: opts.requireApiKey ?? config.requireApiKey,
     store: (opts.rateLimitStore ?? config.rateLimitStore) === 'postgres'
       ? async (bucket, start) => {
@@ -83,8 +93,8 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
       const h = sha(key);
       const hit = keyCache.get(h);
       if (hit && Date.now() - hit.at < 30_000) return hit.v;
-      const row = (await pool.query('SELECT id, rate_per_min FROM api_keys WHERE key_hash = $1 AND active', [h])).rows[0];
-      const v = row ? { id: String(row.id), ratePerMin: row.rate_per_min as number | null } : null;
+      const row = (await pool.query('SELECT id, rate_per_min, monthly_quota FROM api_keys WHERE key_hash = $1 AND active', [h])).rows[0];
+      const v = row ? { id: String(row.id), ratePerMin: row.rate_per_min as number | null, monthlyQuota: row.monthly_quota === null ? null : Number(row.monthly_quota) } : null;
       keyCache.set(h, { at: Date.now(), v });
       if (v) void pool.query('UPDATE api_keys SET last_used_at = now() WHERE id = $1', [row.id]).catch(() => undefined);
       return v;
@@ -360,7 +370,7 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
   });
 
   // ---- API keys (admin) ------------------------------------------------
-  app.post<{ Body: { name?: string; rate_per_min?: number; export_profile?: string; export_countries?: string[] } }>('/v1/api-keys', { preHandler: requireAdmin }, async (req, reply) => {
+  app.post<{ Body: { name?: string; rate_per_min?: number; export_profile?: string; export_countries?: string[]; plan?: string; monthly_quota?: number } }>('/v1/api-keys', { preHandler: requireAdmin }, async (req, reply) => {
     const name = req.body?.name?.trim();
     if (!name) return reply.code(400).send({ error: 'name is required' });
     const rate = req.body.rate_per_min;
@@ -369,12 +379,15 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     if (!PROFILES.includes(profile as Profile)) return reply.code(400).send({ error: `export_profile must be one of ${PROFILES.join(', ')}` });
     const ec = req.body.export_countries?.map((c) => String(c).toUpperCase()) ?? null;
     if (ec && (ec.length === 0 || ec.some((c) => !/^[A-Z]{2}$/.test(c)))) return reply.code(400).send({ error: 'export_countries must be a non-empty list of ISO alpha-2 codes' });
+    const quota = req.body.monthly_quota;
+    if (quota !== undefined && quota !== null && (!Number.isInteger(quota) || quota <= 0)) return reply.code(400).send({ error: 'monthly_quota must be a positive integer (omit for unlimited)' });
+    const plan = req.body.plan?.trim() || null;
     const key = `ci_${randomBytes(24).toString('hex')}`;
-    const row = (await pool.query('INSERT INTO api_keys (name, key_hash, rate_per_min, export_profile, export_countries) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, rate_per_min, export_profile, export_countries, created_at', [name, sha(key), rate ?? null, profile, ec])).rows[0];
-    return reply.code(201).send({ ...row, id: Number(row.id), key }); // the key is shown only here
+    const row = (await pool.query('INSERT INTO api_keys (name, key_hash, rate_per_min, export_profile, export_countries, plan, monthly_quota) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, rate_per_min, export_profile, export_countries, plan, monthly_quota, created_at', [name, sha(key), rate ?? null, profile, ec, plan, quota ?? null])).rows[0];
+    return reply.code(201).send({ ...row, id: Number(row.id), monthly_quota: row.monthly_quota === null ? null : Number(row.monthly_quota), key }); // the key is shown only here
   });
   app.get('/v1/api-keys', { preHandler: requireAdmin }, async () => ({
-    data: (await pool.query('SELECT id, name, rate_per_min, export_profile, export_countries, active, created_at, last_used_at FROM api_keys ORDER BY id')).rows,
+    data: (await pool.query('SELECT id, name, rate_per_min, export_profile, export_countries, plan, monthly_quota::int AS monthly_quota, active, created_at, last_used_at FROM api_keys ORDER BY id')).rows,
   }));
   app.get<{ Querystring: { from?: string; to?: string } }>('/v1/api-keys/usage', { preHandler: requireAdmin }, async (req) => {
     await flushUsage();

@@ -14,7 +14,9 @@ export interface AccessOptions {
   adminToken?: string;
   now?: () => number;
   /** Looks up a presented key that is not in `apiKeys` (e.g. database-managed keys); returns its id and own rate limit. */
-  resolveKey?: (key: string) => Promise<{ id: string; ratePerMin: number | null } | null>;
+  resolveKey?: (key: string) => Promise<{ id: string; ratePerMin: number | null; monthlyQuota?: number | null } | null>;
+  /** Requests of a database key in the current calendar month (approximate across instances); used for `monthlyQuota`. */
+  monthUsed?: (keyId: string) => Promise<number>;
   /** Called once per authorised /v1 request with the key id (`dbkey:<id>` for database keys, `key:...` for env keys); used for metering. */
   onUse?: (id: string) => void;
   /** Shared counter store (several API instances); default is per-process memory. Returns the count in the current window after incrementing. */
@@ -42,12 +44,20 @@ export function installAccessControl(app: FastifyInstance, o: AccessOptions): vo
     const presented = (typeof req.headers['x-api-key'] === 'string' ? req.headers['x-api-key'] : undefined) ?? bearer;
     let id = presented && keys.has(presented) ? `key:${presented}` : '';
     let limit = o.perWindow;
+    let quota: number | null = null;
     if (!id && presented && o.resolveKey) {
       const k = await o.resolveKey(presented);
-      if (k) { id = `dbkey:${k.id}`; if (k.ratePerMin !== null) limit = k.ratePerMin; }
+      if (k) { id = `dbkey:${k.id}`; if (k.ratePerMin !== null) limit = k.ratePerMin; quota = k.monthlyQuota ?? null; }
     }
     if ((o.apiKeys.length > 0 || o.requireKey) && !id) {
       return reply.code(401).send({ error: 'unauthorized', detail: 'send an API key in the x-api-key header or as a Bearer token' });
+    }
+    if (id && quota !== null && o.monthUsed) {
+      // Monthly plan quota: a rejected request is not metered.
+      const used = await o.monthUsed(id);
+      const resets = new Date(Date.UTC(new Date(now()).getUTCFullYear(), new Date(now()).getUTCMonth() + 1, 1)).toISOString();
+      reply.header('x-quota-limit', quota).header('x-quota-remaining', Math.max(0, quota - used - 1));
+      if (used >= quota) return reply.code(429).header('retry-after', Math.max(1, Math.ceil((Date.parse(resets) - now()) / 1000))).send({ error: 'quota_exceeded', monthly_quota: quota, resets_at: resets });
     }
     if (id) { req.apiKeyId = id; o.onUse?.(id); }
     if (limit <= 0) return;

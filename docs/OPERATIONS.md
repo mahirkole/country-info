@@ -86,3 +86,7 @@ curl -s localhost:3000/v1/status
 ```
 Anahtar oluşturma: `POST /v1/api-keys` (Bearer `ADMIN_TOKEN`). Güncelleme: `git pull && docker compose up -d --build` (migration'lar `api` açılışında uygulanır). Günlükler: `docker compose logs -f cycle`. Alarm: `NOTIFY_WEBHOOK_URL`.
 **Doğrulama notu (2026-10-05):** bu geliştirme ortamında Docker daemon çalışmıyor; `docker compose config` ile yapılandırma doğrulandı ve `bash -n`/YAML ayrıştırması yapıldı, ancak **imaj derlenip konteynerler çalıştırılmadı**. İlk gerçek kurulumda `docker compose up --build` ve ilk yükleme ayrıca denenmelidir.
+
+
+## API anahtarı planları ve kota
+`POST /v1/api-keys {name, plan?, rate_per_min?, monthly_quota?, export_profile?, export_countries?}`: `plan` yalnızca etikettir (faturalama kararı ürün tarafındadır), `monthly_quota` takvim ayı başına istek sınırıdır (boş = sınırsız). Aşılınca `429 {error: "quota_exceeded", monthly_quota, resets_at}` + `Retry-After`; reddedilen istek sayılmaz. Her yanıtta `X-Quota-Limit` / `X-Quota-Remaining`. Sayım `api_usage` tablosundan (15 sn önbellekli) artı bu süreçte henüz yazılmamış istekler; birden çok API örneğinde sayım yaklaşıktır (örnek başına en çok ~10 sn'lik yazılmamış istek farkı). Dakikalık hız sınırı kotadan bağımsız çalışır.
