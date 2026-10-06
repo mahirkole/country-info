@@ -207,7 +207,7 @@ describe('EU holiday files (merged from official-source reading)', () => {
     expect(compileHolidays(f, 2024, 2024).some((x) => x.code === 'great-prayer-day')).toBe(false);
   });
   it('stale or memory-based sources are never marked verified', async () => {
-    for (const cc of ['BE', 'LU', 'FI', 'GR', 'SI', 'MT']) {
+    for (const cc of ['BE', 'LU', 'FI', 'GR', 'SI']) {
       expect(compileHolidays(await load(cc), 2026, 2026).every((x) => x.data.verification !== 'verified')).toBe(true);
     }
     // LT is verified from the e-seimas consolidated Labour Code (art. 123, edition valid 2026-06-07..2026-10-31), see the dedicated test below
@@ -250,5 +250,14 @@ describe('LT: verified from the consolidated Labour Code (e-seimas, read 2026-10
     expect(lt).toHaveLength(14);
     expect(lt.every((x) => x.data.verification === 'verified' && /actualedition/.test((x.data.source as { url: string }).url))).toBe(true);
     expect(lt.find((x) => x.code === 'easter-monday')!.data.date).toBe('2026-04-06');
+  });
+});
+
+describe('MT: fixed-date days verified from Cap. 252 (legislation.mt, read 2026-10-06)', () => {
+  it('13 days verified; Good Friday stays unverified because the Act names it without stating the Easter computation', async () => {
+    const mt = compileHolidays((await loadHolidayFiles()).find((f) => f.country === 'MT')!, 2026, 2026);
+    expect(mt.filter((x) => x.data.verification === 'verified')).toHaveLength(13);
+    expect(mt.find((x) => x.code === 'good-friday')!.data.verification).toBe('unverified');
+    expect(mt.find((x) => x.code === 'independence-day')!.data.date).toBe('2026-09-21');
   });
 });

@@ -31,6 +31,7 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | nat-ie | 🟢 | CC BY 4.0; veri ince (31 il/şehir, resmi kod yok) |
 | nat-pt | 🟢 | DGT CAOP CC BY 4.0; freguesia kodu INE'ye ait |
 | nat-cz | 🟢 | ČÚZK/ČSÚ CC BY 4.0 (atıf + metaveri + değişiklik belirtme) |
+| **nat-cy** | 🟢 | DLS ArcGIS katmanları (data.gov.cy): CC BY 4.0; 6 ilçe + 613 belediye/kasaba alanı (tür ayrımı yok, güncelleme düzensiz) |
 | **nat-dk** | 🟢 | Danmarks Statistik sınıflaması: «frit gengive … også ved kommerciel brug» + kaynak; 5 bölge + 11 landsdel + 99 belediye satırı |
 | **nat-fi** | 🟢 | Tilastokeskus sınıflama API'si: CC BY 4.0, ticari kullanım açık; 19 maakunta + 308 kunta |
 | **nat-ee** | 🟢 | Maa-amet EHAK: kullanım kısıtsız + kaynak/tarih atfı, WFS özeti CC BY 4.0 (share-alike YOK; eski «CC BY-SA» işareti doğrulanmadı); 15 maakond + 78 belediye |

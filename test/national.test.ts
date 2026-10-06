@@ -540,3 +540,23 @@ describe('FI adapter (Statistics Finland)', () => {
     expect(() => parseFinland(kunta.slice(0, 100), maakunta, maps)).toThrow(/layout changed/);
   });
 });
+
+import { parseCyprus } from '../src/sources/national/cy.js';
+describe('CY adapter (DLS ArcGIS layers)', () => {
+  const dists = { features: [1, 2, 3, 4, 5, 6].map((c) => ({ attributes: { DIST_CODE: c, DIST_NM_G: `ΕΠΑΡΧΙΑ ${c}` } })) };
+  const comm = (n: number) => ({ features: Array.from({ length: n }, (_, i) => ({ attributes: { DIST_CODE: (i % 6) + 1, VIL_CODE: 100 + i, VIL_NM_G: `ΚΟΙΝΟΤΗΤΑ ${i}` } })) });
+  it('builds district > community area; same names in two districts are fine, duplicate codes are not', () => {
+    const out = parseCyprus(dists, comm(613));
+    expect(out.filter((e) => e.data.level === 1)).toHaveLength(6);
+    expect(out.filter((e) => e.data.level === 2)).toHaveLength(613);
+    expect(out.find((e) => e.id === 'div:CY:vil-1-100')).toMatchObject({ parent_id: 'div:CY:dist-1', name: 'ΚΟΙΝΟΤΗΤΑ 0' });
+  });
+  it('fails loudly on odd responses, transfer limits and wrong counts', () => {
+    expect(() => parseCyprus({}, comm(613))).toThrow(/layout changed/);
+    expect(() => parseCyprus(dists, { ...comm(613), exceededTransferLimit: true })).toThrow(/layout changed/);
+    expect(() => parseCyprus(dists, comm(300))).toThrow(/layout changed/);
+    const dup = comm(613);
+    dup.features[7]!.attributes = { ...dup.features[1]!.attributes };
+    expect(() => parseCyprus(dists, dup)).toThrow(/duplicate/);
+  });
+});
