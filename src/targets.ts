@@ -60,6 +60,7 @@ const nationalTargets = (): RefreshTarget[] => {
     DK: { cadence: 'annual', rows: [110, 120], licenseUrls: ['https://www.dst.dk/da/presse/kildeangivelse'], verdict: 'green', commercial: 'Danmarks Statistik: free reuse incl. commercial use with source attribution, logo excluded; docs/licenses/nat-dk.md' },
     FI: { cadence: 'annual', rows: [310, 345], licenseUrls: ['https://stat.fi/en/about-us/get-to-know-statistics-finland/legislation/terms-of-use'], verdict: 'green', commercial: 'CC BY 4.0 (Statistics Finland terms of use), commercial use stated; data of other organisations excluded; docs/licenses/nat-fi.md' },
     CY: { cadence: 'annual', rows: [610, 630], licenseUrls: ['https://www.data.gov.cy/el/dataset/dioikitika-oria-dimon-kai-koinotiton-dioikitikos-hartis'], verdict: 'green', commercial: 'CC BY 4.0 (data.gov.cy dataset page, DLS); docs/licenses/nat-cy.md' },
+    IE: { cadence: 'annual', rows: [28, 34], licenseUrls: ['https://www.arcgis.com/sharing/rest/content/items/74b839e09e1c48f2b2fe4efccb52a73d?f=json'], verdict: 'green', commercial: 'CC BY 4.0 (Tailte Éireann item description), credit © Tailte Éireann; docs/licenses/nat-ie.md' },
     NO: { cadence: 'monthly', rows: [350, 400], licenseUrls: ['https://kartkatalog.geonorge.no/api/getdata/041f1e6e-bdbc-4091-b48f-8a5990f3cc5b'], verdict: 'green', commercial: 'CC BY 4.0 (dataset records), commercial use allowed per Kartverket terms; API record status Arkivert, see docs/licenses/nat-no.md' },
   };
   return Object.entries(NATIONAL).map(([cc, s]) => {

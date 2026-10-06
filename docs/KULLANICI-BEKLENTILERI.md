@@ -24,6 +24,10 @@ Kod tarafında konteynerden yapılabilen işler bitti; aşağıdakiler karar, er
 | 11 | **`contracts.yml` ilk GitHub Actions çalıştırması** | CI'ya erişimim yok. | Haftalık tetiklenir; ilk sonucu iletin, gürültülü kaynakları ayıklarım. |
 | 12 | **SDK yayınlama** (npm / PyPI) | Hesap ve paket adı sizin. | `sdk/ts` ve `sdk/python` hazır; `private: true` ve `UNLICENSED` yer tutucu. Paket adı ve lisansı seçin. |
 
+| 17 | **BE ve LU tatilleri: «resmî bilgi sayfası» `verified` sayılsın mı?** | Yasa metni okunamadı (BE ejustice captcha, LU legilux JS-only); ancak resmî hükümet sayfaları (emploi.belgique.be, guichet.public.lu) 10/11 yasal tatili sayıyor ve yasayı anıyor. Proje kuralı «resmî metin okundu» der. | (a) `unverified` kalsın (öneri, kural lafzı); (b) bu resmî sayfalar yeterli sayılsın, kural metni "resmî metin veya resmî duyuru" olarak genişletilsin. |
+| 18 | **TR bölünme: OCHA COD-AB (CC BY-IGO, 81 il + 973 ilçe) yüklensin mi?** | HDX lisansı «even commercially» der, ancak metodoloji notu «shared … for humanitarian use only» (üst kaynak HGK) ve kodlar resmî NVİ kodu değil. Üst hak belirsiz. | (a) yükleme (öneri); (b) `license_verdict: amber` ile yükle; (c) avukat yorumu alınca yükle. |
+| 19 | **BG bölünme: NSI EKATTE lisansı «türev ve derleme eser dağıtma» yasağı içeriyor** | API/veri tabanı satışı türev/derleme eser olabilir; lisans EKATTE'yi açıkça adlandırmıyor. | (a) yükleme, Wikidata katmanı kalsın (öneri); (b) avukat yorumu alınırsa EKATTE yüklenir (veri hazır ve doğrulandı: 28 oblast + 265 obshtina). |
+
 ## 3. Hukuki / ticari kapı (lansman öncesi zorunlu)
 
 | # | Madde | Neden | Çözüm |

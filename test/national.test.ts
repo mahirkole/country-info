@@ -560,3 +560,23 @@ describe('CY adapter (DLS ArcGIS layers)', () => {
     expect(() => parseCyprus(dists, dup)).toThrow(/duplicate/);
   });
 });
+
+import { latestLocalAuthorityService, parseIreland } from '../src/sources/national/ie.js';
+describe('IE adapter (Tailte Éireann local authorities)', () => {
+  const hit = (title: string, url = 'https://s.test/x/FeatureServer') => ({ properties: { title, url } });
+  it('picks the newest local-authority service by the year in its title', () => {
+    const r = latestLocalAuthorityService({ features: [hit('Local Authorities  - National Statutory Boundaries - Ungeneralised - 2024', 'https://s.test/a/FeatureServer'), hit('Local Authorities - National Statutory Boundaries - Ungeneralised 2026', 'https://s.test/b/FeatureServer'), hit('Municipal Districts - National Statutory Boundaries - Ungeneralised 2026', 'https://s.test/c/FeatureServer'), hit('Admin Areas - National 1m Map Of Ireland')] });
+    expect(r).toEqual({ url: 'https://s.test/b/FeatureServer', year: 2026 });
+    expect(() => latestLocalAuthorityService({ features: [] })).toThrow(/layout changed/);
+  });
+  it('maps distinct local authorities with their official ids and Irish names; fails on duplicates and wrong counts', () => {
+    const feats = Array.from({ length: 31 }, (_, i) => ({ attributes: { BDY_ID: 1000 + i, BDY_TYPE_VALUE: i < 3 ? 'City Council' : 'County Council', ENG_NAME_VALUE: `PLACE ${i} COUNCIL`, GLE_NAME_VALUE: `Comhairle ${i}` } }));
+    const out = parseIreland({ features: feats });
+    expect(out).toHaveLength(31);
+    expect(out[0]).toMatchObject({ id: 'div:IE:la-1000', data: { type: 'city', name_ga: 'Comhairle 0', osi_bdy_id: 1000 } });
+    expect(out[5]!.data.type).toBe('county');
+    expect(() => parseIreland({ features: [...feats, feats[0]!] })).toThrow(/duplicate|layout changed/);
+    expect(() => parseIreland({ features: feats.slice(0, 10) })).toThrow(/layout changed/);
+    expect(() => parseIreland({ features: feats, exceededTransferLimit: true })).toThrow(/layout changed/);
+  });
+});
