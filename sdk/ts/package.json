@@ -1,0 +1,14 @@
+{
+  "name": "country-info-client",
+  "version": "0.2.0",
+  "description": "TypeScript client for the country-info API (countries, divisions, holidays, scopes and profiles, change feed, webhooks, file bundles)",
+  "type": "module",
+  "main": "dist/sdk.js",
+  "types": "dist/sdk.d.ts",
+  "exports": { ".": { "types": "./dist/sdk.d.ts", "import": "./dist/sdk.js" } },
+  "files": ["dist", "README.md"],
+  "engines": { "node": ">=18" },
+  "scripts": { "build": "tsc -p tsconfig.json", "prepublishOnly": "npm run build" },
+  "license": "UNLICENSED",
+  "private": true
+}
