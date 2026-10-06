@@ -81,3 +81,6 @@ Yüklenmeyenler (2026-10-05 keşif: sınıf bulundu ama sayı resmiyle uymuyor /
 - GeoNames (`geonames`) hâlâ dünya geneli taban katman; ulusal kaynaklar `division` olarak **yanına** eklenir, GeoNames'i silmez. "Yalnızca resmi" mod için bkz. `docs/ROADMAP.md`.
 - Ülkelerin düzey adları farklıdır: `type` ortak sözlükten seçilir, yerel ad `type_local`'e gider; karşılığı olmayan kavram için önce sözlüğe tür eklenir.
 - Mahalle/sokak gibi alt seviyeler (TR NVİ, ülke adres kayıtları) aynı modelle eklenebilir (`level` 4, 5…, `type: neighbourhood|street`); hacim ve KVKK/GDPR nedeniyle ayrıca değerlendirilir.
+
+## OCHA COD-AB (çok ülkeli, resmî üst kaynaklı; `cod-ab`)
+Ulusal adaptörü olmayan ve HDX COD-AB'nin üst kaynağı ulusal bir kurum (istatistik/haritalama/planlama/seçim sınır otoritesi) olan ülkeler için `division` katmanı (46 ülke, 39.717 birim). Ülke seçimi: otomatik ret filtresi + `cod:ack` incelemesi (docs/PROGRESS.md "Faz 12"); lisans: `docs/licenses/ocha-cod-ab.md` (CC BY 3.0 IGO, 🟡). Ulusal adaptör sonradan eklenen ülke otomatik olarak COD'dan çıkar (ulusal kaynak önceliklidir; `NATIONAL` anahtarları atlanır). BE CY DK FI HR IE LT MT COD-AB'de yok.

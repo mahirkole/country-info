@@ -46,3 +46,9 @@ Kod tarafında konteynerden yapılabilen işler bitti; aşağıdakiler karar, er
 - **LAU boşlukları (CY, HR, IE, LT, MT, RO, SK):** ayrıntılı nedenler `docs/PROGRESS.md` "Faz 10" bölümünde.
 
 Kaynaklar: `docs/ROADMAP.md`, `docs/PROGRESS.md`, `docs/OPERATIONS.md`, `/root/.claude/plans/faz10-kalanlar.md`.
+
+## 5. Faz 12 (COD-AB) ile gelen kararlar
+- **BR (IBGE) lisansı:** `docs/licenses/nat-br.md` açık; IBGE kendi lisansı okunursa BR COD-AB'den (veya doğrudan IBGE'den) eklenir. Şu an dışarıda.
+- **Anlaşmazlık bölgesi politikası (PS, UA, GE, MA…):** karar verilene kadar PS/UA/GE ack'lenmedi.
+- **OCHA'nın istediği atıf cümlesi:** HDX'te açık bir "cite as" metni okunamadı; kullandığımız atıf CC BY 3.0 IGO'nun asgari gereklerine göredir (avukat maddesi).
+- **Ack kararlarının gözden geçirilmesi:** ack = üst kaynak metninin resmî bir ulusal kurum olduğunu söylemesi; tek tek ulusal kurum lisansları okunmadı. İsterseniz belirli bir ülkeyi geri almak için `cod_review.status`'u `pending` yapmak yeterli (ülke ilk `refresh`'te kaldırılır).
