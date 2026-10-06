@@ -160,6 +160,15 @@ describe.skipIf(!url)('scopes, metadata and profiles', () => {
     expect(spec.paths['/v1/profile']!.get!.responses['200']!.content!['application/json'].schema.$ref).toBe('#/components/schemas/ProfileResult');
   });
 
+  it('countries=* pages through all countries with a cursor', async () => {
+    const p1 = (await get('/v1/profile?countries=*&scopes=default&page_size=2')).json();
+    expect(p1.countries).toEqual(['DE', 'TR']);
+    expect(p1).toMatchObject({ has_more: true, next_after: 'TR' });
+    const p2 = (await get('/v1/profile?countries=*&scopes=default&page_size=2&after=TR')).json();
+    expect(p2.countries).toEqual(['US']);
+    expect(p2).toMatchObject({ has_more: false, next_after: null });
+  });
+
   it('global metadata carries coverage', async () => {
     const g = (await get('/v1/schema')).json();
     expect(g.countries_total).toBe(3);

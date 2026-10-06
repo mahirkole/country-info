@@ -156,10 +156,10 @@ describe('official holiday files', () => {
   it('ES: only the four nationwide days fixed by the Estatuto de los Trabajadores', async () => {
     expect(dates('ES', compileHolidays(await load('ES'), 2026, 2026))).toEqual(['2026-01-01', '2026-05-01', '2026-10-12', '2026-12-25']);
   });
-  it('IT: 11 days, 6 of them verified from DPR 792/1985', async () => {
+  it('IT: 11 days, all verified (DPR 792/1985 and Legge 260/1949 art. 2 as in force 1-1-2026)', async () => {
     const h = compileHolidays(await load('IT'), 2026, 2026);
     expect(h).toHaveLength(11);
-    expect(h.filter((x) => x.data.verification === 'verified')).toHaveLength(6);
+    expect(h.filter((x) => x.data.verification === 'verified')).toHaveLength(11);
     expect(h.find((x) => x.code === 'lunedi-dellangelo')!.data.date).toBe('2026-04-06');
   });
   it('no verified record lacks a source URL and read date', async () => {
@@ -207,9 +207,12 @@ describe('EU holiday files (merged from official-source reading)', () => {
     expect(compileHolidays(f, 2024, 2024).some((x) => x.code === 'great-prayer-day')).toBe(false);
   });
   it('stale or memory-based sources are never marked verified', async () => {
-    for (const cc of ['BE', 'LU', 'FI', 'GR', 'SI', 'MT', 'LT']) {
+    for (const cc of ['BE', 'LU', 'FI', 'GR', 'SI', 'MT']) {
       expect(compileHolidays(await load(cc), 2026, 2026).every((x) => x.data.verification !== 'verified')).toBe(true);
     }
+    // LT: only the day added by XIII-2415 (2020) was read from the amending act; the rest cites a pre-2020 text of the Labour Code
+    const lt = compileHolidays(await load('LT'), 2026, 2026);
+    expect(lt.filter((x) => x.data.verification === 'verified').map((x) => x.code)).toEqual(['all-souls']);
   });
   it('Orthodox Easter drives Greek Easter Monday', async () => {
     const r = compileHolidays(await load('GR'), 2026, 2026).find((x) => /easter|pascha|orthodox/i.test(x.code ?? ''));

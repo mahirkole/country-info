@@ -301,10 +301,11 @@
     }
    },
    "source": {
-    "citation": "Zákon č. 241/1993 Z. z. § 1 písm. f), § 2 ods. 3 [doğrulanmadı: 2024 sürümünde 17 Kasım'ın dinlenme günü olduğu metinden doğrulanmadı]",
-    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html"
+    "citation": "Zákon č. 241/1993 Z. z. (znenie účinné od 2024-01-01) § 1 písm. f) 17. november - Deň boja za slobodu a demokraciu; § 2 ods. 1 štátne sviatky sú dni pracovného pokoja; § 2 ods. 3 nevzťahuje sa na písm. d) a e) (2024 sürümü 2026-10-06'da okundu; 1 Kasım 2025 sonrası sürümde 17 Kasım dinlenme günü değildir)",
+    "url": "https://www.slov-lex.sk/static/SK/ZZ/1993/241/20240101.html",
+    "checked_on": "2026-10-06"
    },
-   "verification": "unverified",
+   "verification": "verified",
    "to_year": 2024
   },
   {

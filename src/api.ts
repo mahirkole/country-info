@@ -547,9 +547,9 @@ ${entries}
   // requested country has, `union` (default) everything. A named profile (own, per API key) stores such a selection.
   const MAX_PROFILE_COUNTRIES = 50;
   const csv = (v?: string): string[] => (v ? v.split(',').map((x) => x.trim()).filter(Boolean) : []);
-  type SelQuery = { limit?: string; countries?: string; scopes?: string; mode?: string; locale?: string; level?: string; year?: string; region?: string; profile?: string };
+  type SelQuery = { after?: string; page_size?: string; limit?: string; countries?: string; scopes?: string; mode?: string; locale?: string; level?: string; year?: string; region?: string; profile?: string };
   /** Selection from the query, completed by the named profile (explicit query parameters win), or an error message. */
-  const selection = async (q: SelQuery, w: ReturnType<typeof who>, keyId: string | undefined, pathCountry?: string): Promise<{ countries: string[]; scopes: string[]; mode: Mode; locale?: string; level?: 1 | 2; year?: number; region?: string; limit?: number } | { error: string }> => {
+  const selection = async (q: SelQuery, w: ReturnType<typeof who>, keyId: string | undefined, pathCountry?: string): Promise<{ more?: { has_more: boolean; next_after: string | null }; countries: string[]; scopes: string[]; mode: Mode; locale?: string; level?: 1 | 2; year?: number; region?: string; limit?: number } | { error: string }> => {
     let prof: { scopes: string[]; countries: string[] | null; mode: Mode; locale: string | null } | undefined;
     const name = q.profile ?? (keyId?.startsWith('dbkey:') ? (await pool.query('SELECT default_profile FROM api_keys WHERE id = $1', [keyId.slice(6)])).rows[0]?.default_profile : undefined);
     if (name) {
@@ -557,7 +557,15 @@ ${entries}
       prof = (await pool.query('SELECT scopes, countries, mode, locale FROM scope_profiles WHERE name = $1 AND api_key_id IS NOT DISTINCT FROM $2', [name, owner])).rows[0];
       if (!prof && q.profile) return { error: `unknown profile ${q.profile}` };
     }
-    const countries = pathCountry ? [pathCountry.toUpperCase()] : csv(q.countries).length ? csv(q.countries).map((c) => c.toUpperCase()) : (prof?.countries ?? []);
+    let more: { has_more: boolean; next_after: string | null } | undefined;
+    let countries: string[];
+    if (!pathCountry && q.countries === '*') {
+      // all countries, one page at a time (cursor = last country code of the previous page)
+      const size = Math.min(Math.max(Number(q.page_size) || 25, 1), MAX_PROFILE_COUNTRIES);
+      const rows = (await pool.query(`SELECT code FROM entities WHERE kind = 'country' AND code > $1 ORDER BY code LIMIT $2`, [(q.after ?? '').toUpperCase(), size + 1])).rows.map((r) => r.code as string);
+      countries = rows.slice(0, size);
+      more = { has_more: rows.length > size, next_after: rows.length > size ? countries[countries.length - 1]! : null };
+    } else countries = pathCountry ? [pathCountry.toUpperCase()] : csv(q.countries).length ? csv(q.countries).map((c) => c.toUpperCase()) : (prof?.countries ?? []);
     if (!countries.length) return { error: 'countries is required (comma-separated ISO codes) unless the profile lists them' };
     if (countries.length > MAX_PROFILE_COUNTRIES) return { error: `at most ${MAX_PROFILE_COUNTRIES} countries per request` };
     const scopes = csv(q.scopes).length ? csv(q.scopes) : (prof?.scopes ?? DEFAULT_SCOPES);
@@ -568,7 +576,7 @@ ${entries}
     if (q.level && q.level !== '1' && q.level !== '2') return { error: 'level must be 1 or 2' };
     const year = q.year ? Number(q.year) : undefined;
     if (year !== undefined && (!Number.isInteger(year) || year < 1900 || year > 2200)) return { error: 'invalid year' };
-    return { countries, scopes, mode, locale: q.locale ?? prof?.locale ?? undefined, level: q.level ? (Number(q.level) as 1 | 2) : undefined, year, region: q.region, limit: q.limit && /^\d+$/.test(q.limit) ? Number(q.limit) : undefined };
+    return { more, countries, scopes, mode, locale: q.locale ?? prof?.locale ?? undefined, level: q.level ? (Number(q.level) as 1 | 2) : undefined, year, region: q.region, limit: q.limit && /^\d+$/.test(q.limit) ? Number(q.limit) : undefined };
   };
   const optsOf = (s: { locale?: string; level?: 1 | 2; year?: number; region?: string; limit?: number }) => ({ locale: s.locale, level: s.level, year: s.year, region: s.region, limit: s.limit });
 
@@ -594,7 +602,8 @@ ${entries}
   app.get<{ Querystring: SelQuery }>('/v1/profile', async (req, reply) => {
     const sel = await selection(req.query, who(req), req.apiKeyId);
     if ('error' in sel) return reply.code(400).send({ error: sel.error });
-    return composeProfile(pool, sel.countries, sel.scopes, sel.mode, optsOf(sel));
+    const doc = await composeProfile(pool, sel.countries, sel.scopes, sel.mode, optsOf(sel));
+    return sel.more ? { ...doc, ...sel.more } : doc;
   });
 
   app.post<{ Body: { name?: string; scopes?: string[]; countries?: string[]; mode?: string; locale?: string; api_key_id?: number; default?: boolean } }>('/v1/scope-profiles', async (req, reply) => {
