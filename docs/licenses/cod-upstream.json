@@ -1,1 +1,497 @@
-[]
+[
+  {
+    "licence_name": "",
+    "publisher": "UAE Government open data portal Bayanat.ae (datasets of federal entities incl. FCSC); upstream per OCHA: Federal Competitiveness and Statistics Centre / UAE Ministry of Cabinet Affairs",
+    "url": "https://bayanat.ae/en/Copyright",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Bayanat portal states CC BY 4.0 for its datasets, but the FCSC administrative-boundary dataset was not confirmed to be published there: dataset-level grant not established.",
+    "country": "AE",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "AGCHO / NSIA",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Upstream terms page unreadable from this environment: nsia.gov.af and ocha.gov.af refused by egress proxy (connect_rejected); no terms read.",
+    "country": "AF",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Statistical Committee of the Republic of Armenia (Armstat) website footer; OCHA upstream is \"Government of Armenia (various agencies - see metadata)\" (no single owner named)",
+    "url": "https://www.armstat.am/en/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No licence/terms for reuse of the data could be read; only a generic \"All rights reserved\" footer on Armstat. Upstream agency is not identified precisely. Needs written confirmation.",
+    "country": "AM",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Institut Géographique du Burkina (IGB)",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. IGB's own site states no reuse licence; upstream terms cannot be established.",
+    "country": "BF",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Ministerio de Desarrollo Rural y Tierras (MDRyT)",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Publisher hosts unreachable from this environment (curl to geo.gob.bo, geobolivia.gob.bo, mdryt.gob.bo: connection failed, HTTP code 000); no terms page read.",
+    "country": "BO",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Comité National de Télédétection et d'Information Géographique (CNTIG)",
+    "url": "https://cntig.net/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No licence for the data on CNTIG's site; only a generic all-rights-reserved footer. Not cleared; written confirmation needed.",
+    "country": "CI",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "No named licence; \"Condiciones de uso\" text on the BCN vector-maps page",
+    "publisher": "Biblioteca del Congreso Nacional de Chile (BCN)",
+    "url": "https://www.bcn.cl/siit/mapas_vectoriales",
+    "quote": "Los mapas vectoriales son puestos a disposición en virtud del principio de transparencia de la función pública. Las personas o instituciones pueden usar libremente esta información, señalando como fuente a la Biblioteca del Congreso Nacional de Chile.",
+    "checked_on": "2026-10-06",
+    "terms": "Fuente: Biblioteca del Congreso Nacional de Chile | Material \"sólo posee carácter referencial\"; not for work requiring geodesic precision. Page covers BCN vector maps (division regional/provincial/comunal layers); no explicit statement on commercial use, redistribution or derivatives.",
+    "country": "CL",
+    "verdict": "amber",
+    "page_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "licence_name": "DANE \"Términos y condiciones\" (licencia de usuario final)",
+    "publisher": "Departamento Administrativo Nacional de Estadística (DANE)",
+    "url": "https://www.dane.gov.co/index.php/terminos-y-condiciones",
+    "quote": "Se autoriza el uso, aprovechamiento, transformación y análisis de la información contenida en esta portal, siempre y cuando se haga la siguiente cita textual: [...] El DANE pone este material a disposición de los usuarios en forma individual, como licencia de usuario final, queda por lo tanto prohibida para la Entidad y sus servidores públicos toda comercialización o usufructo de este derecho de acceso.",
+    "checked_on": "2026-10-06",
+    "terms": "“Fuente: Departamento Administrativo Nacional de Estadística: www.dane.gov.co” | Material offered \"en forma individual, como licencia de usuario final\"; the commercialisation prohibition is addressed to the Entity and its public servants (ambiguous for third parties); DANE may change terms without notice. Terms are for the www.dane.gov.co portal; DIVIPOLA/geoportal-specific terms not read.",
+    "country": "CO",
+    "verdict": "amber",
+    "page_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Instituto Nacional de Estadística y Censos (INEC)",
+    "url": "https://inec.cr/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Blocked: inec.cr returns HTTP 403 Access Denied (Akamai edge) to curl with browser UA; admin.inec.cr loads but has no terms. Terms not read.",
+    "country": "CR",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Oficina Nacional de Estadística (ONE)",
+    "url": "https://www.one.gob.do/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Blocked: one.gob.do returns HTTP 403 \"Just a moment...\" (Cloudflare JS challenge) for every path tried; terms not read.",
+    "country": "DO",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "INEC Ecuador",
+    "url": "https://www.ecuadorencifras.gob.ec/documentos/web-inec/Geografia_Estadistica/Micrositio_geoportal/index.html",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Download page https://www.ecuadorencifras.gob.ec/documentos/web-inec/Geografia_Estadistica/Micrositio_geoportal/index.html only shows checkbox text \"He leído las políticas de Uso y Distribución de la Información\" without a link; guessed terms URLs returned 404. Policy text not read.",
+    "country": "EC",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. ",
+    "country": "EG",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Ethiopian Statistical Service (ESS; formerly CSA) + regional BoFED",
+    "url": "https://ess.gov.et/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No reuse licence or terms of use found on the publisher site; footer notice only.",
+    "country": "ET",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": null,
+    "publisher": "Institut National de Cartographie (INC Gabon)",
+    "url": "https://incgabon.ga/nos-produits",
+    "quote": "© 2022 Institut National de Cartographie du Gabon Tous droits réservés",
+    "checked_on": "2026-10-06",
+    "terms": "RED (absent grant). INC Gabon: \"Tous droits réservés\" and a commercial sales catalogue; no reuse licence published. Not loaded.",
+    "country": "GA",
+    "verdict": "red"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Ghana Statistical Service (GSS)",
+    "url": "https://statsghana.gov.gh/about/privacy-confidentiality",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No reuse licence or terms of use found on publisher site.",
+    "country": "GH",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "SINIT / SEPLAN",
+    "url": "https://sinit.hn/2023/09/11/marco-legal/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Only found sinit.hn/2023/09/11/marco-legal/ which states a free-access principle (\"El geoportal promueve el libre acceso a la información pública\") under the Ley de Transparencia, which is an access right, not a reuse licence; no reuse/commercial/attribution terms found.",
+    "country": "HN",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Centre National de l'Information Géo-Spatiale (CNIGS)",
+    "url": "https://cnigs.ht/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. cnigs.ht pages (home, /site/produits, /site/haitidata) read; no licence/terms text found (footer only has \"Privacy | Legal | Site Map\" links without readable target).",
+    "country": "HT",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Badan Pusat Statistik (BPS)",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Upstream terms page unreadable from this environment: bps.go.id/en/terms-of-use and /id/terms-of-use return 403 Cloudflare challenge (curl and WebFetch).",
+    "country": "ID",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Central Statistical Organization / Central Organization for Statistics and GIS (COSIT; site now titled هيأة الإحصاء ونظم المعلومات الجغرافية)",
+    "url": "https://cosit.gov.iq/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Publisher site states no reuse licence for data; the only rights notice concerns site design. Cannot establish permission; written confirmation needed.",
+    "country": "IQ",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Independent Electoral and Boundaries Commission (IEBC)",
+    "url": "https://www.iebc.or.ke/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Publisher site not fetchable; nothing verified.",
+    "country": "KE",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "National Geographic Department (NGD)",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Upstream terms page unreadable from this environment: ngd.gov.la refused by egress proxy.",
+    "country": "LA",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. ",
+    "country": "LB",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Survey Department of Sri Lanka",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Upstream terms page unreadable from this environment: survey.gov.lk home page and disclaimer.php fetched but contain no licence/terms text (disclaimer.php 157 chars of text); no copyright/terms page found.",
+    "country": "LK",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Haut-Commissariat au Plan (HCP)",
+    "url": "https://www.hcp.ma/Conditions-generales-d-utilisation-Version-1-0_a2194.html",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "HCP terms invoke CC BY 4.0 for site indicators only; administrative hierarchy tables are not named and the same terms require written authorisation to reproduce other site elements: grant for this dataset not established.",
+    "country": "MA",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Institut Géographique du Mali (IGM)",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Publisher site unreachable; no terms read.",
+    "country": "ML",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "National Statistical Office of Mongolia",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Upstream terms page unreadable from this environment: home page links to https://www.1212.mn/en/terms_of_use but that host is unreachable (curl 000; WebFetch 503).",
+    "country": "MN",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Agence Nationale de la Statistique, de l'Analyse Démographique et Economique (ANSADE)",
+    "url": "https://ansade.mr/fr/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No data licence published; only generic all-rights-reserved footer. Not cleared.",
+    "country": "MR",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Government of Maldives / National Bureau of Statistics",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Upstream terms page unreadable from this environment: www.nsb.gov.mv refused by egress proxy; statisticsmaldives.gov.mv home page reachable but has no licence/terms link.",
+    "country": "MV",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "National Statistical Office of Malawi",
+    "url": "https://www.nsomalawi.mw/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No licence/terms text located; only all-rights-reserved footer.",
+    "country": "MW",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "Términos de Libre Uso de la Información del INEGI",
+    "publisher": "Instituto Nacional de Estadística y Geografía (INEGI)",
+    "url": "https://www.inegi.org.mx/inegi/terminos.html",
+    "quote": "Puede hacer y distribuir copias de la información, sin alterar ni suprimir sus metadatos. [...] Puede adaptar y reordenar la información. [...] Puede explotar comercialmente la información, utilizándola como insumo para generar otros productos o servicios. [...] Debe otorgar los créditos correspondientes al INEGI como autor",
+    "checked_on": "2026-10-06",
+    "terms": "“Fuente: INEGI, nombre del producto de donde se extrae la información” (+ fecha de actualización si procede) | Keep metadata on copies; notify end users of any analysis/transformation and do not suggest INEGI performed it; do not imply INEGI endorsement/sponsorship; INEGI not liable. Terms are general to INEGI information (the MG/AGEEs layers are INEGI information).",
+    "country": "MX",
+    "verdict": "green",
+    "page_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Namibia Statistics Agency (NSA)",
+    "url": "https://nsa.org.na/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No licence grant found; Act signals State copyright in spatial data but no terms.",
+    "country": "NA",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Institut Géographique National du Niger (IGN.N)",
+    "url": "https://www.ignn.ne/cartotheque/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No reuse licence on IGNN's site; data sold; terms not established.",
+    "country": "NE",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Instituto Geográfico Nacional (IGN)",
+    "url": "https://www.gob.pe/ign",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. gob.pe/ign, gob.pe IGN publications and datosabiertos.gob.pe read; no IGN-specific or portal licence/terms text found (candidate URLs 404). Peru national open-data licence instrument not located on publisher site.",
+    "country": "PE",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "PNG National Statistical Office",
+    "url": "https://www.nso.gov.pg/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No licence or terms page found. Only a footer copyright notice was read; with no licence granted this means permission is not established.",
+    "country": "PG",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "NAMRIA / Philippine Statistics Authority",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Upstream terms page unreadable from this environment: psa.gov.ph, openstat.psa.gov.ph/Terms and rsso09.psa.gov.ph/terms-use return 403 Cloudflare challenge; data.gov.ph tunnel closed. A web-search snippet (NOT read on the publisher site, so not quoted/not relied on) suggests openstat tables are CC-BY while PSA publications need written permission for commercial reuse; needs a manual read from a browser. NAMRIA terms not examined.",
+    "country": "PH",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "State of Qatar Open Data portal (Government of Qatar; datasets published mostly by National Planning Council, successor of the Planning and Statistics Authority)",
+    "url": "https://www.data.gov.qa/pages/license/annexes",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Qatar Open Data Licence (CC BY 4.0 based) is stated for portal datasets; the full licence PDF was unreadable and the PSA boundary dataset was not found on the portal: not established.",
+    "country": "QA",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "ANCPI (Agenția Națională de Cadastru și Publicitate Imobiliară); national framework Legea 179/2022 and data.gov.ro",
+    "url": "https://geoportal.ancpi.ro/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Official sources unreachable from this environment; nothing quotable. Retry from another network.",
+    "country": "RO",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "CC BY 4.0 (stated per product on the ZBGIS \"na stiahnutie\" page); general law: zákon 211/2000 Z. z. §21f",
+    "publisher": "Geodetický a kartografický ústav Bratislava (GKÚ) / Úrad geodézie, kartografie a katastra SR (ÚGKK SR) - ZBGIS download page on skgeodesy.sk (Geoportal.SK data)",
+    "url": "https://www.skgeodesy.sk/gku/produkty-sluzby/na-stiahnutie/zbgis.html",
+    "quote": "Licenčné podmienky Autor GKÚ Bratislava Licencia CC-BY 4.0 | Hranice územnosprávnych jednotiek a katastrálnych území SR v základnej úrovni a generalizovaných úrovniach 1, 2 a 3. Jedná sa o plošné vrstvy (polygón) s atribútmi názov a kód.",
+    "checked_on": "2026-10-06",
+    "terms": "CC BY 4.0 stated on the GKÚ ZBGIS download page (author GKÚ Bratislava) for the administrative-units layers with name and code attributes; attribute GKÚ Bratislava. geoportal.sk itself fails TLS here.",
+    "country": "SK",
+    "verdict": "green",
+    "page_sha256": "2d712ffe8d45383e0dcfd9eeb21fcba8cdab20a658d0680f33bde9a9b59cc409"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Statistics Sierra Leone / Government of Sierra Leone",
+    "url": "https://www.statistics.sl/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Publisher site blocked by captcha.",
+    "country": "SL",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Government of Sint Maarten, Ministry of VROMI - \"St. Maarten Open Data\" site (ArcGIS Hub)",
+    "url": "https://gis-vromi-sxm.opendata.arcgis.com/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "VROMI open-data site says free use incl. commercial (TOU CC BY 4.0) but adds \"No rights may be derived\" and lists no datasets: the boundary dataset is not individually confirmed.",
+    "country": "SX",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Eswatini Central Statistics Office (CSO)",
+    "url": "https://www.cso.gov.sz/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Publisher site unreachable.",
+    "country": "SZ",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Institut National de la Statistique, des Etudes Economiques et Démographiques (INSEED Tchad)",
+    "url": "https://www.inseed.td",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. No data licence published; generic all-rights-reserved footer only. Not cleared.",
+    "country": "TD",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Royal Thai Survey Department",
+    "url": "",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Upstream terms page unreadable from this environment: rtsd.mi.th tunnel closed; data.go.th 403. A DGA catalogue dataset page (catalog-dga.data.go.th/en/dataset/di-open4-01) shows 'License Creative Commons Attributions' but that is another agency's dataset and says nothing about RTSD boundaries.",
+    "country": "TH",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "INS 'Conditions d'utilisation' (open-data reuse licence, compatible by its Art. 7 with OGL UK, CC-BY 2.0, ODC-BY)",
+    "publisher": "Institut National de la Statistique (INS Tunisie)",
+    "url": "https://www.ins.tn/conditions-utilisation",
+    "quote": "La présente licence permet la réutilisation commerciale et non commerciale de toutes données publiques et informations mises à disposition par le producteur dans les conditions prévues ci-dessous. | Diffuser et redistribuer les données ou les informations | Adapter, modifier, extraire et transformer à partir des données ou des informations, notamment pour créer des informations dérivées ; Exploiter les données ou les informations à titre commercial, par exemple en la combinant avec d’autres données ou informations , ou en les incluant dans votre propre produit ou application. | La réutilisation ne peut être valablement faite sans mention préalable de la paternité de données ou de l’information, sa source (a minima le nom du « producteur ») et la date de sa dernière mise à jour.",
+    "checked_on": "2026-10-06",
+    "terms": "Mention of authorship, source (at minimum the producer's name, here INS Tunisie) and date of last update; URL link acceptable; must not suggest official status or endorsement by the producer (Art. 4). | Attribution only (Art. 4); no official/endorsement implication; reuse must not mislead third parties about content, source or update date (Art. 6); data provided as-is, no warranty; Tunisian law governs (Art. 8). No NC/ND/SA. Caveat: the page speaks of 'données publiques mises à disposition par le producteur'; it does not name the dataportal.ins.tn map/boundary layer specifically (dataportal.ins.tn/en/Map, the source named by HDX, was unreachable: connection reset). The cited decree itself was not read.",
+    "country": "TN",
+    "verdict": "amber",
+    "page_sha256": "80ba691aba2e05a89bf49854363b655d06b2684eae8407bcd23f8f0cc9f9cc24"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Instituto Nacional de Estadística (INE)",
+    "url": "https://ine.gob.ve/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Only an \"all rights reserved\" footer was read; no data licence found.",
+    "country": "VE",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "General Statistics Office (now National Statistics Office, nso.gov.vn)",
+    "url": "https://www.nso.gov.vn/en/legal-document/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Only \"Copyright belongs to the National Statistics Office\" and a source-citation request were read (nso.gov.vn/en/legal-document); no statement on commercial use, redistribution or derived databases: permission not established.",
+    "country": "VN",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Central Statistical Organization (CSO) Yemen",
+    "url": "http://www.cso-yemen.com/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Official site unreachable/hijacked; no terms retrievable. Need written confirmation; HCT approval is humanitarian-use context, not a commercial licence.",
+    "country": "YE",
+    "verdict": "unread"
+  },
+  {
+    "licence_name": "MDB data licence (custom, 'public domain' with restrictions) - in licenceInfo of MDB-owned ArcGIS Online items (owner MDBUser1)",
+    "publisher": "Municipal Demarcation Board (MDB)",
+    "url": "https://www.arcgis.com/sharing/rest/content/items/30b6e281a5074eddbf1a3f82aa00459e?f=json",
+    "quote": "The user of municipal and ward boundary data shall not sell the data to third parties or appropriate it for commercial use.",
+    "checked_on": "2026-10-06",
+    "terms": "RED. Municipal Demarcation Board data licence (ArcGIS item licenceInfo): \"The user of municipal and ward boundary data shall not sell the data to third parties or appropriate it for commercial use.\" Not loaded.",
+    "country": "ZA",
+    "verdict": "red"
+  },
+  {
+    "licence_name": "",
+    "publisher": "Zimbabwe National Statistics Agency (ZIMSTAT)",
+    "url": "https://zimstat.co.zw/copyright-disclaimer-and-privacy-policy/",
+    "quote": "",
+    "checked_on": "2026-10-06",
+    "terms": "Upstream terms could not be read (site unreachable, challenge page, or only a generic copyright footer): permission not established. Terms page read but it grants no reuse licence; effectively unestablished (treat as permission needed, not 'red' since no explicit restriction).",
+    "country": "ZW",
+    "verdict": "unread"
+  }
+]

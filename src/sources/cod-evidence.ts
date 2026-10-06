@@ -38,7 +38,7 @@ export function parseEvidence(json: string): UpstreamEvidence[] {
     if (seen.has(e.country)) throw bad('duplicate country');
     seen.add(e.country);
     if (!e.verdict || !VERDICTS.has(e.verdict)) throw bad('verdict must be green|amber|red|unread');
-    for (const k of ['publisher', 'url', 'quote', 'checked_on', 'terms'] as const) if (!e[k] && e.verdict !== 'unread') throw bad(`${k} is required`);
+    for (const k of ['publisher', 'url', 'quote', 'checked_on', 'terms'] as const) if (!e[k] && (e.verdict === 'green' || e.verdict === 'amber')) throw bad(`${k} is required`);
     if (e.url && !/^https?:\/\//.test(e.url)) throw bad('url must be http(s)');
     return { licence_name: '', publisher: '', url: '', quote: '', checked_on: '', terms: '', ...e } as UpstreamEvidence;
   });
@@ -57,6 +57,9 @@ export const pageText = (html: string): string =>
 
 const norm = (s: string) => pageText(s).toLowerCase();
 
+/** A quote may join several verbatim excerpts of the same page with `[...]` or `|`; every excerpt must be on the page. */
+export const quotePieces = (q: string): string[] => q.split(/\s*(?:\[\.\.\.\]|\|)\s*/).map((x) => x.trim()).filter(Boolean);
+
 export interface EvidenceCheck { country: string; quoteFound: boolean; fingerprint: string | null; changed: boolean; error?: string }
 
 /** Second pass: refetch the publisher page, check the quote is still on it and compare the licensing-sentence fingerprint. */
@@ -65,7 +68,8 @@ export async function verifyEvidence(e: UpstreamEvidence, get: (url: string) => 
   try {
     const html = await get(e.url);
     const fp = createHash('sha256').update(licenseExcerpt(html)).digest('hex');
-    return { country: e.country, quoteFound: norm(html).includes(norm(e.quote)), fingerprint: fp, changed: !!e.page_sha256 && e.page_sha256 !== fp };
+    const text = norm(html);
+    return { country: e.country, quoteFound: quotePieces(e.quote).every((q) => text.includes(norm(q))), fingerprint: fp, changed: !!e.page_sha256 && e.page_sha256 !== fp };
   } catch (err) {
     return { country: e.country, quoteFound: false, fingerprint: null, changed: false, error: (err as Error).message };
   }
@@ -78,7 +82,7 @@ export async function verifyAll(cacheDir: string, write: boolean): Promise<(Evid
   for (const e of list) {
     const r = await verifyEvidence(e, (u) => fetchText(u, `cod_ev_${createHash('md5').update(u).digest('hex').slice(0, 10)}.html`, cacheDir, 0));
     out.push({ ...r, verdict: e.verdict });
-    if (write && e.verdict !== 'unread') {
+    if (write && (e.verdict === 'green' || e.verdict === 'amber')) {
       if (r.quoteFound && r.fingerprint) e.page_sha256 = r.fingerprint;
       else { e.verdict = 'unread'; e.terms = `${e.terms} [second pass failed: ${r.error ?? 'quote not found on the page'}]`.trim(); }
     }

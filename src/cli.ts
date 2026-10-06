@@ -166,7 +166,7 @@ async function main() {
       const write = process.argv.includes('--write');
       const res = await verifyAll(config.cacheDir, write);
       for (const r of res) console.log(`${r.country} ${r.verdict.padEnd(6)} quote:${r.quoteFound ? 'found' : 'MISSING'} ${r.changed ? 'PAGE-CHANGED ' : ''}${r.error ?? ''}`);
-      const drift = res.filter((r) => r.verdict !== 'unread' && (!r.quoteFound || r.changed));
+      const drift = res.filter((r) => (r.verdict === 'green' || r.verdict === 'amber') && (!r.quoteFound || r.changed));
       if (!write && drift.length) {
         await migrate(pool);
         // A country whose evidence no longer holds is sent back to review: it is not loaded again until the page is re-read.

@@ -116,7 +116,7 @@ function everyTarget(): RefreshTarget[] {
     ...nationalTargets(),
     {
       // BR stays out until IBGE's own licence is read (docs/licenses/ocha-cod-ab.md); TR/PL are refused by the deny filter.
-      meta: COD_SOURCE, cadence: 'monthly', expectedRows: [30_000, 50_000], scope: { kinds: ['division'] }, // the source owns all its own records: a country that is excluded/unacked later is removed (guarded by the delete ratio)
+      meta: COD_SOURCE, cadence: 'monthly', expectedRows: [3_000, 12_000], scope: { kinds: ['division'] }, // the source owns all its own records: a country that is excluded/unacked later is removed (guarded by the delete ratio)
      
       load: (dir, ctx) => loadCod(dir, new Set([...Object.keys(NATIONAL), 'BR']), ctx),
       licenseUrls: ['https://docs.humdata.org/about/data-licenses', 'https://creativecommons.org/licenses/by/3.0/igo/legalcode', 'https://docs.humdata.org/about/hdx-terms-of-service'],

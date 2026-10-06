@@ -128,8 +128,8 @@ async function run(pool: pg.Pool, t: RefreshTarget, o: RefreshOptions): Promise<
   try {
     const r = await ingest(pool, t.meta, input, {
       ...t.scope,
-      maxDeleteRatio: vintageChanged ? 0.3 : 0.05,
-      maxChangeRatio: vintageChanged ? 1 : 0.5,
+      maxDeleteRatio: process.env.ALLOW_BULK_DELETE === '1' ? 1 : vintageChanged ? 0.3 : 0.05, // ALLOW_BULK_DELETE=1: an intentional large removal (e.g. a source's countries dropped by a licence decision)
+      maxChangeRatio: process.env.ALLOW_BULK_DELETE === '1' || vintageChanged ? 1 : 0.5,
       reason: vintageChanged ? `vintage_change: ${src.version} -> ${t.meta.version}` : undefined,
     });
     const changed = r.inserted + r.updated + r.deleted > 0;

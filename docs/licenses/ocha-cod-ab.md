@@ -60,6 +60,9 @@
 - Açık sorular / yayıncıya yazılacak teyit: (a) OCHA FISS (HDX ToS iletişim adresi olarak yalnız hdx@un.org okundu): TUR için "humanitarian use only"un CC BY-IGO etiketiyle ilişkisi ve ticari kullanım; (b) POL: UNHCR'nin OSM-PRG türevinin lisansı (ODbL mi?) — PRG'nin (GUGiK) kendi koşulları; (c) BRA: IBGE'nin kendi lisansı (`docs/licenses/nat-br.md` ile çapraz kontrol); (d) OCHA'nın istediği atıf cümlesi (HDX'te açık bir "cite as" metni okunamadı); (e) sui generis veritabanı hakkı ve ihracat/yaptırım satırı okunamadı; (f) tabular XLSX içeriğinin gerçekten geometrisiz ve yalnızca ad/P-code/üst P-code içerdiği örnek dosya üzerinde doğrulanmadı.
 - Okuyan: Claude (alt-ajan) Bağımsız ikinci geçiş yapıldı mı: hayır (2026-10-05)
 
+## Faz 13 eki: üst veri sahibi lisansı
+Üst sahip lisansı ülke ülke okundu: `docs/licenses/cod-upstream.md` / `.json`. Yalnızca kanıtlı (🟢/🟡) 5 ülke yüklenir (MX SK CL CO TN); aşağıdaki "a) üst yayıncının hakkı" riski bu ülkeler için kapatıldı, diğerleri yüklenmez.
+
 ## Faz 12 eki (2026-10-06): adaptörün lisans uygulaması
 - **Kullanım:** `cod-ab` kaynağı (docs/PROGRESS.md "Faz 12"); yalnızca öznitelik tabloları (XLSX); her ülke paketinin `license_id` değeri her `refresh`'te `cc-by-igo` olarak doğrulanır, değilse ülke atlanır. Lisans sayfaları `check:licenses` ile izlenir (docs.humdata.org data-licenses, CC BY 3.0 IGO legalcode, HDX ToS).
 - **Ülke kararı:** TR (humanitarian use only) ve PL (OSM) metin filtresiyle otomatik dışlanır; BR IBGE lisansı okunana kadar dışarıda; BG/RO/SK gibi AB üyelerinde yalnızca COD'un yayımladığı düzeyler alınır (BG filtre dışı: UNICEF). Genel karar 🟡 (amber): ticari pakete girer, çünkü CC BY 3.0 IGO ticari kullanımı, uyarlamayı ve dağıtımı atıfla verir; ek şartlar aşağıdadır.
