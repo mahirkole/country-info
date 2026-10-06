@@ -186,6 +186,44 @@
     "checked_on": "2026-10-04"
    },
    "verification": "verified"
+  },
+  {
+   "id": "st-brigids-day",
+   "names": {
+    "en": "St Brigid's Day"
+   },
+   "type": "public",
+   "when": {
+    "if_weekday": {
+     "when": {
+      "fixed": {
+       "month": 2,
+       "day": 1
+      }
+     },
+     "weekday": 5,
+     "then": {
+      "fixed": {
+       "month": 2,
+       "day": 1
+      }
+     },
+     "else": {
+      "nth_weekday": {
+       "month": 2,
+       "weekday": 1,
+       "n": 1
+      }
+     }
+    }
+   },
+   "from_year": 2023,
+   "source": {
+    "citation": "S.I. No. 50/2022 Organisation of Working Time (Covid-19 Commemoration) Regulations 2022, reg. 4 (first Monday in February each year from 2023) and reg. 5 (1 February when it falls on a Friday)",
+    "url": "https://www.irishstatutebook.ie/eli/2022/si/50/made/en/print",
+    "checked_on": "2026-10-06"
+   },
+   "verification": "verified"
   }
  ]
 }

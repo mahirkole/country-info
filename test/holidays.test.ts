@@ -231,3 +231,17 @@ describe('LV: 4 May and 18 November move to the next working day on a weekend', 
     expect(datesFor(rule('labour-day'), 2026)[0]!.observed).toBeUndefined(); // 1 May carries no such rule in the act's sentence
   });
 });
+
+describe('IE: St Brigid\'s Day (S.I. No. 50/2022, regs. 4-5, read 2026-10-06)', () => {
+  it('first Monday of February from 2023, 1 February when that is a Friday, nothing before 2023', async () => {
+    const ie = (await loadHolidayFiles()).find((f) => f.country === 'IE')!;
+    const rule = ie.rules.find((r) => r.id === 'st-brigids-day')!;
+    const d = (y: number) => datesFor(rule, y)[0]?.date;
+    expect(d(2022)).toBeUndefined();
+    expect(d(2023)).toBe('2023-02-06');
+    expect(d(2024)).toBe('2024-02-05');
+    expect(d(2025)).toBe('2025-02-03'); // 1 Feb 2025 is a Saturday
+    expect(d(2030)).toBe('2030-02-01'); // a Friday
+    expect(rule.verification).toBe('verified');
+  });
+});
