@@ -26,13 +26,14 @@ import { DK } from './dk.js';
 import { FI } from './fi.js';
 import { CY } from './cy.js';
 import { IE } from './ie.js';
+import { SK } from './sk.js';
 
 /**
  * One adapter per country, each reading that country's own official data.
  * To add a country: read the publisher's license first (docs/LICENSES.md), write
  * `src/sources/national/<cc>.ts` exporting a NationalSource, register it here, add a test.
  */
-export const NATIONAL: Record<string, NationalSource> = { US, FR, IT, NL, NO, SE, CZ, DE, AT, CA, CH, AU, GB, ES, PT, JP, PL, LV, SI, HU, GR, LU, EE, DK, FI, CY, IE };
+export const NATIONAL: Record<string, NationalSource> = { US, FR, IT, NL, NO, SE, CZ, DE, AT, CA, CH, AU, GB, ES, PT, JP, PL, LV, SI, HU, GR, LU, EE, DK, FI, CY, IE, SK };
 
 export class LicenseNotEstablished extends Error {}
 

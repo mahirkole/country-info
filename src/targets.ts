@@ -6,6 +6,7 @@ import { EU27 } from './sources/eu.js';
 import { GEONAMES, loadGeoNames } from './sources/geonames.js';
 import { GISCO_LAU, GISCO_NUTS, loadLau, loadNuts } from './sources/gisco.js';
 import { NATIONAL } from './sources/national/index.js';
+import { sparqlQuery } from './sources/national/sk.js';
 import { sourcePriority } from './sources/priority.js';
 import { WD_COUNTRIES, wikidataLoader, wikidataMeta } from './sources/wikidata-countries.js';
 import { HOLIDAYS_SOURCE, loadHolidaysWithFeeds } from './holidays/load.js';
@@ -62,6 +63,7 @@ const nationalTargets = (): RefreshTarget[] => {
     FI: { cadence: 'annual', rows: [310, 345], licenseUrls: ['https://stat.fi/en/about-us/get-to-know-statistics-finland/legislation/terms-of-use'], verdict: 'green', commercial: 'CC BY 4.0 (Statistics Finland terms of use), commercial use stated; data of other organisations excluded; docs/licenses/nat-fi.md' },
     CY: { cadence: 'annual', rows: [610, 630], licenseUrls: ['https://www.data.gov.cy/el/dataset/dioikitika-oria-dimon-kai-koinotiton-dioikitikos-hartis'], verdict: 'green', commercial: 'CC BY 4.0 (data.gov.cy dataset page, DLS); docs/licenses/nat-cy.md' },
     IE: { cadence: 'annual', rows: [28, 34], licenseUrls: ['https://www.arcgis.com/sharing/rest/content/items/74b839e09e1c48f2b2fe4efccb52a73d?f=json'], verdict: 'green', commercial: 'CC BY 4.0 (Tailte Éireann item description), credit © Tailte Éireann; docs/licenses/nat-ie.md' },
+    SK: { cadence: 'monthly', rows: [2900, 3100], licenseUrls: [`https://data.slovensko.sk/api/sparql?query=${encodeURIComponent(sparqlQuery('Register Adries - Register obcí'))}`], verdict: 'green', commercial: 'CC0 declared in the catalogue TermsOfUse of the distribution (checked at every load; a non-CC0 declaration stops the load); Ministry of the Interior Register adries; docs/licenses/nat-sk.md' },
     NO: { cadence: 'monthly', rows: [350, 400], licenseUrls: ['https://kartkatalog.geonorge.no/api/getdata/041f1e6e-bdbc-4091-b48f-8a5990f3cc5b'], verdict: 'green', commercial: 'CC BY 4.0 (dataset records), commercial use allowed per Kartverket terms; API record status Arkivert, see docs/licenses/nat-no.md' },
   };
   return Object.entries(NATIONAL).map(([cc, s]) => {

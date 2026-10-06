@@ -580,3 +580,45 @@ describe('IE adapter (Tailte Éireann local authorities)', () => {
     expect(() => parseIreland({ features: feats, exceededTransferLimit: true })).toThrow(/layout changed/);
   });
 });
+
+import { parseSlovakia, pickDistribution, sparqlQuery } from '../src/sources/national/sk.js';
+
+describe('SK adapter (Register adries, CC0 via the national open-data catalogue)', () => {
+  const H = '_id,changeId,changedAt,databaseOperation,objectId,versionId,createdReason,validFrom,validTo,effectiveDate,codelistCode';
+  const kr = `${H},regionCode,regionName,modified_timestamp
+1,None,None,INSERT,1,1,CREATE,1000-01-01T00:00:00,2004-04-30T23:59:59,1996-07-24,CL000023,0,Neznámy,None
+2,None,None,INSERT,2,2,CREATE,1000-01-01T00:00:00,3000-12-31T00:00:00,1996-07-24,CL000023,SK010,Bratislavský,None
+3,None,None,INSERT,3,3,CREATE,1000-01-01T00:00:00,3000-12-31T00:00:00,1996-07-24,CL000023,SK041,Prešovský,None`;
+  const ok = `${H},countyCode,countyName,regionIdentifier,modified_timestamp
+1,None,None,INSERT,11,1,CREATE,1000-01-01T00:00:00,2004-04-30T23:59:59,1996-07-24,CL000024,6000,Neznámy,1,None
+2,None,None,INSERT,12,2,CREATE,1000-01-01T00:00:00,3000-12-31T00:00:00,1996-07-24,CL000024,SK0101,Bratislava I,2,None
+3,None,None,INSERT,13,3,CREATE,1000-01-01T00:00:00,3000-12-31T00:00:00,1996-07-24,CL000024,SK041D,Vranov nad Topľou,3,None`;
+  const mkOb = (extra = '') => `${H},municipalityCode,municipalityName,countyIdentifier,status,cityIdentifier,modified_timestamp
+1,None,None,INSERT,92,1,CREATE,1000-01-01T00:00:00,2004-04-30T23:59:59,1000-01-01,CL000025,100000,Neznáma,11,MUNICIPALITY,None,None
+2,None,None,INSERT,93,2,CREATE,1000-01-01T00:00:00,3000-12-31T00:00:00,1000-01-01,CL000025,SK041D544116,Čaklov,13,MUNICIPALITY,None,None
+3,None,None,INSERT,94,3,CREATE,1000-01-01T00:00:00,3000-12-31T00:00:00,1000-01-01,CL000025,SK0101529311,Bratislava-Staré Mesto,12,CITY_DISTRICT,None,None
+4,None,None,INSERT,95,4,CREATE,1000-01-01T00:00:00,3000-12-31T00:00:00,1000-01-01,CL000025,NEDODANE,Veľká Poľana,91,MUNICIPALITY,None,None
+5,None,None,INSERT,96,5,CREATE,1000-01-01T00:00:00,2010-01-01T00:00:00,1000-01-01,CL000025,SK0101599999,Zaniknutá,12,MUNICIPALITY,None,None${extra}`;
+  // the sanity band (>= 2500 municipalities) is checked by the adapter, so tests use a pure parser entry via a low-level helper: expect the band error on a tiny fixture
+  it('rejects a layout/volume that looks wrong instead of loading a fragment', () => {
+    expect(() => parseSlovakia(kr, ok, mkOb(), '2026-10-06')).toThrow(/look wrong/);
+  });
+  it('builds kraj > okres > obec with registry ids, drops placeholders and expired versions (letters in okres codes are valid)', () => {
+    const many = Array.from({ length: 2500 }, (_, i) => `\n${100 + i},None,None,INSERT,${1000 + i},${100 + i},CREATE,1000-01-01T00:00:00,3000-12-31T00:00:00,1000-01-01,CL000025,SK041D${String(600000 + i)},Obec ${i},13,MUNICIPALITY,None,None`).join('');
+    const out = parseSlovakia(kr, ok, mkOb(many), '2026-10-06', false);
+    const by = (id: string) => out.find((e) => e.id === id)!;
+    expect(by('div:SK:SK010')).toMatchObject({ parent_id: 'country:SK', data: { level: 1, type: 'region', type_local: 'kraj' } });
+    expect(by('div:SK:SK041D')).toMatchObject({ parent_id: 'div:SK:SK041', data: { level: 2, type: 'district' } });
+    expect(by('div:SK:SK041D544116')).toMatchObject({ parent_id: 'div:SK:SK041D', name: 'Čaklov', data: { level: 3, type: 'municipality' } });
+    expect(by('div:SK:SK0101529311')).toMatchObject({ parent_id: 'div:SK:SK0101', data: { type: 'borough', status: 'CITY_DISTRICT' } });
+    expect(out.some((e) => ['NEDODANE', '100000', 'SK0101599999', '6000'].includes(e.code ?? ''))).toBe(false);
+  });
+  it('refuses a distribution that is not declared CC0 and picks the newest initial+change CSV', () => {
+    const b = (mod: string, lic: string) => ({ t: { value: 'Obce - inicializačné a zmenové dáta do 02/2024' }, mod: { value: mod }, url: { value: `https://x/${mod}` }, lic: { value: lic } });
+    const CC0 = 'http://publications.europa.eu/resource/authority/licence/CC0';
+    expect(pickDistribution({ results: { bindings: [b('2024-05-22T00:00:00Z', CC0), b('2025-01-01T00:00:00Z', CC0)] } }, 'x')).toEqual({ url: 'https://x/2025-01-01T00:00:00Z', modified: '2025-01-01' });
+    expect(() => pickDistribution({ results: { bindings: [b('2025-01-01T00:00:00Z', 'http://publications.europa.eu/resource/authority/licence/CC_BY_NC_4_0')] } }, 'x')).toThrow(/not declared CC0/);
+    expect(() => pickDistribution({ results: { bindings: [] } }, 'x')).toThrow(/layout changed/);
+    expect(sparqlQuery('T')).toContain('STR(?st) = "T"');
+  });
+});
