@@ -81,6 +81,17 @@ export function planLinks(admin1: Row[], nuts: Row[]): LinkPlan {
   return plan;
 }
 
+/**
+ * Second pass for GeoNames admin1 units that matched no NUTS region (their level is a municipality or similar: SI, MT, LV, HR, PT, CY, IE ...):
+ * name match against the national/Wikidata `division` units of the same country, per source level (`nat-si:2`), unique 1:1 matches only.
+ */
+export function planDivisionLinks(unlinkedAdmin1: Row[], divisions: Row[]): Link[] {
+  // GeoNames spells many units with a generic English type word ("Municipality of Žalec", "Žalec Municipality"); the national lists use the bare name.
+  const bare = (n: string) => n.replace(/^(municipality|city|town|commune|county|district|parish) of\s+/i, '').replace(/\s+(municipality|county|district|parish)$/i, '');
+  const withBare = unlinkedAdmin1.map((r) => ({ ...r, names: [...new Set([...r.names, ...r.names.map(bare)])] }));
+  return planLinks(withBare, divisions).links.map((l) => ({ ...l, method: 'name_exact_div' }));
+}
+
 const SCOPE = [...EU27, 'TR'];
 
 /** Recompute GeoNames admin1 <-> NUTS links and review items (derived data, fully rebuilt each run). */
@@ -93,12 +104,31 @@ export async function linkRegions(pool: pg.Pool): Promise<LinkPlan> {
         [source, kinds, SCOPE],
       )
     ).rows.map((r) => ({ ...r, names: (r.names as (string | null)[]).filter((x): x is string => !!x) })) as Row[];
-  const plan = planLinks(await load(['admin1'], 'geonames'), await load(['nuts1', 'nuts2', 'nuts3'], 'gisco-nuts'));
+  const admin1 = await load(['admin1'], 'geonames');
+  const plan = planLinks(admin1, await load(['nuts1', 'nuts2', 'nuts3'], 'gisco-nuts'));
+  // Admin1 units that are no NUTS level (municipalities etc.) of countries with national division data.
+  const linked = new Set(plan.links.map((l) => l.a));
+  const leftover = (
+    await pool.query(
+      `SELECT id, country_code::text AS country_code, 'admin1' AS kind, ARRAY[name, name_ascii] AS names FROM entities
+       WHERE source_id = 'geonames' AND kind = 'admin1' AND NOT (id = ANY($1)) AND NOT EXISTS (SELECT 1 FROM entity_links l WHERE l.a_id = entities.id AND l.method <> 'name_exact_div')`,
+      [[...linked]],
+    )
+  ).rows.map((r) => ({ ...r, names: (r.names as (string | null)[]).filter((x): x is string => !!x) })) as Row[];
+  const divisions = (
+    await pool.query(
+      `SELECT id, country_code::text AS country_code, source_id || ':' || coalesce(data->>'level', '?') AS kind, ARRAY[name, name_ascii] AS names
+       FROM entities WHERE kind = 'division' AND (source_id LIKE 'nat-%' OR source_id LIKE 'wd-%') AND country_code = ANY($1)`,
+      [[...new Set(leftover.map((r) => r.country_code))]],
+    )
+  ).rows.map((r) => ({ ...r, names: (r.names as (string | null)[]).filter((x): x is string => !!x) })) as Row[];
+  const divLinks = planDivisionLinks(leftover, divisions);
+  plan.links.push(...divLinks);
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    await client.query("DELETE FROM entity_links WHERE method = 'name_exact'");
+    await client.query("DELETE FROM entity_links WHERE method IN ('name_exact', 'name_exact_div')");
     await client.query("DELETE FROM review_items WHERE field = 'link:nuts' AND status = 'open'");
     if (plan.links.length) {
       await client.query(

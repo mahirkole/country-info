@@ -39,3 +39,22 @@ describe('planLinks', () => {
     expect(plan.unmatched).toEqual(['gn:2']);
   });
 });
+
+import { planDivisionLinks } from '../src/linking.js';
+describe('planDivisionLinks (admin1 that is no NUTS level)', () => {
+  const a = (id: string, name: string, cc = 'SI') => ({ id, country_code: cc, kind: 'admin1', names: [name] });
+  const d = (id: string, name: string, kind = 'nat-si:1', cc = 'SI') => ({ id, country_code: cc, kind, names: [name] });
+  it('matches through the generic English type word, unique 1:1 only, best level per country', () => {
+    const links = planDivisionLinks(
+      [a('gn:1', 'Municipality of Žalec'), a('gn:2', 'Bled Municipality'), a('gn:3', 'Kranj'), a('gn:4', 'Dup')],
+      [d('div:SI:1', 'Žalec'), d('div:SI:2', 'Bled'), d('div:SI:3', 'Kranj'), d('div:SI:4', 'Dup'), d('div:SI:5', 'Dup'), d('div:SI:99', 'Žalec', 'nat-si:2')],
+    );
+    expect(links).toEqual(expect.arrayContaining([
+      { a: 'gn:1', b: 'div:SI:1', method: 'name_exact_div' },
+      { a: 'gn:2', b: 'div:SI:2', method: 'name_exact_div' },
+      { a: 'gn:3', b: 'div:SI:3', method: 'name_exact_div' },
+    ]));
+    expect(links.find((l) => l.a === 'gn:4')).toBeUndefined(); // two candidates: ambiguous
+    expect(links.some((l) => l.b === 'div:SI:99')).toBe(false); // lower-scoring level is not used
+  });
+});
