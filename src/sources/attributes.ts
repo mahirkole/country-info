@@ -17,7 +17,7 @@ export const ATTR_SOURCES = {
   libphonenumber: {
     authority: 'Google libphonenumber – PhoneNumberMetadata.xml (calling codes and dialling prefixes)', url: 'https://github.com/google/libphonenumber',
     license: 'Apache License 2.0 (file header and repository LICENSE, read): use, reproduce, modify and distribute commercially; keep the license and notices with redistributed copies of the file.',
-    attribution: 'Telephone metadata derived from Google libphonenumber (Apache License 2.0), © The Libphonenumber Authors.', verdict: 'amber', commercial: 'Apache-2.0 header and LICENSE read: commercial use allowed, notice retention; clause text and NOTICE unread (docs/licenses/libphonenumber.md)',
+    attribution: 'Telephone metadata (calling codes and dialling prefixes only) extracted and modified from Google libphonenumber PhoneNumberMetadata.xml, © The Libphonenumber Authors, licensed under the Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0).', verdict: 'green', commercial: 'Apache-2.0 (header, LICENSE incl. section 4 read; no NOTICE file in the repository): commercial use allowed; pass on the license reference and mark modification (docs/licenses/libphonenumber.md)',
   },
   'wikidata-driving': {
     authority: 'Wikidata – driving side of countries (P1622)', url: 'https://www.wikidata.org/wiki/Property:P1622',

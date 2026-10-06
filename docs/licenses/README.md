@@ -32,7 +32,7 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | nat-pt | 🟢 | DGT CAOP CC BY 4.0; freguesia kodu INE'ye ait |
 | nat-cz | 🟢 | ČÚZK/ČSÚ CC BY 4.0 (atıf + metaveri + değişiklik belirtme) |
 | **iana-tz** | 🟢 | tzdb kamu malı (LICENSE ve zone.tab başlığı okundu); ülke saat dilimleri (`zone.tab`, "deprecated" ama ülke başına tek satır) |
-| **libphonenumber** | 🟡 | Apache-2.0 (dosya başlığı + LICENSE okundu); yalnızca arama kodu/önekler; NOTICE ve 4. madde okunamadı → avukat maddesi |
+| **libphonenumber** | 🟢 | Apache-2.0 (dosya başlığı + LICENSE 4. madde okundu, NOTICE yok); yalnızca arama kodu/önekler; atıf metni lisans URL'si ve değişiklik notunu taşır |
 | **wikidata** | 🟢 | Yapılandırılmış veri CC0 (ticari, yeniden dağıtım serbest, atıf gerekmez). Sınırlar: User-Agent zorunlu, 60 sn sorgu zaman aşımı, IP başına 5 paralel sorgu, 429 yönetimi; büyük çekimler için dump. Topluluk verisidir (resmi değil). Üçüncü taraf kökenli içerik CC0 ile temizlenmiş olmaz |
 | ocha-cod-ab | 🟡 (ülkeye göre) | CC BY-IGO ticari kullanıma izin verir ama **TR 🔴** (metodoloji: "shared… for humanitarian use only"), PL 🟡 (UNHCR "from OSM PRG": ODbL olasılığı), BR 🟡 (IBGE kendi lisansı okunmadı) → **Türkiye için kullanılmaz** |
 | cldr | 🟡 | Unicode License V3: ticari, satış, değiştirme serbest (bildirim korunur). Yerelleştirilmiş ülke adları ve `currencyData` 🟢; `territoryInfo` (nüfus/GSYH/dil) World Bank/CIA/Ethnologue kökenli tahmin 🟡; `territoryContainment` "UNM49 tabanlı" → BM M49 🔴 zincirine takılır |
