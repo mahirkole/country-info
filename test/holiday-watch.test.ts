@@ -69,6 +69,17 @@ describe.skipIf(!url)('law watch state machine', () => {
     expect((await run()).status).toBe('error');
     expect((await pool.query('SELECT status, last_error FROM holiday_law_watch')).rows[0]).toMatchObject({ status: 'ok', last_error: 'empty page text' });
   });
+  it('three consecutive fetch failures show up in /v1/status; one success clears them', async () => {
+    await run();
+    pages.set('https://law.test/a', new Error('503'));
+    for (let i = 0; i < 3; i++) await run();
+    const app = await buildApp(pool, { adminToken: 't', exportDir: await mkdtemp(join(tmpdir(), 'ci-')) });
+    expect((await app.inject('/v1/status')).json().attention).toEqual(expect.arrayContaining([{ id: 'official-holidays', status: 'law_unreachable', urls: ['https://law.test/a'] }]));
+    pages.set('https://law.test/a', '<p>§ 1 January 1st is a public holiday.</p>');
+    await run();
+    expect((await app.inject('/v1/status')).json().attention.some((a: { status: string }) => a.status === 'law_unreachable')).toBe(false);
+    await app.close();
+  });
   it('a confirmed change shows in /v1/status', async () => {
     await run();
     pages.set('https://law.test/a', 'new text');

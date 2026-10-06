@@ -331,6 +331,8 @@ export async function buildApp(pool: pg.Pool, opts: { adminToken?: string; expor
     const attention: { id: string; status: string; stale?: boolean; rows?: number; expected?: number[]; urls?: string[] }[] = rows.filter((r) => r.status !== 'ok' || r.stale).map((r) => ({ id: r.id, status: r.status, stale: r.stale }));
     const law = (await pool.query(`SELECT url, countries FROM holiday_law_watch WHERE status = 'changed' ORDER BY url`)).rows as { url: string; countries: string[] }[];
     if (law.length) attention.push({ id: 'official-holidays', status: 'law_changed', urls: law.map((l) => l.url) });
+    const lawDown = (await pool.query(`SELECT url FROM holiday_law_watch WHERE error_count >= 3 ORDER BY url`)).rows as { url: string }[];
+    if (lawDown.length) attention.push({ id: 'official-holidays', status: 'law_unreachable', urls: lawDown.map((l) => l.url) });
     for (const d of detail) {
       if (d.in_band === false && d.rows > 0) attention.push({ id: d.id, status: 'out_of_band', rows: d.rows, expected: d.expected! }); // a source that never loaded shows up through its status
 

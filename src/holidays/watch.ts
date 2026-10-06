@@ -54,7 +54,7 @@ export async function checkHolidayLaw(pool: pg.Pool, cacheDir: string, o: { dir?
       if (text === '') throw new Error('empty page text');
       fp = createHash('sha256').update(text).digest('hex');
     } catch (e) {
-      await pool.query(`UPDATE holiday_law_watch SET last_error = $2, checked_at = now() WHERE url = $1`, [u.url, (e as Error).message]);
+      await pool.query(`UPDATE holiday_law_watch SET last_error = $2, error_count = error_count + 1, checked_at = now() WHERE url = $1`, [u.url, (e as Error).message]);
       out.push({ url: u.url, status: 'error', detail: (e as Error).message });
       continue;
     }
@@ -64,7 +64,7 @@ export async function checkHolidayLaw(pool: pg.Pool, cacheDir: string, o: { dir?
       out.push({ url: u.url, status: 'baseline' });
       continue;
     }
-    await pool.query('UPDATE holiday_law_watch SET citations = $2, countries = $3, last_error = NULL, checked_at = now() WHERE url = $1', [u.url, u.citations, u.countries]);
+    await pool.query('UPDATE holiday_law_watch SET citations = $2, countries = $3, last_error = NULL, error_count = 0, checked_at = now() WHERE url = $1', [u.url, u.citations, u.countries]);
     if (fp === row.sha256) {
       await pool.query('UPDATE holiday_law_watch SET pending_sha256 = NULL, flaps = 0, status = CASE WHEN status = \'volatile\' THEN \'ok\' ELSE status END WHERE url = $1', [u.url]);
       out.push({ url: u.url, status: row.status === 'changed' ? 'open' : 'unchanged' });
