@@ -105,6 +105,12 @@ export async function composeProfile(pool: pg.Pool, countries: string[], scopes:
   return { schema_version: SCHEMA_VERSION, mode, scopes, countries: known, unknown_countries: resolved.unknown_countries, data, omitted: resolved.notes };
 }
 
+/** Country-level availability from the data: `full` when ≥90% of the countries carry the scope, `partial` when some do, `none` otherwise; other granularities keep the catalog's statement. */
+function derivedAvailability(declared: Record<string, string>, s: ScopeDef, withData: number, total: number): Record<string, string> {
+  if (!s.applies_to.includes('country') || total === 0) return declared;
+  return { ...declared, country: withData === 0 ? 'none' : withData / total >= 0.9 ? 'full' : 'partial' };
+}
+
 let coverageCache: { at: number; value: unknown } | null = null;
 /** Global metadata: the catalog plus how many countries carry each scope/field (cached for 10 minutes). */
 export async function globalSchema(pool: pg.Pool, now = Date.now()): Promise<unknown> {
@@ -124,10 +130,11 @@ export async function globalSchema(pool: pg.Pool, now = Date.now()): Promise<unk
     if (cheap.includes(s.id)) {
       const { kept, known } = presence(resolved, s, all, 'union');
       const all_ = s.fields.map((fd) => { const p = kept.find((k) => k.path === fd.path); return p ?? { ...fd, present_in: [] as string[], coverage: 0 }; });
-      scopes[s.id] = { ...doc.scopes[s.id], 'x-countries-with-data': known.filter((c) => Object.values(resolved.data[c]![s.id] ?? {}).length).length, properties: toProperties(all_, src) };
+      const withData = known.filter((c) => Object.values(resolved.data[c]![s.id] ?? {}).length).length;
+      scopes[s.id] = { ...doc.scopes[s.id], 'x-countries-with-data': withData, 'x-availability': derivedAvailability(doc.scopes[s.id]['x-availability'], s, withData, all.length), properties: toProperties(all_, src) };
     } else {
       const n = (await pool.query(AGG[s.id]!)).rows[0].n;
-      scopes[s.id] = { ...doc.scopes[s.id], 'x-countries-with-data': n };
+      scopes[s.id] = { ...doc.scopes[s.id], 'x-countries-with-data': n, 'x-availability': derivedAvailability(doc.scopes[s.id]['x-availability'], s, n, all.length) };
     }
   }
   const value = { ...doc, countries_total: all.length, scopes };

@@ -173,6 +173,8 @@ describe.skipIf(!url)('scopes, metadata and profiles', () => {
     const g = (await get('/v1/schema')).json();
     expect(g.countries_total).toBe(3);
     expect(g.scopes.measurement.properties.system['x-coverage']).toBe(1);
+    expect(g.scopes.measurement['x-availability'].country).toBe('full'); // derived from the data: all 3 countries
+    expect(g.scopes.currency['x-availability'].country).toBe('none'); // no currency attributes in the fixture
     expect(g.scopes.measurement.properties.units['x-present-in']).toEqual(['TR', 'US']);
   });
 
