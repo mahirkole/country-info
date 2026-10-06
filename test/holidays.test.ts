@@ -210,9 +210,7 @@ describe('EU holiday files (merged from official-source reading)', () => {
     for (const cc of ['BE', 'LU', 'FI', 'GR', 'SI', 'MT']) {
       expect(compileHolidays(await load(cc), 2026, 2026).every((x) => x.data.verification !== 'verified')).toBe(true);
     }
-    // LT: only the day added by XIII-2415 (2020) was read from the amending act; the rest cites a pre-2020 text of the Labour Code
-    const lt = compileHolidays(await load('LT'), 2026, 2026);
-    expect(lt.filter((x) => x.data.verification === 'verified').map((x) => x.code)).toEqual(['all-souls']);
+    // LT is verified from the e-seimas consolidated Labour Code (art. 123, edition valid 2026-06-07..2026-10-31), see the dedicated test below
   });
   it('Orthodox Easter drives Greek Easter Monday', async () => {
     const r = compileHolidays(await load('GR'), 2026, 2026).find((x) => /easter|pascha|orthodox/i.test(x.code ?? ''));
@@ -243,5 +241,14 @@ describe('IE: St Brigid\'s Day (S.I. No. 50/2022, regs. 4-5, read 2026-10-06)', 
     expect(d(2025)).toBe('2025-02-03'); // 1 Feb 2025 is a Saturday
     expect(d(2030)).toBe('2030-02-01'); // a Friday
     expect(rule.verification).toBe('verified');
+  });
+});
+
+describe('LT: verified from the consolidated Labour Code (e-seimas, read 2026-10-06)', () => {
+  it('all 14 days carry the consolidated-edition source, Easter is stated as the Western tradition', async () => {
+    const lt = compileHolidays((await loadHolidayFiles()).find((f) => f.country === 'LT')!, 2026, 2026);
+    expect(lt).toHaveLength(14);
+    expect(lt.every((x) => x.data.verification === 'verified' && /actualedition/.test(x.data.source.url))).toBe(true);
+    expect(lt.find((x) => x.code === 'easter-monday')!.data.date).toBe('2026-04-06');
   });
 });
