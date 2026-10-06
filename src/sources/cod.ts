@@ -5,6 +5,7 @@ import { fetchBytes, fetchText } from './fetch.js';
 import { parseCsv } from './csv.js';
 import { readXlsx, type Sheet } from './xlsx.js';
 import { isAdminType } from '../taxonomy.js';
+import { loadEvidence, usable, type UpstreamEvidence } from './cod-evidence.js';
 
 const HDX = 'https://data.humdata.org';
 const MAX_LEVEL = 3;
@@ -195,7 +196,7 @@ export async function ackCod(pool: pg.Pool, cacheDir: string, arg: string): Prom
   const want = new Set(arg.split(',').map((x) => x.trim().toUpperCase()).filter(Boolean));
   const done: string[] = [];
   for (const c of meta) {
-    if (!(want.has('ALL') || want.has(c.iso2)) || denyReason(c) || c.levelFull < 1) continue;
+    if (!(want.has('ALL') || want.has(c.iso2)) || denyReason(c) || c.levelFull < 1 || !usable(loadEvidence().find((e) => e.country === c.iso2))) continue;
     await pool.query(
       `INSERT INTO cod_review (country, status, source_sha256, source_text, note) VALUES ($1, 'acked', $2, $3, 'acknowledged')
        ON CONFLICT (country) DO UPDATE SET status = 'acked', source_sha256 = $2, source_text = $3, updated_at = now()`,
@@ -210,7 +211,8 @@ export async function ackCod(pool: pg.Pool, cacheDir: string, arg: string): Prom
  * Countries to load = metadata rows that pass the deny filter, have no national adapter, and whose upstream text was acknowledged
  * (`cod:ack`) with the same sha256 as today. Everything else is recorded in `cod_review` with the reason and not loaded.
  */
-export async function loadCod(cacheDir: string, skip: ReadonlySet<string>, ctx?: CodContext): Promise<EntityInput[]> {
+export async function loadCod(cacheDir: string, skip: ReadonlySet<string>, ctx?: CodContext, evidenceList: UpstreamEvidence[] = loadEvidence()): Promise<EntityInput[]> {
+  const evidence = new Map(evidenceList.map((e) => [e.country, e]));
   const meta = parseCodMetadata(await fetchText(await globalMetadataUrl(cacheDir), 'cod_global_metadata.csv', cacheDir));
   const acked = new Map<string, string>();
   if (ctx?.pool) for (const r of (await ctx.pool.query("SELECT country, source_sha256 FROM cod_review WHERE status = 'acked'")).rows) acked.set(r.country as string, r.source_sha256 as string);
@@ -221,6 +223,7 @@ export async function loadCod(cacheDir: string, skip: ReadonlySet<string>, ctx?:
     if (deny) { await setReview(ctx, c, 'excluded', deny); continue; }
     if (c.levelFull < 1) { await setReview(ctx, c, 'excluded', 'no fully covered administrative level'); continue; }
     if (acked.get(c.iso2) !== sourceSha(c)) { await setReview(ctx, c, 'pending', acked.has(c.iso2) ? 'upstream source text changed since it was reviewed' : 'upstream source not reviewed yet (cod:ack)'); continue; }
+    if (!usable(evidence.get(c.iso2))) { await setNote(ctx, c, `not loaded: upstream owner's licence not established (docs/licenses/cod-upstream.json: ${evidence.get(c.iso2)?.verdict ?? 'no entry'})`); continue; }
     try {
       const pkg = (JSON.parse(await fetchText(`${HDX}/api/3/action/package_show?id=cod-ab-${c.iso3}`, `cod_pkg_${c.iso3}.json`, cacheDir)) as { result?: CkanPackage }).result;
       if (pkg?.license_id !== 'cc-by-igo') throw new Error(`package license is ${pkg?.license_id ?? 'missing'}, not cc-by-igo`);

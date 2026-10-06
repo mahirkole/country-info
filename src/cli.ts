@@ -12,6 +12,7 @@ import { allTargets, licenseWatchTargets, syncTargetMetadata } from './targets.j
 import { dueSourceIds, runRefresh, type RunResult } from './refresh.js';
 import { ackLicense, checkLicenses } from './license-watch.js';
 import { ackCod } from './sources/cod.js';
+import { verifyAll } from './sources/cod-evidence.js';
 import { loadHolidaysWithFeeds, HOLIDAYS_SOURCE } from './holidays/load.js';
 import { compileHolidays } from './holidays/rules.js';
 import { diffHolidays, fetchNager } from './holidays/check.js';
@@ -159,6 +160,22 @@ async function main() {
       }
       break;
     }
+    case 'cod-evidence': {
+      // cod-evidence [--write]: second pass over docs/licenses/cod-upstream.json (page still carries the quote? licensing text unchanged?).
+      // --write stores fingerprints of verified entries and downgrades entries whose quote is not found to "unread".
+      const write = process.argv.includes('--write');
+      const res = await verifyAll(config.cacheDir, write);
+      for (const r of res) console.log(`${r.country} ${r.verdict.padEnd(6)} quote:${r.quoteFound ? 'found' : 'MISSING'} ${r.changed ? 'PAGE-CHANGED ' : ''}${r.error ?? ''}`);
+      const drift = res.filter((r) => r.verdict !== 'unread' && (!r.quoteFound || r.changed));
+      if (!write && drift.length) {
+        await migrate(pool);
+        // A country whose evidence no longer holds is sent back to review: it is not loaded again until the page is re-read.
+        await pool.query("UPDATE cod_review SET status = 'pending', note = 'upstream licence page changed or quote missing (cod-evidence)', updated_at = now() WHERE country = ANY($1)", [drift.map((r) => r.country)]);
+        process.exitCode = 1;
+        await notify(config.notifyUrl, ['country-info COD upstream licence watch', ...drift.map((r) => `⚖️ ${r.country}: ${r.error ?? (r.changed ? 'licensing text changed' : 'quote missing')}`)].join('\n'));
+      }
+      break;
+    }
     case 'check-holiday-law': {
       // check-holiday-law: fingerprints of the legal texts cited by verified holiday rules; exit 1 on a confirmed change.
       await migrate(pool);
@@ -282,7 +299,7 @@ async function main() {
       return; // keep pool open
     }
     default:
-      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | cod-ack <CC,CC|all> | check-holiday-law | holiday-law-ack <url|all> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | enrich-attributes | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | prune | notify [text] | deliver | serve');
+      console.error('usage: cli.ts migrate | ingest | ingest-gisco | ingest-holidays [from] [to] | refresh [--due|--source ids] [--force] [--dry-run] | check-licenses [id] | license-ack <id> | cod-ack <CC,CC|all> | cod-evidence [--write] | check-holiday-law | holiday-law-ack <url|all> | link | enrich-wikidata [--spec s] [--limit n] | enrich-cldr | enrich-attributes | ingest-national <CC|all> | check-holidays [year] | export [snapshotId] [--commercial] | publish [--profile p] [--rollback id] | digest | prune | notify [text] | deliver | serve');
       process.exitCode = 1;
   }
   await pool.end();

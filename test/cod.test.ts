@@ -75,3 +75,36 @@ describe('COD-AB entities', () => {
     expect(e.every((x) => isAdminType(x.data.type as string))).toBe(true);
   });
 });
+
+import { parseEvidence, usable, verifyEvidence, pageText } from '../src/sources/cod-evidence.js';
+
+const EV = (o: Record<string, unknown> = {}) => ({ country: 'KE', publisher: 'IEBC', licence_name: 'x', url: 'https://example.org/t', quote: 'may be used for any purpose, including commercial', verdict: 'green', checked_on: '2026-10-06', terms: 'credit IEBC', ...o });
+
+describe('COD-AB upstream licence evidence', () => {
+  it('validates the evidence file shape', () => {
+    expect(parseEvidence(JSON.stringify([EV()]))).toHaveLength(1);
+    expect(() => parseEvidence(JSON.stringify([EV(), EV()]))).toThrow(/duplicate/);
+    expect(() => parseEvidence(JSON.stringify([EV({ verdict: 'yes' })]))).toThrow(/verdict/);
+    expect(() => parseEvidence(JSON.stringify([EV({ quote: '' })]))).toThrow(/quote is required/);
+    expect(() => parseEvidence(JSON.stringify([EV({ url: 'ftp://x' })]))).toThrow(/http/);
+    expect(parseEvidence(JSON.stringify([{ country: 'XX', verdict: 'unread' }]))[0]!.verdict).toBe('unread');
+  });
+  it('only green/amber evidence makes a country loadable', () => {
+    const [g, a, r, u] = ['green', 'amber', 'red', 'unread'].map((v) => parseEvidence(JSON.stringify([EV({ verdict: v })]))[0]);
+    expect([usable(g), usable(a), usable(r), usable(u), usable(undefined)]).toEqual([true, true, false, false, false]);
+  });
+  it('second pass: finds the quote through markup/whitespace/quote differences and detects a changed page', async () => {
+    const e = parseEvidence(JSON.stringify([EV()]))[0]!;
+    const page = '<html><body><p>Data  may be used for any purpose,\n including <b>commercial</b> use.</p></body></html>';
+    const first = await verifyEvidence(e, async () => page.replace('any purpose', 'research'));
+    expect(first).toMatchObject({ quoteFound: false }); // a quote that is not on the page is never accepted
+    const e2 = { ...e, quote: 'may be used for any purpose, including commercial' };
+    const ok = await verifyEvidence(e2, async () => page);
+    expect(ok.quoteFound).toBe(true);
+    const stored = { ...e2, page_sha256: ok.fingerprint! };
+    expect((await verifyEvidence(stored, async () => page)).changed).toBe(false);
+    expect((await verifyEvidence(stored, async () => page.replace('any purpose', 'non-commercial licence only'))).changed).toBe(true);
+    expect((await verifyEvidence(e2, async () => { throw new Error('403'); })).error).toBe('403');
+    expect(pageText('a&nbsp;&nbsp;“b”')).toBe('a "b"');
+  });
+});
