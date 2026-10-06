@@ -70,6 +70,8 @@ export interface AttributeDiff {
   /** Country → attribute groups whose content changed (added, changed or removed). */
   changed: Record<string, string[]>;
   localeChanges: number;
+  /** Snapshot of the change-feed entries recorded for the same load, when there is one. */
+  snapshotId?: number | null;
 }
 
 /** Release note for a change in the CLDR-derived country attributes (no snapshot: these are not part of the change feed). */
@@ -97,12 +99,12 @@ export async function createAttributeReleaseNote(db: pg.Pool, d: AttributeDiff):
   const cmap = Object.fromEntries(countries.map((c) => [c, d.changed[c]!.length]));
   const r = await db.query(
     `INSERT INTO release_notes (snapshot_id, kind, source_id, vintage, reason, title, body_md, totals, countries, public, highlight)
-     VALUES (NULL, 'attributes', $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
-    [d.source, d.vintageTo, vintage ? `vintage_change: ${d.vintageTo}` : null, title, body, JSON.stringify({ inserted: 0, updated: countries.length, deleted: 0 }), JSON.stringify(cmap), isPublic, vintage],
+     VALUES ($10, 'attributes', $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+    [d.source, d.vintageTo, vintage ? `vintage_change: ${d.vintageTo}` : null, title, body, JSON.stringify({ inserted: 0, updated: countries.length, deleted: 0 }), JSON.stringify(cmap), isPublic, vintage, d.snapshotId ?? null],
   );
   const id = Number(r.rows[0].id);
   if (isPublic) {
-    await enqueueEvent(db, 'release.published', { release_id: id, snapshot_id: null, kind: 'attributes', source_ids: [d.source], vintage: d.vintageTo, reason: vintage ? `vintage_change: ${d.vintageTo}` : null, title, totals: { inserted: 0, updated: countries.length, deleted: 0 }, changes_by_country: cmap, release_url: `/v1/releases/${id}` }, { countries });
+    await enqueueEvent(db, 'release.published', { release_id: id, snapshot_id: d.snapshotId ?? null, kind: 'attributes', source_ids: [d.source], vintage: d.vintageTo, reason: vintage ? `vintage_change: ${d.vintageTo}` : null, title, totals: { inserted: 0, updated: countries.length, deleted: 0 }, changes_by_country: cmap, release_url: `/v1/releases/${id}` }, { countries });
   }
   return id;
 }

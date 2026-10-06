@@ -2,6 +2,7 @@ import type pg from 'pg';
 import { fetchText } from './fetch.js';
 import { CLDR_BASE } from './cldr.js';
 import { createAttributeReleaseNote, type AttributeDiff } from '../release-notes.js';
+import { attributeChanges, recordAttributeChanges } from '../attribute-changes.js';
 
 /** CLDR files that are keyed by territory; `001` is the world default. */
 type Terr<T> = Record<string, T>;
@@ -240,10 +241,13 @@ export async function enrichCldrAttributes(pool: pg.Pool, cacheDir: string, curr
   let note: number | null = null;
   if (oldAttrs.length) {
     const codeOf = new Map(countries.map((c) => [c.id, c.code]));
-    const changed = diffAttributes(oldAttrs, rows.map((r) => ({ code: codeOf.get(r.id)!, grp: r.grp, data: r.data })));
+    const ch = attributeChanges(oldAttrs, rows.map((r) => ({ code: codeOf.get(r.id)!, grp: r.grp, data: r.data })));
+    const changed = Object.fromEntries(ch.map((c) => [c.code, c.groups]));
+    const vintageChange = oldAttrs[0]!.vintage !== null && oldAttrs[0]!.vintage !== vintage;
+    const snapshotId = await recordAttributeChanges(pool, 'cldr', ch, vintageChange ? `vintage_change: ${vintage}` : undefined).catch((e) => { console.error('attribute changes:', (e as Error).message); return null; });
     const localeChanges = Object.keys(diffAttributes(oldLocales, [...formats].map(([code, data]) => ({ code, grp: 'formats', data })))).length;
     const src = (await pool.query(`SELECT authority, license_verdict FROM sources WHERE id = 'cldr'`)).rows[0];
-    const diff: AttributeDiff = { source: 'cldr', authority: src?.authority ?? 'Unicode CLDR', verdict: src?.license_verdict ?? null, vintageFrom: oldAttrs[0]!.vintage, vintageTo: vintage, changed, localeChanges };
+    const diff: AttributeDiff = { source: 'cldr', authority: src?.authority ?? 'Unicode CLDR', verdict: src?.license_verdict ?? null, vintageFrom: oldAttrs[0]!.vintage, vintageTo: vintage, changed, localeChanges, snapshotId };
     note = await createAttributeReleaseNote(pool, diff).catch((e) => { console.error('release note:', (e as Error).message); return null; });
   }
   return { attributes: rows.length, locales: formats.size, vintage, release_note: note };

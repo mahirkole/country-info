@@ -15,7 +15,7 @@ export interface IngestResult {
 }
 
 const CHUNK = 2000;
-const ADVISORY_LOCK = 727001;
+export const ADVISORY_LOCK = 727001;
 
 /** Key-sorted JSON so equal content always hashes equal. */
 export function canonical(v: unknown): string {

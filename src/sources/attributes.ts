@@ -2,7 +2,7 @@ import type pg from 'pg';
 import { fetchText } from './fetch.js';
 import { sparql, type Binding } from './wikidata.js';
 import { createAttributeReleaseNote } from '../release-notes.js';
-import { diffAttributes } from './cldr-attrs.js';
+import { attributeChanges, recordAttributeChanges } from '../attribute-changes.js';
 
 /** Country attributes from sources other than CLDR: time zones (IANA tz database), telephony (libphonenumber), driving side (Wikidata). */
 export const TZ_BASE = 'https://data.iana.org/time-zones/tzdb';
@@ -147,8 +147,11 @@ async function replaceAttributes(pool: pg.Pool, source: AttrSourceId, rows: Row[
   }
   let note: number | null = null;
   if (old.length) {
-    const changed = diffAttributes(old, rows.map((r) => ({ code: codeOf.get(r.id)!, grp: r.grp, data: r.data })));
-    note = await createAttributeReleaseNote(pool, { source, authority: ATTR_SOURCES[source].authority, verdict: ATTR_SOURCES[source].verdict, vintageFrom: old[0]!.vintage, vintageTo: vintage, changed, localeChanges: 0 }).catch((e) => { console.error('release note:', (e as Error).message); return null; });
+    const ch = attributeChanges(old, rows.map((r) => ({ code: codeOf.get(r.id)!, grp: r.grp, data: r.data })));
+    const changed = Object.fromEntries(ch.map((c) => [c.code, c.groups]));
+    const vintageChange = old[0]!.vintage !== null && old[0]!.vintage !== vintage;
+    const snapshotId = await recordAttributeChanges(pool, source, ch, vintageChange ? `vintage_change: ${vintage}` : undefined).catch((e) => { console.error('attribute changes:', (e as Error).message); return null; });
+    note = await createAttributeReleaseNote(pool, { source, authority: ATTR_SOURCES[source].authority, verdict: ATTR_SOURCES[source].verdict, vintageFrom: old[0]!.vintage, vintageTo: vintage, changed, localeChanges: 0, snapshotId }).catch((e) => { console.error('release note:', (e as Error).message); return null; });
   }
   return { rows: rows.length, release_note: note };
 }
