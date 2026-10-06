@@ -48,6 +48,7 @@ Kod tarafında konteynerden yapılabilen işler bitti; aşağıdakiler karar, er
 Kaynaklar: `docs/ROADMAP.md`, `docs/PROGRESS.md`, `docs/OPERATIONS.md`, `/root/.claude/plans/faz10-kalanlar.md`.
 
 ## 5. Faz 12/13 (COD-AB) ile gelen kararlar
+- **BE resmî bölünme (karar):** BeSt Address (CC BY 4.0, 312 MB/yenileme) + Flaman VRBG WFS ile belediyeler ve Flaman düzeyleri alınabilir ama il/bölge hiyerarşisi için NIS-önek eşleme tablosu gerekir (elle liste = otomasyon kuralına aykırı) ve Wikidata katmanı zaten aynı hiyerarşiyi veriyor. İsterseniz yalnızca belediye düzeyini resmî kaynaktan ekleyip hiyerarşiyi Wikidata'dan alırız; söylemezseniz BE Wikidata'da kalır.
 - **Üst veri sahibi lisansları (44 ülke ⚪/🔴):** konteynerden okunamadı (Cloudflare, TLS, proxy) veya yalnızca «tüm hakları saklıdır» var. Tarayıcıdan okuyabileceğiniz ülkelerin (ID, PH, TH, KE, ET, GH, CR, DO, AF, LA, MN, MV, RO, HT, PE, BO, EC …) kurum telif/kullanım sayfalarını bana iletirseniz (veya erişimi olan bir ortamda `npm run cod:evidence`) kanıt kaydını tamamlayıp ülkeleri geri alırım. Yazılı izin istemeyeceğiniz kararı geçerli.
 - **BR (IBGE) lisansı:** `docs/licenses/nat-br.md` açık; IBGE kendi lisansı okunursa BR COD-AB'den (veya doğrudan IBGE'den) eklenir. Şu an dışarıda.
 - **Anlaşmazlık bölgesi politikası (PS, UA, GE, MA…):** karar verilene kadar PS/UA/GE ack'lenmedi.

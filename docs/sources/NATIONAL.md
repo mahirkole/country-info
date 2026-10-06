@@ -55,7 +55,7 @@ Motor: `src/sources/wikidata-divisions.ts`, ülke yapılandırması `src/sources
 | LU | canton (12), commune (100) | 112 |
 | EE | maakond (15), vald/linn (78) | 93 |
 | IE | local authority (31) | 31 |
-| SK | kraj (8), okres (79), obec/mesto/mestská časť (2.928) | 3.015 — Register adries, CC0 (nat-sk) |
+| SK (resmî) | kraj (8), okres (79), obec/mesto/mestská časť/vojenský obvod (2.928) | 3.015 — Register adries (nat-sk, CC0); aşağıdaki Wikidata SK satırı topluluk çapraz referansı olarak kalır, resmî katman önceliklidir |
 | CY | επαρχία (6), δήμος/κοινότητα (613) | 619 |
 | DK | region (5), landsdel (11), kommune (99) | 115 |
 | FI | maakunta (19), kunta (308) | 327 |
