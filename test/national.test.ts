@@ -453,3 +453,20 @@ describe('GeoPackage reader and PT islands', () => {
     expect(e.find((x) => x.id === 'div:PT:fr-310101')!.parent_id).toBe('div:PT:mn-3101');
   });
 });
+
+import { parseLuxembourg } from '../src/sources/national/lu.js';
+describe('LU adapter (STATEC LAU workbook)', () => {
+  const header = [['NUTS 3 - CODE REGION', 'LAU1 - CODE CANTON', 'CANTON', 'LAU2 - CODE COMMUNE', 'COMMUNE'], ['', '', '', 'LAU2 - MUNICIPALITY CODE', 'MUNICIPALITY']];
+  const rows = (n: number) => Array.from({ length: n }, (_, i) => ['LU000', String((i % 12) + 1).padStart(2, '0'), `Canton ${(i % 12) + 1}`, String((i % 12 + 1) * 100 + Math.floor(i / 12) + 1).padStart(4, '0'), `Commune ${i}`]);
+  it('finds the current sheet by its header, builds canton > commune and checks the counts', () => {
+    const { entities, asOf } = parseLuxembourg([{ name: 'Index', rows: [['x']] }, { name: 'LU_SEP 2023', rows: [...header, ...rows(100), ['', '', '', '', '']] }, { name: 'LU_OLD', rows: [...header, ...rows(102)] }]);
+    expect(asOf).toBe('LU_SEP 2023');
+    expect(entities.filter((e) => e.data.type === 'canton')).toHaveLength(12);
+    expect(entities.filter((e) => e.data.type === 'commune')).toHaveLength(100);
+    expect(entities.find((e) => e.id === 'div:LU:com-0101')).toMatchObject({ parent_id: 'div:LU:can-01', name: 'Commune 0' });
+  });
+  it('fails loudly on a changed layout or wrong counts', () => {
+    expect(() => parseLuxembourg([{ name: 'Index', rows: [] }])).toThrow(/layout changed/);
+    expect(() => parseLuxembourg([{ name: 'S', rows: [...header, ...rows(60)] }])).toThrow(/layout changed/);
+  });
+});

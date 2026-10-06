@@ -31,6 +31,7 @@ Her dosya `TEMPLATE.md` yapısındadır; alıntılar yayıncı sayfasından okun
 | nat-ie | 🟢 | CC BY 4.0; veri ince (31 il/şehir, resmi kod yok) |
 | nat-pt | 🟢 | DGT CAOP CC BY 4.0; freguesia kodu INE'ye ait |
 | nat-cz | 🟢 | ČÚZK/ČSÚ CC BY 4.0 (atıf + metaveri + değişiklik belirtme) |
+| **nat-lu** | 🟢 | STATEC LAU kodları (data.public.lu): veri seti CC0; 12 kanton + 100 komün; XLSX için ayrı lisans cümlesi yok |
 | **libaddressinput** | 🟢 | Veri CC BY 4.0 (hizmet sayfası + README okundu); posta kodu deseni/örnekleri ve adres düzeni; hizmet ToS okunamadı |
 | **iana-tz** | 🟢 | tzdb kamu malı (LICENSE ve zone.tab başlığı okundu); ülke saat dilimleri (`zone.tab`, "deprecated" ama ülke başına tek satır) |
 | **libphonenumber** | 🟢 | Apache-2.0 (dosya başlığı + LICENSE 4. madde okundu, NOTICE yok); yalnızca arama kodu/önekler; atıf metni lisans URL'si ve değişiklik notunu taşır |

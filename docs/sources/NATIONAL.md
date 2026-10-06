@@ -61,7 +61,7 @@ Yüklenmeyenler (2026-10-05 keşif: sınıf bulundu ama sayı resmiyle uymuyor /
 ## AB27 LAU boşluğu — araştırma sonuçları (2026-10-05, alt-ajan raporları + üretici doğrulaması)
 - **Yüklendi:** LV, SI, HU, GR (yukarıdaki tablo), PL.
 - **EE:** resmî Statistikaamet EHAK sınıflandırması yayıncı beyanıyla **CC BY-SA 4.0** (ShareAlike) → satış paketine uygunluğu hukuki karar, resmî kaynak yüklenmedi; Wikidata katmanı yüklendi (sayı kapısı EHAK'ın 78'ine göre).
-- **LU:** ACT CSV'si yayıncı lisansı okunamadığı için alınmadı; bunun yerine Wikidata katmanı (12 kanton + 100 komün, resmî 100) yüklendi.
+- **LU:** resmî kaynak **nat-lu** (STATEC LAU kodları XLSX, data.public.lu CC0; 12 kanton + 100 komün, dosyanın kendi sayım beyanıyla uyumlu; docs/licenses/nat-lu.md) — 2026-10-06'da eklendi; Wikidata katmanı (`wd-lu`) öncelik kuralıyla ikinci sırada kalır.
 - **IE:** CSO PxStat (31 yerel yönetim, CC BY 4.0 yayıncı beyanı) ama resmi kısa kod/üst birim yok → yüklenmedi.
 - **CY:** CYSTAT LAU2 listesi 615 kayıt, 2024 reformu öncesi; lisans yalnız portal meta verisi → yüklenmedi.
 - **LT, MT:** resmî siteler konteynerden erişilemedi; LT Wikidata katmanıyla yüklendi (60), MT yüklenmedi.
