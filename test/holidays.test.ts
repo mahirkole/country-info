@@ -207,9 +207,14 @@ describe('EU holiday files (merged from official-source reading)', () => {
     expect(compileHolidays(f, 2024, 2024).some((x) => x.code === 'great-prayer-day')).toBe(false);
   });
   it('stale or memory-based sources are never marked verified', async () => {
-    for (const cc of ['BE', 'LU', 'FI', 'GR']) {
+    for (const cc of ['BE', 'GR']) {
       expect(compileHolidays(await load(cc), 2026, 2026).every((x) => x.data.verification !== 'verified')).toBe(true);
     }
+    // LU/FI: only the days whose DATE the read official text states are verified (LU Code du travail L. 232-2 gives 1 May and 23 June; FI Laki 388/1937 gives 6 Dec);
+    // name-only entries (Easter/Ascension/Whit Monday offsets, Assumption, All Saints, Christmas, Europe Day…) stay unverified.
+    const verified = async (cc: string) => compileHolidays(await load(cc), 2026, 2026).filter((x) => x.data.verification === 'verified').map((x) => x.code).sort();
+    expect(await verified('LU')).toEqual(['labour-day', 'national-day']);
+    expect(await verified('FI')).toEqual(['independence-day']);
     // LT is verified from the e-seimas consolidated Labour Code (art. 123, edition valid 2026-06-07..2026-10-31), see the dedicated test below
   });
   it('Orthodox Easter drives Greek Easter Monday', async () => {

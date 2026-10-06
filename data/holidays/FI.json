@@ -168,9 +168,11 @@
     }
    },
    "source": {
-    "citation": "Not read; statutory basis not located"
+    "citation": "Laki itsenäisyyspäivän viettämisestä yleisenä juhla- ja vapaapäivänä 388/1937, 1 §: « on joulukuun kuudetta päivää, jota tässä laissa sanotaan itsenäisyyspäiväksi, vuosittain vietettävä yleisenä juhla- ja vapaapäivänä » (Finlex ajantasainen versio; Finlex'in ajantasaiset tekstit eivät ole virallisia, alkuperäinen on Suomen säädöskokoelmassa)",
+    "url": "https://opendata.finlex.fi/finlex/avoindata/v1/akn/fi/act/statute-consolidated/1937/388/fin@",
+    "checked_on": "2026-10-06"
    },
-   "verification": "unverified"
+   "verification": "verified"
   },
   {
    "id": "christmas-day",
