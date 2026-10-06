@@ -90,3 +90,5 @@ Anahtar oluşturma: `POST /v1/api-keys` (Bearer `ADMIN_TOKEN`). Güncelleme: `gi
 
 ## API anahtarı planları ve kota
 `POST /v1/api-keys {name, plan?, rate_per_min?, monthly_quota?, export_profile?, export_countries?}`: `plan` yalnızca etikettir (faturalama kararı ürün tarafındadır), `monthly_quota` takvim ayı başına istek sınırıdır (boş = sınırsız). Aşılınca `429 {error: "quota_exceeded", monthly_quota, resets_at}` + `Retry-After`; reddedilen istek sayılmaz. Her yanıtta `X-Quota-Limit` / `X-Quota-Remaining`. Sayım `api_usage` tablosundan (15 sn önbellekli) artı bu süreçte henüz yazılmamış istekler; birden çok API örneğinde sayım yaklaşıktır (örnek başına en çok ~10 sn'lik yazılmamış istek farkı). Dakikalık hız sınırı kotadan bağımsız çalışır.
+
+**Golden denetim:** `GOLDEN_DATABASE_URL=<yüklü veritabanı> npx vitest run test/golden.test.ts` (varsayılan olarak atlanır): kaynak satır bantları (`sources.expected_*`), öznitelik kapsamı (parser sözleşme sınırları) ve doğrulanmış tatillerde kaynak/okuma tarihi. Hafızadan sayı içermez.

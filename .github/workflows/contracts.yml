@@ -24,3 +24,4 @@ jobs:
       - run: npm ci
       - run: npm run check:sources
       - run: npm run check:licenses
+      # The golden checks need a fully loaded database (GOLDEN_DATABASE_URL); they run on the production-like host, see docs/OPERATIONS.md.
